@@ -6,8 +6,7 @@ Maintainer: Yulong Niu <yulong.niu@hotmail.com>
 Depends:
     R (>= 3.5.0)
 Imports:
-    magrittr,
-    readr
+    magrittr
 Suggests:
     testthat,
     BiocStyle,

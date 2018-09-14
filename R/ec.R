@@ -10,23 +10,55 @@
 ##'
 ##' ec <- system.file('extdata', 'example.ec', package = 'RNASeqEM') %>% read_ec
 ##' @author Yulong Niu \email{yulong.niu@@hotmail.com}
-##' @importFrom readr read_tsv
-##' @importFrom dplyr select
 ##' @export
 ##'
 read_ec <- function(ecpath) {
 
   ecMat <- ecpath %>%
-    read_tsv(col_names = c('ec', 't'))
+    read.table(stringsAsFactor = FALSE)
 
-  ecList <- ecMat %>%
-    select(t) %>%
-    unlist %>%
-    strsplit(',', fixed = TRUE)
-
-  names(ecList) <- ecMat %>%
-    select(ec) %>%
-    unlist
+  ecList <- apply(ecMat, 1, function(x) {
+    eachec <- list(ec = x[1] %>% as.integer,
+                   t = x[2] %>%
+                     strsplit(split = ',', fixed = TRUE) %>%
+                     unlist(use.names = FALSE) %>%
+                     as.integer)
+    })
 
   return(ecList)
+}
+
+##' Find equivalence class clusters
+##'
+##' Cluster ec with common transcripts.
+##'
+##' @title Cluster equivalence class
+##' @param ec A \code{list} of equivalence class
+##' @return A \code{list}. Each element is a ec cluster.
+##' @examples
+##' require('magrittr')
+##'
+##' ec <- system.file('extdata', 'example.ec', package = 'RNASeqEM') %>% read_ec
+##' Clusterec(ec)
+##' @author Yulong Niu \email{yulong.niu@@hotmail.com}
+##' @export
+##'
+Clusterec <- function(ec) {
+
+  startec <- 
+}
+
+
+##' .. content for \description{} (no empty lines) ..
+##'
+##' .. content for \details{} ..
+##' @title 
+##' @param startec 
+##' @param ec 
+##' @return 
+##' @examples 
+##' @author Yulong Niu \email{yulong.niu@@hotmail.com}
+##' @export
+##' 
+cluster1st_ <- function(startec, ec) {
 }

@@ -10,12 +10,14 @@
 ##'
 ##' ec <- system.file('extdata', 'example.ec', package = 'RNASeqEM') %>% read_ec
 ##' @author Yulong Niu \email{yulong.niu@@hotmail.com}
+##' @importFrom utils read.table
+##' @importFrom magrittr %>%
 ##' @export
 ##'
 read_ec <- function(ecpath) {
 
   ecMat <- ecpath %>%
-    read.table(stringsAsFactor = FALSE)
+    read.table(stringsAsFactors = FALSE)
 
   ecList <- apply(ecMat, 1, function(x) {
     eachec <- list(ec = x[1] %>% as.integer,
@@ -41,6 +43,7 @@ read_ec <- function(ecpath) {
 ##' ec <- system.file('extdata', 'example.ec', package = 'RNASeqEM') %>% read_ec
 ##' Clusterec(ec)
 ##' @author Yulong Niu \email{yulong.niu@@hotmail.com}
+##' @importFrom magrittr %<>% %>%
 ##' @export
 ##'
 Clusterec <- function(ec) {
@@ -95,7 +98,7 @@ Clusterec <- function(ec) {
 ##' @param l A \code{list}. Each element is a vector.
 ##' @return A \code{list}.
 ##' @author Yulong Niu \email{yulong.niu@@hotmail.com}
-##' @importFrom magrittr %<>%
+##' @importFrom magrittr %>%
 ##' @keywords internal
 ##'
 collapseL_ <- function(l, logidx) {

@@ -34,7 +34,7 @@ read_ec <- function(ecpath) {
 ##'
 ##' @title Cluster equivalence class
 ##' @param ec A \code{list} of equivalence class
-##' @return A \code{list}. Each element is a ec cluster.
+##' @return A \code{list}. Each element is an ec cluster.
 ##' @examples
 ##' require('magrittr')
 ##'
@@ -45,20 +45,60 @@ read_ec <- function(ecpath) {
 ##'
 Clusterec <- function(ec) {
 
-  startec <- 
+  eccluster <- list()
+
+  ## search seed
+  ec1st <- ec[[1]]$ec
+  t1st <- ec[[1]]$t
+
+  ## search space
+  ecleft <- ec[-1]
+  ecs <- lapply(ecleft, `[[`, 1)
+  ts <- lapply(ecleft, `[[`, 2)
+
+  while(TRUE) {
+
+    ## break point
+    if (length(ecs) == 0) {
+      break
+    } else {}
+
+    ## check common t
+    eachlog <- sapply(ts, function(x) {
+      return(sum(t1st %in% x) > 0)
+    })
+
+    ## update ecs and ts
+    if (sum(eachlog) > 0) {
+      ec1st <- ecs %>% collapseL_(eachlog) %>% c(ec1st)
+      t1st <- ts %>% collapseL_(eachlog) %>% c(t1st) %>% unique
+      ecs %<>% `[`(!eachlog)
+      ts %<>% `[`(!eachlog)
+    } else {
+      eccluster[[length(eccluster) + 1]] <- list(ec = ec1st, t = t1st)
+      ec1st <- ecs[[1]]
+      t1st <- ts[[1]]
+      ecs %<>% `[`(-1)
+      ts %<>% `[`(-1)
+    }
+  }
+
+  return(eccluster)
 }
 
 
-##' .. content for \description{} (no empty lines) ..
+##' Cluster EM internal functions.
 ##'
-##' .. content for \details{} ..
-##' @title 
-##' @param startec 
-##' @param ec 
-##' @return 
-##' @examples 
+##' Collapse list.
+##'
+##' @title Internal functions for cluster EM
+##' @param l A \code{list}. Each element is a vector.
+##' @return A \code{list}.
 ##' @author Yulong Niu \email{yulong.niu@@hotmail.com}
-##' @export
-##' 
-cluster1st_ <- function(startec, ec) {
+##' @importFrom magrittr %<>%
+##' @keywords internal
+##'
+collapseL_ <- function(l, logidx) {
+  res <- l[logidx] %>% unlist
+  return(res)
 }

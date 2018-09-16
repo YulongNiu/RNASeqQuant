@@ -4,28 +4,21 @@
 ##'
 ##' @title Standard read in ec files
 ##' @param ecpath The path of ec files.
-##' @return A \code{list} each element is combined transcript IDs
+##' @return A \code{list}. 1st element is ec, and 2nd element is transcript ID.
 ##' @examples
 ##' require('magrittr')
 ##'
 ##' ec <- system.file('extdata', 'example.ec', package = 'RNASeqEM') %>% read_ec
 ##' @author Yulong Niu \email{yulong.niu@@hotmail.com}
 ##' @importFrom utils read.table
-##' @importFrom magrittr %>%
 ##' @export
 ##'
 read_ec <- function(ecpath) {
 
-  ecMat <- ecpath %>%
-    read.table(stringsAsFactors = FALSE)
+  ecMat <- read.table(ecpath, stringsAsFactors = FALSE)
 
-  ecList <- apply(ecMat, 1, function(x) {
-    eachec <- list(ec = x[1] %>% as.integer,
-                   t = x[2] %>%
-                     strsplit(split = ',', fixed = TRUE) %>%
-                     unlist(use.names = FALSE) %>%
-                     as.integer)
-    })
+  ecList <- list(ecs = ecMat[, 1],
+                 ts = strsplit(ecMat[, 2], split = ',', fixed = TRUE))
 
   return(ecList)
 }
@@ -51,13 +44,12 @@ Clusterec <- function(ec) {
   eccluster <- list()
 
   ## search seed
-  ec1st <- ec[[1]]$ec
-  t1st <- ec[[1]]$t
+  ec1st <- ec$ecs[1]
+  t1st <- ec$ts[[1]]
 
   ## search space
-  ecleft <- ec[-1]
-  ecs <- lapply(ecleft, `[[`, 1)
-  ts <- lapply(ecleft, `[[`, 2)
+  ecs <- ec$ecs[-1]
+  ts <- ec$ts[-1]
 
   while(TRUE) {
 
@@ -73,13 +65,13 @@ Clusterec <- function(ec) {
 
     ## update ecs and ts
     if (sum(eachlog) > 0) {
-      ec1st <- ecs %>% collapseL_(eachlog) %>% c(ec1st)
+      ec1st %<>% c(ecs[eachlog])
       t1st <- ts %>% collapseL_(eachlog) %>% c(t1st) %>% unique
       ecs %<>% `[`(!eachlog)
       ts %<>% `[`(!eachlog)
     } else {
       eccluster[[length(eccluster) + 1]] <- list(ec = ec1st, t = t1st)
-      ec1st <- ecs[[1]]
+      ec1st <- ecs[1]
       t1st <- ts[[1]]
       ecs %<>% `[`(-1)
       ts %<>% `[`(-1)

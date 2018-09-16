@@ -10,7 +10,7 @@ read_ec(ecpath)
 \item{ecpath}{The path of ec files.}
 }
 \value{
-A \code{list} each element is combined transcript IDs
+A \code{list}. 1st element is ec, and 2nd element is transcript ID.
 }
 \description{
 Read in equivalence class

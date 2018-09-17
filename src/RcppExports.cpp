@@ -6,14 +6,17 @@
 
 using namespace Rcpp;
 
-// SumCppPara
-arma::vec SumCppPara(const Rcpp::List x);
-RcppExport SEXP _RNASeqEM_SumCppPara(SEXP xSEXP) {
+// EMSingle
+arma::vec EMSingle(arma::vec& rho, const std::vector<arma::vec>& effectlen, const std::vector<arma::uvec>& ts, arma::uvec& ecnum);
+RcppExport SEXP _RNASeqEM_EMSingle(SEXP rhoSEXP, SEXP effectlenSEXP, SEXP tsSEXP, SEXP ecnumSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Rcpp::List >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(SumCppPara(x));
+    Rcpp::traits::input_parameter< arma::vec& >::type rho(rhoSEXP);
+    Rcpp::traits::input_parameter< const std::vector<arma::vec>& >::type effectlen(effectlenSEXP);
+    Rcpp::traits::input_parameter< const std::vector<arma::uvec>& >::type ts(tsSEXP);
+    Rcpp::traits::input_parameter< arma::uvec& >::type ecnum(ecnumSEXP);
+    rcpp_result_gen = Rcpp::wrap(EMSingle(rho, effectlen, ts, ecnum));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -42,7 +45,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_RNASeqEM_SumCppPara", (DL_FUNC) &_RNASeqEM_SumCppPara, 1},
+    {"_RNASeqEM_EMSingle", (DL_FUNC) &_RNASeqEM_EMSingle, 4},
     {"_RNASeqEM_Strsplit", (DL_FUNC) &_RNASeqEM_Strsplit, 2},
     {"_RNASeqEM_SplitEC", (DL_FUNC) &_RNASeqEM_SplitEC, 1},
     {NULL, NULL, 0}

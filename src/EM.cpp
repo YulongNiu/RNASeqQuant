@@ -11,44 +11,45 @@ using namespace std;
 
 // [[Rcpp::depends(RcppArmadillo, RcppParallel)]]
 
-struct SumRoot : public Worker
+struct ExpectEC : public Worker
 {
-  std::vector<arma::vec> idx;
-  arma::vec& output;
+  arma::vec& rho;
+  const std::vector<arma::vec>& effectlen;
+  const std::vector<arma::uvec>& ts;
+  arma::uvec& ecnum;
+  arma::vec& newrho;
 
-  SumRoot(std::vector<arma::vec> idx,
-          arma::vec& output)
-    : idx(idx), output(output) {}
+  ExpectEC(arma::vec& rho,
+           const std::vector<arma::vec>& effectlen,
+           const std::vector<arma::uvec>& ts,
+           arma::uvec& ecnum,
+           arma::vec& newrho)
+    : rho(rho), effectlen(effectlen), ts(ts), ecnum(ecnum), newrho(newrho) {}
 
   void operator()(std::size_t begin, std::size_t end) {
 
     for (std::size_t i = begin; i < end; ++i) {
-      output[i] = sum(idx[i]);
+      vec eachrho = rho.elem(ts[i]) * ecnum[i] / effectlen[i];
+      newrho.elem(ts[i]) += eachrho / sum(eachrho);
     }
+
   }
 };
 
 
 // [[Rcpp::export]]
-arma::vec SumCppPara(const Rcpp::List x) {
+arma::vec EMSingle(arma::vec& rho,
+                   const std::vector<arma::vec>& effectlen,
+                   const std::vector<arma::uvec>& ts,
+                   arma::uvec& ecnum) {
 
   // allocate the output vector
-  vec output(x.size());
+  vec newrho(rho.n_elem, fill::zeros);
 
-  vector<vec> idx(x.size());
-  for (int i = 0; i < x.size(); ++i) {
-    NumericVector eachelem = x[i];
-    vec eachvec(eachelem.begin(), eachelem.size(), false);
-    idx[i] = eachvec;
-  }
+  ExpectEC expectEC(rho, effectlen, ts, ecnum, newrho);
 
-  // SumRoot functor (pass input and output vector)
-  SumRoot sumRoot(idx, output);
+  parallelFor(0, effectlen.size(), expectEC);
 
-  // call parallelFor to do the work
-  parallelFor(0, x.size(), sumRoot);
-
-  // return the output matrix
-  return output;
+  return newrho;
 }
 

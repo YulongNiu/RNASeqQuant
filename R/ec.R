@@ -98,3 +98,26 @@ collapseL_ <- function(l, logidx) {
   return(res)
 }
 
+
+
+## library('Rcpp')
+## sourceCpp('../src/strsplit.cpp')
+## sourceCpp('../src/EM.cpp')
+
+## ##    f1 f2 f3
+## ## ec1 1 1 1
+## ## ec2 0 1 1
+## ## ec3 1 0 1
+## ## ec4 1 0 0
+## ## ec5 1 1 0
+
+## rho <- rep(1/3, 3)
+## effectlen <- list(rep(1, 3), rep(1, 2), rep(1, 2), 1, rep(1, 2))
+## ts <- list(0:2, 1:2, c(0, 2), 0, 0:1)
+## ecnum <- rep(1, 5)
+
+## for (i in 1:10000) {
+##   rho <- EMSingle(rho, effectlen, ts, ecnum)
+## }
+
+## rho/5

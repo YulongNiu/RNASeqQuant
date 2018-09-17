@@ -9,3 +9,7 @@ Strsplit <- function(s, delim) {
     .Call(`_RNASeqEM_Strsplit`, s, delim)
 }
 
+SplitEC <- function(ec) {
+    .Call(`_RNASeqEM_SplitEC`, ec)
+}
+

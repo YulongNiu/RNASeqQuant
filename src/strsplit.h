@@ -7,4 +7,6 @@
 arma::uvec Strsplit(const std::string& s,
                     char delim);
 
+std::vector<arma::uvec> SplitEC(const Rcpp::CharacterVector& ec);
+
 #endif

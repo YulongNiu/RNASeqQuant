@@ -34,3 +34,18 @@ arma::uvec Strsplit(const std::string& s,
 
   return res;
 }
+
+
+// [[Rcpp::export]]
+std::vector<arma::uvec> SplitEC(const Rcpp::CharacterVector& ec) {
+
+  uword ecsize = ec.size();
+  vector<uvec> res(ecsize);
+
+  for (uword i = 0; i < ecsize; ++i) {
+    res[i] = Strsplit(string(ec(i)), ',');
+  }
+
+  return res;
+}
+

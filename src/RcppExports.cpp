@@ -29,10 +29,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// SplitEC
+std::vector<arma::uvec> SplitEC(const Rcpp::CharacterVector& ec);
+RcppExport SEXP _RNASeqEM_SplitEC(SEXP ecSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::CharacterVector& >::type ec(ecSEXP);
+    rcpp_result_gen = Rcpp::wrap(SplitEC(ec));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_RNASeqEM_SumCppPara", (DL_FUNC) &_RNASeqEM_SumCppPara, 1},
     {"_RNASeqEM_Strsplit", (DL_FUNC) &_RNASeqEM_Strsplit, 2},
+    {"_RNASeqEM_SplitEC", (DL_FUNC) &_RNASeqEM_SplitEC, 1},
     {NULL, NULL, 0}
 };
 

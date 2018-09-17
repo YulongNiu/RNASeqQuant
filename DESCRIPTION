@@ -8,7 +8,9 @@ Depends:
     R (>= 3.5.0)
 Imports:
     magrittr,
-    utils
+    utils,
+    Rcpp,
+    RcppParallel
 Suggests:
     testthat,
     BiocStyle,
@@ -21,4 +23,5 @@ RoxygenNote: 6.1.0
 VignetteBuilder: knitr
 LinkingTo: 
     Rcpp,
-    RcppArmadillo
+    RcppArmadillo,
+    RcppParallel

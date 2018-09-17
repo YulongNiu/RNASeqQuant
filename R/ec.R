@@ -97,3 +97,4 @@ collapseL_ <- function(l, logidx) {
   res <- l[logidx] %>% unlist
   return(res)
 }
+

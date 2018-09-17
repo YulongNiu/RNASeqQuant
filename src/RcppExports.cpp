@@ -18,7 +18,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // Strsplit
-std::vector<unsigned long> Strsplit(const std::string& s, char delim);
+arma::uvec Strsplit(const std::string& s, char delim);
 RcppExport SEXP _RNASeqEM_Strsplit(SEXP sSEXP, SEXP delimSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;

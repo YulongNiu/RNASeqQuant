@@ -1,23 +1,36 @@
+#define ARMA_64BIT_WORD 1
+#include <RcppArmadillo.h>
+
 #include <sstream>
 #include <string>
 #include <algorithm>
 #include <iterator>
 #include <vector>
+#include <iostream>
+
+#include "strsplit.h"
 
 using namespace std;
+using namespace arma;
+
+// [[Rcpp::depends(RcppArmadillo)]]
 
 // ref: https://ysonggit.github.io/coding/2014/12/16/split-a-string-using-c.html
 // [[Rcpp::export]]
-std::vector<unsigned long> Strsplit(const std::string& s,
-                                    char delim) {
+arma::uvec Strsplit(const std::string& s,
+                    char delim) {
 
   stringstream ss(s);
   string item;
-  vector<unsigned long> tokens;
+  uvec tokens(s.size());
+  uword i = 0;
+
   while (getline(ss, item, delim)) {
-    tokens.push_back(stoul(item));
+    tokens(i) = stoul(item);
+    ++i;
   }
-  return tokens;
+
+  uvec res = tokens.subvec(0, i-1);
+
+  return res;
 }
-
-

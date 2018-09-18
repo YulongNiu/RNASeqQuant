@@ -100,24 +100,45 @@ collapseL_ <- function(l, logidx) {
 
 
 
-## library('Rcpp')
-## sourceCpp('../src/strsplit.cpp')
-## sourceCpp('../src/EM.cpp')
+library('Rcpp')
+sourceCpp('../src/strsplit.cpp')
+sourceCpp('../src/EM.cpp')
 
-## ##    f1 f2 f3
-## ## ec1 1 1 1
-## ## ec2 0 1 1
-## ## ec3 1 0 1
-## ## ec4 1 0 0
-## ## ec5 1 1 0
+##    f1 f2 f3
+## ec1 1 1 1
+## ec2 0 1 1
+## ec3 1 0 1
+## ec4 1 0 0
+## ec5 1 1 0
 
-## rho <- rep(1/3, 3)
-## effectlen <- list(rep(1, 3), rep(1, 2), rep(1, 2), 1, rep(1, 2))
-## ts <- list(0:2, 1:2, c(0, 2), 0, 0:1)
-## ecnum <- rep(1, 5)
+rho <- rep(1/3, 3)
+effectlen <- list(rep(1, 3), rep(1, 2), rep(1, 2), 1, rep(1, 2))
+ts <- list(0:2, 1:2, c(0, 2), 0, 0:1)
+ecnum <- rep(1, 5)
+spenum <- c(0, 3)
 
-## for (i in 1:10000) {
-##   rho <- EMSingle(rho, effectlen, ts, ecnum)
-## }
+for (i in 1:10000) {
+  rho <- EMSingle(rho, effectlen, ts, ecnum, spenum)
+}
 
-## rho/5
+rho
+
+##    f1 f2 f3 f1' f2'
+## ec1 1  1  0  0  1
+## ec2 1  0  1  1  0
+## ec3 0  1  1  0  0
+## ec4 0  0  0  1  1
+## ec5 1  0  1  0  1
+## ec6 1  1  0  1  0
+
+rho <- c(rep(1/3, 3), rep(1/2, 2))
+effectlen <- list(rep(1, 3), rep(1, 3), rep(1, 2), rep(1, 2), rep(1, 3), rep(1, 3))
+ts <- list(c(0, 1, 4), c(0, 2, 3), c(1:2), c(3:4), c(0, 2, 4), c(0, 1, 3))
+ecnum <- rep(1, 6)
+spenum <- c(0, 3, 2)
+
+for (i in 1:1000) {
+  rho <- EMSingle(rho, effectlen, ts, ecnum, spenum)
+}
+
+rho

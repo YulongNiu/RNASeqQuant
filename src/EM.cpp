@@ -15,22 +15,22 @@ struct ExpectEC : public Worker
 {
   arma::vec& rho;
   const std::vector<arma::vec>& efflen;
-  const std::vector<arma::uvec>& ts;
+  const std::vector<arma::uvec>& es;
   arma::uvec& ecnum;
   arma::vec& newrho;
 
   ExpectEC(arma::vec& rho,
            const std::vector<arma::vec>& efflen,
-           const std::vector<arma::uvec>& ts,
+           const std::vector<arma::uvec>& es,
            arma::uvec& ecnum,
            arma::vec& newrho)
-    : rho(rho), efflen(efflen), ts(ts), ecnum(ecnum), newrho(newrho) {}
+    : rho(rho), efflen(efflen), es(es), ecnum(ecnum), newrho(newrho) {}
 
   void operator()(std::size_t begin, std::size_t end) {
 
     for (std::size_t i = begin; i < end; ++i) {
-      vec eachrho = rho.elem(ts[i]) * ecnum[i] / efflen[i];
-      newrho.elem(ts[i]) += eachrho / sum(eachrho);
+      vec eachrho = rho.elem(es[i]) * ecnum[i] / efflen[i];
+      newrho.elem(es[i]) += eachrho / sum(eachrho);
     }
 
   }
@@ -40,7 +40,7 @@ struct ExpectEC : public Worker
 // [[Rcpp::export]]
 arma::vec EMSingle(arma::vec& rho,
                    const std::vector<arma::vec>& efflen,
-                   const std::vector<arma::uvec>& ts,
+                   const std::vector<arma::uvec>& es,
                    arma::uvec& ecnum,
                    arma::uvec& spenum) {
 
@@ -48,7 +48,7 @@ arma::vec EMSingle(arma::vec& rho,
   vec newrho(rho.n_elem, fill::zeros);
 
   // step1: create parallel worker and call
-  ExpectEC expectEC(rho, efflen, ts, ecnum, newrho);
+  ExpectEC expectEC(rho, efflen, es, ecnum, newrho);
   parallelFor(0, efflen.size(), expectEC);
 
   // step2: calculate real newrho

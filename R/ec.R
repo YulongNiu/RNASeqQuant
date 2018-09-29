@@ -112,13 +112,14 @@ sourceCpp('../src/EM.cpp')
 ## ec5 1 1 0
 
 rho <- rep(1/3, 3)
-effectlen <- list(rep(1, 3), rep(1, 2), rep(1, 2), 1, rep(1, 2))
-ts <- list(0:2, 1:2, c(0, 2), 0, 0:1)
+rho <- c(1/6, 1/3, 1/2)
+ec <- SplitEC(c('0,1,2', '1,2', '0,2', '0', '0,1'))
+effectlen <- MatchEfflen(ec, rep(1, 3))
 ecnum <- rep(1, 5)
 spenum <- c(0, 3)
 
-for (i in 1:10000) {
-  rho <- EMSingle(rho, effectlen, ts, ecnum, spenum)
+for (i in 1:100000) {
+  rho <- EMSingle(rho, effectlen, ec, ecnum, spenum)
 }
 
 rho
@@ -129,15 +130,19 @@ rho
 ## ec3 0  1  1  0  0
 ## ec4 0  0  0  1  1
 ## ec5 1  0  1  0  1
-## ec6 1  1  0  1  0
+## ec6 1  1  0  0  0
 
 rho <- c(rep(1/3, 3), rep(1/2, 2))
-effectlen <- list(rep(1, 3), rep(1, 3), rep(1, 2), rep(1, 2), rep(1, 3), rep(1, 3))
-ts <- list(c(0, 1, 4), c(0, 2, 3), c(1:2), c(3:4), c(0, 2, 4), c(0, 1, 3))
+
+rho <- c(c(1/6, 1/2, 1/3), rep(1/2, 2))
+
+rho <- c(c(1/6, 1/2, 1/3), c(1/4, 3/4))
+effectlen <- list(rep(1, 3), rep(1, 3), rep(1, 2), rep(1, 2), rep(1, 3), rep(1, 2))
+ts <- list(c(0, 1, 4), c(0, 2, 3), c(1:2), c(3:4), c(0, 2, 4), c(0, 1))
 ecnum <- rep(1, 6)
 spenum <- c(0, 3, 2)
 
-for (i in 1:1000) {
+for (i in 1:100000) {
   rho <- EMSingle(rho, effectlen, ts, ecnum, spenum)
 }
 

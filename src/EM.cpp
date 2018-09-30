@@ -29,8 +29,8 @@ struct ExpectEC : public Worker
   void operator()(std::size_t begin, std::size_t end) {
 
     for (std::size_t i = begin; i < end; ++i) {
-      vec eachrho = rho.elem(es[i]) * ecnum[i] / efflen[i];
-      newrho.elem(es[i]) += eachrho / sum(eachrho);
+      vec eachrho = rho.elem(es[i]) / efflen[i];
+      newrho.elem(es[i]) += eachrho * ecnum[i]/ sum(eachrho);
     }
 
   }

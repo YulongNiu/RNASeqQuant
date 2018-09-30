@@ -49,12 +49,11 @@ std::vector<arma::uvec> SplitEC(const Rcpp::CharacterVector& ec) {
 }
 
 
-
 // [[Rcpp::export]]
-std::vector<arma::uvec> MatchEfflen(const std::vector<arma::uvec>& ecvec,
-                                    const arma::uvec& efflen) {
+std::vector<arma::vec> MatchEfflen(const std::vector<arma::uvec>& ecvec,
+                                   const arma::vec& efflen) {
   uword ecsize = ecvec.size();
-  vector<uvec> res(ecsize);
+  vector<vec> res(ecsize);
 
   for (uword i = 0; i < ecsize; ++i) {
     res[i] = efflen.elem(ecvec[i]);
@@ -62,3 +61,4 @@ std::vector<arma::uvec> MatchEfflen(const std::vector<arma::uvec>& ecvec,
 
   return res;
 }
+

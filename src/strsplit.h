@@ -9,4 +9,7 @@ arma::uvec Strsplit(const std::string& s,
 
 std::vector<arma::uvec> SplitEC(const Rcpp::CharacterVector& ec);
 
+std::vector<arma::vec> MatchEfflen(const std::vector<arma::uvec>& ecvec,
+                                   const arma::vec& efflen);
+
 #endif

@@ -137,13 +137,42 @@ rho <- c(rep(1/3, 3), rep(1/2, 2))
 rho <- c(c(1/6, 1/2, 1/3), rep(1/2, 2))
 
 rho <- c(c(1/6, 1/2, 1/3), c(1/4, 3/4))
+
 effectlen <- list(rep(1, 3), rep(1, 3), rep(1, 2), rep(1, 2), rep(1, 3), rep(1, 2))
-ts <- list(c(0, 1, 4), c(0, 2, 3), c(1:2), c(3:4), c(0, 2, 4), c(0, 1))
+ec <- SplitEC(c('0,1,4', '0,2,3', '1,2', '3,4', '0,2,4', '0,1'))
+effectlen <- MatchEfflen(ec, rep(1, 5))
 ecnum <- rep(1, 6)
 spenum <- c(0, 3, 2)
 
 for (i in 1:100000) {
-  rho <- EMSingle(rho, effectlen, ts, ecnum, spenum)
+  rho <- EMSingle(rho, effectlen, ec, ecnum, spenum)
 }
 
 rho
+
+
+## ## test simulate exampl
+## library('magrittr')
+## setwd('/extDisk1/RESEARCH/RNASeqEMtest/ktest/testpseudo/')
+## ec <- read.delim('pseudoalignments.ec',
+##                  stringsAsFactor = FALSE,
+##                  header = FALSE)[, 2] %>%
+##   SplitEC
+
+## effectlen <- read.delim('../testquant/abundance.tsv',
+##                         stringsAsFactor = FALSE)[, 3] %>%
+##   MatchEfflen(ec, .)
+
+## ecnum <- read.delim('pseudoalignments.tsv',
+##                     stringsAsFactor = FALSE,
+##                     header = FALSE)[, 2]
+
+## tsnum <- unlist(ec) %>% max %>% `+`(1)
+## spenum <- c(0, tsnum)
+## rho <- rep(1/tsnum, tsnum)
+
+## for (i in 1:53) {
+##   rho <- EMSingle(rho, effectlen, ec, ecnum, spenum)
+## }
+
+## rho * 9413

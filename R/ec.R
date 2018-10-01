@@ -100,55 +100,55 @@ collapseL_ <- function(l, logidx) {
 
 
 
-library('Rcpp')
-sourceCpp('../src/strsplit.cpp')
-sourceCpp('../src/EM.cpp')
+## library('Rcpp')
+## sourceCpp('../src/utilities.cpp')
+## sourceCpp('../src/EM.cpp')
 
-##    f1 f2 f3
-## ec1 1 1 1
-## ec2 0 1 1
-## ec3 1 0 1
-## ec4 1 0 0
-## ec5 1 1 0
+## ##    f1 f2 f3
+## ## ec1 1 1 1
+## ## ec2 0 1 1
+## ## ec3 1 0 1
+## ## ec4 1 0 0
+## ## ec5 1 1 0
 
-rho <- rep(1/3, 3)
-rho <- c(1/6, 1/3, 1/2)
-ec <- SplitEC(c('0,1,2', '1,2', '0,2', '0', '0,1'))
-effectlen <- MatchEfflen(ec, rep(1, 3))
-ecnum <- rep(1, 5)
-spenum <- c(0, 3)
+## cp <- rep(1/3, 3)
+## cp <- c(1/6, 1/3, 1/2)
+## ec <- SplitEC(c('0,1,2', '1,2', '0,2', '0', '0,1'))
+## effectlen <- MatchEfflen(ec, rep(1, 3))
+## ecnum <- rep(1, 5)
+## spenum <- IdxSpenum(3)
 
-for (i in 1:100000) {
-  rho <- EMSingle(rho, effectlen, ec, ecnum, spenum)
-}
+## for (i in 1:100000) {
+##   cp <- EMSingle(cp, effectlen, ec, ecnum, spenum)
+## }
 
-rho
+## cp
 
-##    f1 f2 f3 f1' f2'
-## ec1 1  1  0  0  1
-## ec2 1  0  1  1  0
-## ec3 0  1  1  0  0
-## ec4 0  0  0  1  1
-## ec5 1  0  1  0  1
-## ec6 1  1  0  0  0
+## ##    f1 f2 f3 f1' f2'
+## ## ec1 1  1  0  0  1
+## ## ec2 1  0  1  1  0
+## ## ec3 0  1  1  0  0
+## ## ec4 0  0  0  1  1
+## ## ec5 1  0  1  0  1
+## ## ec6 1  1  0  0  0
 
-rho <- c(rep(1/3, 3), rep(1/2, 2))
+## cp <- c(rep(1/3, 3), rep(1/2, 2))
 
-rho <- c(c(1/6, 1/2, 1/3), rep(1/2, 2))
+## cp <- c(c(1/6, 1/2, 1/3), rep(1/2, 2))
 
-rho <- c(c(1/6, 1/2, 1/3), c(1/4, 3/4))
+## cp <- c(c(1/6, 1/2, 1/3), c(1/4, 3/4))
 
-effectlen <- list(rep(1, 3), rep(1, 3), rep(1, 2), rep(1, 2), rep(1, 3), rep(1, 2))
-ec <- SplitEC(c('0,1,4', '0,2,3', '1,2', '3,4', '0,2,4', '0,1'))
-effectlen <- MatchEfflen(ec, rep(1, 5))
-ecnum <- rep(1, 6)
-spenum <- c(0, 3, 2)
+## effectlen <- list(rep(1, 3), rep(1, 3), rep(1, 2), rep(1, 2), rep(1, 3), rep(1, 2))
+## ec <- SplitEC(c('0,1,4', '0,2,3', '1,2', '3,4', '0,2,4', '0,1'))
+## effectlen <- MatchEfflen(ec, rep(1, 5))
+## ecnum <- rep(1, 6)
+## spenum <- IdxSpenum(c(3, 2))
 
-for (i in 1:100000) {
-  rho <- EMSingle(rho, effectlen, ec, ecnum, spenum)
-}
+## for (i in 1:100000) {
+##   cp <- EMSingle(cp, effectlen, ec, ecnum, spenum)
+## }
 
-rho
+## cp
 
 
 ## ## test simulate exampl
@@ -168,11 +168,12 @@ rho
 ##                     header = FALSE)[, 2]
 
 ## tsnum <- unlist(ec) %>% max %>% `+`(1)
-## spenum <- c(0, tsnum)
-## rho <- rep(1/tsnum, tsnum)
+## spenum <- IdxSpenum(tsnum)
 
-## for (i in 1:53) {
-##   rho <- EMSingle(rho, effectlen, ec, ecnum, spenum)
+## cp <- rep(1/tsnum, tsnum)
+
+## for (i in 1:52) {
+##   cp <- EMSingle(cp, effectlen, ec, ecnum, spenum)
 ## }
 
-## rho * 9413
+## cp * 9413

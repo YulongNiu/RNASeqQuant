@@ -7,16 +7,17 @@
 using namespace Rcpp;
 
 // EMSingle
-arma::vec EMSingle(arma::vec& rho, const std::vector<arma::vec>& effectlen, const std::vector<arma::uvec>& ts, arma::uvec& ecnum);
-RcppExport SEXP _RNASeqEM_EMSingle(SEXP rhoSEXP, SEXP effectlenSEXP, SEXP tsSEXP, SEXP ecnumSEXP) {
+arma::vec EMSingle(arma::vec& countper, const std::vector<arma::vec>& efflen, const std::vector<arma::uvec>& ec, arma::uvec& ecnum, arma::uvec& spenum);
+RcppExport SEXP _RNASeqEM_EMSingle(SEXP countperSEXP, SEXP efflenSEXP, SEXP ecSEXP, SEXP ecnumSEXP, SEXP spenumSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::vec& >::type rho(rhoSEXP);
-    Rcpp::traits::input_parameter< const std::vector<arma::vec>& >::type effectlen(effectlenSEXP);
-    Rcpp::traits::input_parameter< const std::vector<arma::uvec>& >::type ts(tsSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type countper(countperSEXP);
+    Rcpp::traits::input_parameter< const std::vector<arma::vec>& >::type efflen(efflenSEXP);
+    Rcpp::traits::input_parameter< const std::vector<arma::uvec>& >::type ec(ecSEXP);
     Rcpp::traits::input_parameter< arma::uvec& >::type ecnum(ecnumSEXP);
-    rcpp_result_gen = Rcpp::wrap(EMSingle(rho, effectlen, ts, ecnum));
+    Rcpp::traits::input_parameter< arma::uvec& >::type spenum(spenumSEXP);
+    rcpp_result_gen = Rcpp::wrap(EMSingle(countper, efflen, ec, ecnum, spenum));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -43,11 +44,36 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// MatchEfflen
+std::vector<arma::vec> MatchEfflen(const std::vector<arma::uvec>& ecvec, const arma::vec& efflen);
+RcppExport SEXP _RNASeqEM_MatchEfflen(SEXP ecvecSEXP, SEXP efflenSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::vector<arma::uvec>& >::type ecvec(ecvecSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type efflen(efflenSEXP);
+    rcpp_result_gen = Rcpp::wrap(MatchEfflen(ecvec, efflen));
+    return rcpp_result_gen;
+END_RCPP
+}
+// IdxSpenum
+arma::uvec IdxSpenum(const arma::uvec& spenum);
+RcppExport SEXP _RNASeqEM_IdxSpenum(SEXP spenumSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::uvec& >::type spenum(spenumSEXP);
+    rcpp_result_gen = Rcpp::wrap(IdxSpenum(spenum));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_RNASeqEM_EMSingle", (DL_FUNC) &_RNASeqEM_EMSingle, 4},
+    {"_RNASeqEM_EMSingle", (DL_FUNC) &_RNASeqEM_EMSingle, 5},
     {"_RNASeqEM_Strsplit", (DL_FUNC) &_RNASeqEM_Strsplit, 2},
     {"_RNASeqEM_SplitEC", (DL_FUNC) &_RNASeqEM_SplitEC, 1},
+    {"_RNASeqEM_MatchEfflen", (DL_FUNC) &_RNASeqEM_MatchEfflen, 2},
+    {"_RNASeqEM_IdxSpenum", (DL_FUNC) &_RNASeqEM_IdxSpenum, 1},
     {NULL, NULL, 0}
 };
 

@@ -1,5 +1,4 @@
 #include <RcppArmadillo.h>
-#define ARMA_64BIT_WORD 1
 
 #include <sstream>
 #include <string>

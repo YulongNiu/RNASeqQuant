@@ -13,23 +13,23 @@ using namespace std;
 
 struct ExpectEC : public Worker
 {
-  arma::vec& countper;
+  arma::vec& prob;
   const std::vector<arma::vec>& efflen;
   const std::vector<arma::uvec>& ec;
-  arma::uvec& ecnum;
-  arma::vec& newcountper;
+  arma::uvec& count;
+  arma::vec& estcount;
 
-  ExpectEC(arma::vec& countper,
+  ExpectEC(arma::vec& prob,
            const std::vector<arma::vec>& efflen,
            const std::vector<arma::uvec>& ec,
-           arma::uvec& ecnum,
-           arma::vec& newcountper)
-    : countper(countper), efflen(efflen), ec(ec), ecnum(ecnum), newcountper(newcountper) {}
+           arma::uvec& count,
+           arma::vec& estcount)
+    : prob(prob), efflen(efflen), ec(ec), count(count), estcount(estcount) {}
 
   void operator()(std::size_t begin, std::size_t end) {
     for (std::size_t i = begin; i < end; ++i) {
-      vec eachcp = countper.elem(ec[i]) / efflen[i];
-      newcountper.elem(ec[i]) += eachcp * ecnum(i)/ sum(eachcp);
+      vec eachcp = prob.elem(ec[i]) / efflen[i];
+      estcount.elem(ec[i]) += eachcp * count(i)/ sum(eachcp);
     }
 
   }
@@ -38,37 +38,54 @@ struct ExpectEC : public Worker
 
 //' Parallel a single EM iteration.
 //'
-//' Add zero at the head of input \code{spenum}.
+//' One iteration of EM model.
 //'
 //' @title Single EM iteration
-//' @return A updated \code{arma::vec} of count percentage.
-//' @param countper A \code{arma::vec} of input count percentage.
+//' @return A updated \code{arma::vec} estimated counts of different transcripts.
+//' @param prob A \code{arma::vec} of probabilities of selecting a read from the different transcripts.
 //' @param efflen A \code{std::vector<arma::vec>} indicated the effective length of transcripts.
 //' @param ec A \code{std::vector<arma::vec>} indicated equivalence classes with the same length of \code{efflen}.
-//' @param ecnum A \code{arma::uvec} indicated the mapped count number of equivalence class with the same length of \code{efflen}.
+//' @param count A \code{arma::uvec} indicated the mapped count number of equivalence class with the same length of \code{efflen}.
+//' @author Yulong Niu \email{yulong.niu@@hotmail.com}
+//' @keywords internal
+// [[Rcpp::export]]
+arma::vec EMSingle(arma::vec& prob,
+                   const std::vector<arma::vec>& efflen,
+                   const std::vector<arma::uvec>& ec,
+                   arma::uvec& count) {
+
+  vec estcount(prob.n_elem, fill::zeros);
+
+  // create parallel worker and call
+  ExpectEC expectEC(prob, efflen, ec, count, estcount);
+  parallelFor(0, efflen.size(), expectEC);
+
+  return estcount;
+}
+
+
+//' Transform estimated count to probabilities.
+//'
+//' Use estimated counts as the outputs and EM stop conditions.
+//'
+//' @title Counts to probabilities
+//' @return A \code{arma::vec} indicates probabilities of selecting a read from the different transcripts.
+//' @param estcount A \code{arma::vec} estimated counts of transcripts.
 //' @param spenum A \code{arma::uvec} indicated number of transcripts.
 //' @author Yulong Niu \email{yulong.niu@@hotmail.com}
 //' @keywords internal
 // [[Rcpp::export]]
-arma::vec EMSingle(arma::vec& countper,
-                   const std::vector<arma::vec>& efflen,
-                   const std::vector<arma::uvec>& ec,
-                   arma::uvec& ecnum,
-                   arma::uvec& spenum) {
+arma::vec Estcount2Prob(arma::vec& estcount,
+                        arma::uvec& spenum) {
 
-  vec newcountper(countper.n_elem, fill::zeros);
+  vec prob(prob.n_elem, fill::zeros);
 
-  // step1: create parallel worker and call
-  ExpectEC expectEC(countper, efflen, ec, ecnum, newcountper);
-  parallelFor(0, efflen.size(), expectEC);
-
-  // step2: calculate real newcountper
   for (uword i = 0; i < spenum.n_elem - 1; ++i) {
     uword start = spenum(i);
     uword end = spenum(i) + spenum(i+1) - 1;
-    newcountper.subvec(start, end) /= sum(newcountper.subvec(start, end));
+    prob.subvec(start, end) = estcount.subvec(start, end) / sum(estcount.subvec(start, end));
   }
 
-  return newcountper;
+  return prob;
 }
 

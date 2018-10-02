@@ -7,17 +7,28 @@
 using namespace Rcpp;
 
 // EMSingle
-arma::vec EMSingle(arma::vec& countper, const std::vector<arma::vec>& efflen, const std::vector<arma::uvec>& ec, arma::uvec& ecnum, arma::uvec& spenum);
-RcppExport SEXP _RNASeqEM_EMSingle(SEXP countperSEXP, SEXP efflenSEXP, SEXP ecSEXP, SEXP ecnumSEXP, SEXP spenumSEXP) {
+arma::vec EMSingle(arma::vec& prob, const std::vector<arma::vec>& efflen, const std::vector<arma::uvec>& ec, arma::uvec& count);
+RcppExport SEXP _RNASeqEM_EMSingle(SEXP probSEXP, SEXP efflenSEXP, SEXP ecSEXP, SEXP countSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::vec& >::type countper(countperSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type prob(probSEXP);
     Rcpp::traits::input_parameter< const std::vector<arma::vec>& >::type efflen(efflenSEXP);
     Rcpp::traits::input_parameter< const std::vector<arma::uvec>& >::type ec(ecSEXP);
-    Rcpp::traits::input_parameter< arma::uvec& >::type ecnum(ecnumSEXP);
+    Rcpp::traits::input_parameter< arma::uvec& >::type count(countSEXP);
+    rcpp_result_gen = Rcpp::wrap(EMSingle(prob, efflen, ec, count));
+    return rcpp_result_gen;
+END_RCPP
+}
+// Estcount2Prob
+arma::vec Estcount2Prob(arma::vec& estcount, arma::uvec& spenum);
+RcppExport SEXP _RNASeqEM_Estcount2Prob(SEXP estcountSEXP, SEXP spenumSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec& >::type estcount(estcountSEXP);
     Rcpp::traits::input_parameter< arma::uvec& >::type spenum(spenumSEXP);
-    rcpp_result_gen = Rcpp::wrap(EMSingle(countper, efflen, ec, ecnum, spenum));
+    rcpp_result_gen = Rcpp::wrap(Estcount2Prob(estcount, spenum));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -69,7 +80,8 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_RNASeqEM_EMSingle", (DL_FUNC) &_RNASeqEM_EMSingle, 5},
+    {"_RNASeqEM_EMSingle", (DL_FUNC) &_RNASeqEM_EMSingle, 4},
+    {"_RNASeqEM_Estcount2Prob", (DL_FUNC) &_RNASeqEM_Estcount2Prob, 2},
     {"_RNASeqEM_Strsplit", (DL_FUNC) &_RNASeqEM_Strsplit, 2},
     {"_RNASeqEM_SplitEC", (DL_FUNC) &_RNASeqEM_SplitEC, 1},
     {"_RNASeqEM_MatchEfflen", (DL_FUNC) &_RNASeqEM_MatchEfflen, 2},

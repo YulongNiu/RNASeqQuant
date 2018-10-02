@@ -3,19 +3,32 @@
 
 #' Parallel a single EM iteration.
 #'
-#' Add zero at the head of input \code{spenum}.
+#' One iteration of EM model.
 #'
 #' @title Single EM iteration
-#' @return A updated \code{arma::vec} of count percentage.
-#' @param countper A \code{arma::vec} of input count percentage.
+#' @return A updated \code{arma::vec} estimated counts of different transcripts.
+#' @param prob A \code{arma::vec} of probabilities of selecting a read from the different transcripts.
 #' @param efflen A \code{std::vector<arma::vec>} indicated the effective length of transcripts.
 #' @param ec A \code{std::vector<arma::vec>} indicated equivalence classes with the same length of \code{efflen}.
-#' @param ecnum A \code{arma::uvec} indicated the mapped count number of equivalence class with the same length of \code{efflen}.
+#' @param count A \code{arma::uvec} indicated the mapped count number of equivalence class with the same length of \code{efflen}.
+#' @author Yulong Niu \email{yulong.niu@@hotmail.com}
+#' @keywords internal
+EMSingle <- function(prob, efflen, ec, count) {
+    .Call(`_RNASeqEM_EMSingle`, prob, efflen, ec, count)
+}
+
+#' Transform estimated count to probabilities.
+#'
+#' Use estimated counts as the outputs and EM stop conditions.
+#'
+#' @title Counts to probabilities
+#' @return A \code{arma::vec} indicates probabilities of selecting a read from the different transcripts.
+#' @param estcount A \code{arma::vec} estimated counts of transcripts.
 #' @param spenum A \code{arma::uvec} indicated number of transcripts.
 #' @author Yulong Niu \email{yulong.niu@@hotmail.com}
 #' @keywords internal
-EMSingle <- function(countper, efflen, ec, ecnum, spenum) {
-    .Call(`_RNASeqEM_EMSingle`, countper, efflen, ec, ecnum, spenum)
+Estcount2Prob <- function(estcount, spenum) {
+    .Call(`_RNASeqEM_Estcount2Prob`, estcount, spenum)
 }
 
 #' Split strings and equivalence classes.

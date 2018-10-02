@@ -4,27 +4,25 @@
 \alias{EMSingle}
 \title{Single EM iteration}
 \usage{
-EMSingle(countper, efflen, ec, ecnum, spenum)
+EMSingle(prob, efflen, ec, count)
 }
 \arguments{
-\item{countper}{A \code{arma::vec} of input count percentage.}
+\item{prob}{A \code{arma::vec} of probabilities of selecting a read from the different transcripts.}
 
 \item{efflen}{A \code{std::vector<arma::vec>} indicated the effective length of transcripts.}
 
 \item{ec}{A \code{std::vector<arma::vec>} indicated equivalence classes with the same length of \code{efflen}.}
 
-\item{ecnum}{A \code{arma::uvec} indicated the mapped count number of equivalence class with the same length of \code{efflen}.}
-
-\item{spenum}{A \code{arma::uvec} indicated number of transcripts.}
+\item{count}{A \code{arma::uvec} indicated the mapped count number of equivalence class with the same length of \code{efflen}.}
 }
 \value{
-A updated \code{arma::vec} of count percentage.
+A updated \code{arma::vec} estimated counts of different transcripts.
 }
 \description{
 Parallel a single EM iteration.
 }
 \details{
-Add zero at the head of input \code{spenum}.
+One iteration of EM model.
 }
 \author{
 Yulong Niu \email{yulong.niu@hotmail.com}

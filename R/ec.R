@@ -92,7 +92,7 @@ EM <- function(pseudo, spenum, maxiter = 10000, n = 2) {
     ## stop condition
     stopcond <- est > countChangeLimit &
       (abs(est - startcount)/est) > countChange
-    if (sum(stopcond) == 0) {
+    if (sum(stopcond, na.rm = TRUE) == 0) {
       ## print(cbind(est, startcount))
       ## print(startprob)
       ## print((abs(est - startcount)/est))
@@ -110,31 +110,7 @@ EM <- function(pseudo, spenum, maxiter = 10000, n = 2) {
 }
 
 
-## library('Rcpp')
-## sourceCpp('../src/utilities.cpp')
-## sourceCpp('../src/EM.cpp')
 
-## ##    f1 f2 f3
-## ## ec1 1 1 1
-## ## ec2 0 1 1
-## ## ec3 1 0 1
-## ## ec4 1 0 0
-## ## ec5 1 1 0
-
-## cp <- rep(1/3, 3)
-## cp <- c(1/6, 1/3, 1/2)
-## ec <- SplitEC(c('0,1,2', '1,2', '0,2', '0', '0,1'))
-## effectlen <- MatchEfflen(ec, rep(1, 3))
-## ecnum <- rep(1, 5)
-## spenum <- IdxSpenum(3)
-
-## for (i in 1:100) {
-##   count <- EMSingle(cp, effectlen, ec, ecnum)
-##   cp <- Estcount2Prob(estcount, spenum)
-## }
-
-## count
-## cp
 
 ## ##    f1 f2 f3 f1' f2'
 ## ## ec1 1  1  0  0  1
@@ -163,29 +139,17 @@ EM <- function(pseudo, spenum, maxiter = 10000, n = 2) {
 ## cp
 
 
-## test simulate exampl
-## library('magrittr')
-## setwd('/extDisk1/RESEARCH/RNASeqEMtest/ktest/testpseudo/')
-## ec <- read.delim('pseudoalignments.ec',
-##                  stringsAsFactor = FALSE,
-##                  header = FALSE)[, 2] %>%
-##   SplitEC
+## library(magrittr)
+## library(Rcpp)
+## library(RcppParallel)
+## sourceCpp('../src/utilities.cpp')
+## sourceCpp('../src/EM.cpp')
 
-## effectlen <- read.delim('../testquant/abundance.tsv',
-##                         stringsAsFactor = FALSE)[, 3] %>%
-##   MatchEfflen(ec, .)
+## ecmat <- read.table('/extDisk1/RESEARCH/RNASeqEMtest/athtest/pseudoalignments_ath.tsv', header = TRUE, stringsAsFactors = FALSE)
+## efflenmat <- read.table('/extDisk1/RESEARCH/RNASeqEMtest/athtest/abundance_ath.tsv', header = TRUE, stringsAsFactors = FALSE)
+## plist <- list(ec = ecmat$Transcript, count = ecmat$Count, efflen = efflenmat$eff_length)
 
-## ecnum <- read.delim('pseudoalignments.tsv',
-##                     stringsAsFactor = FALSE,
-##                     header = FALSE)[, 2]
+## pseudo <- plist
+## spenum <- 41392
 
-## ## single
-## spenum <- IdxSpenum(14)
-## cp1 <- rep(1/14, 14)
-
-## for (i in 1:100) {
-##   cp1 <- EMSingle(cp1, effectlen, ec, ecnum, spenum)
-## }
-
-## cp1
-
+## tmp1 <- EM(plist, 41392, n = 8)

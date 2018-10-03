@@ -28,8 +28,10 @@ struct ExpectEC : public Worker
 
   void operator()(std::size_t begin, std::size_t end) {
     for (std::size_t i = begin; i < end; ++i) {
-      vec eachcp = prob.elem(ec[i]) / efflen[i];
-      estcount.elem(ec[i]) += eachcp * count(i)/ sum(eachcp);
+      if (count(i) > 0) {
+        vec eachcp = prob.elem(ec[i]) / efflen[i];
+        estcount.elem(ec[i]) += eachcp * count(i)/ sum(eachcp);
+      } else {}
     }
 
   }
@@ -78,7 +80,7 @@ arma::vec EMSingle(arma::vec& prob,
 arma::vec Estcount2Prob(arma::vec& estcount,
                         arma::uvec& spenum) {
 
-  vec prob(prob.n_elem, fill::zeros);
+  vec prob(estcount.n_elem, fill::zeros);
 
   for (uword i = 0; i < spenum.n_elem - 1; ++i) {
     uword start = spenum(i);
@@ -89,3 +91,18 @@ arma::vec Estcount2Prob(arma::vec& estcount,
   return prob;
 }
 
+
+// // [[Rcpp::export]]
+// arma::vec TestSub(arma::vec& estcount,
+//                   arma::uvec& spenum) {
+
+//   vec prob(estcount.n_elem, fill::zeros);
+
+//   // for (uword i = 0; i < spenum.n_elem - 1; ++i) {
+//   //   uword start = spenum(i);
+//   //   uword end = spenum(i) + spenum(i+1) - 1;
+//   //   prob.subvec(start, end) = estcount.subvec(start, end) / sum(estcount.subvec(start, end));
+//   // }
+
+//   return prob;
+// }

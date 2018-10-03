@@ -52,17 +52,17 @@ arma::uvec Strsplit(const std::string& s,
 }
 
 
-//' @param ec A \code{character vector} and each element is a string with comma delimiter.
+//' @param ecraw A \code{character vector} and each element is a string with comma delimiter.
 //' @rdname strsplit
 //' @keywords internal
 // [[Rcpp::export]]
-std::vector<arma::uvec> SplitEC(const Rcpp::CharacterVector& ec) {
+std::vector<arma::uvec> SplitEC(const Rcpp::CharacterVector& ecraw) {
 
-  uword ecsize = ec.size();
+  uword ecsize = ecraw.size();
   vector<uvec> res(ecsize);
 
   for (uword i = 0; i < ecsize; ++i) {
-    res[i] = Strsplit(string(ec(i)), ',');
+    res[i] = Strsplit(string(ecraw(i)), ',');
   }
 
   return res;
@@ -75,18 +75,18 @@ std::vector<arma::uvec> SplitEC(const Rcpp::CharacterVector& ec) {
 //'
 //' @title Match transcript effect length
 //' @return A \code{std::vector<arma::vec>} with the same length of \code{ecvec}.
-//' @param ecvec A \code{std::vector<arma::uvec>} containing separated vectors, such as the output of \code{SplitEC()} in this package.
-//' @param efflen A code{arma::vec} indicating the effect length of transcript.
+//' @param ec A \code{std::vector<arma::uvec>} containing separated vectors, such as the output of \code{SplitEC()} in this package.
+//' @param efflenraw A code{arma::vec} indicating the effect length of transcript.
 //' @author Yulong Niu \email{yulong.niu@@hotmail.com}
 //' @keywords internal
 // [[Rcpp::export]]
-std::vector<arma::vec> MatchEfflen(const std::vector<arma::uvec>& ecvec,
-                                   const arma::vec& efflen) {
-  uword ecsize = ecvec.size();
+std::vector<arma::vec> MatchEfflen(const std::vector<arma::uvec>& ec,
+                                   const arma::vec& efflenraw) {
+  uword ecsize = ec.size();
   vector<vec> res(ecsize);
 
   for (uword i = 0; i < ecsize; ++i) {
-    res[i] = efflen.elem(ecvec[i]);
+    res[i] = efflenraw.elem(ec[i]);
   }
 
   return res;
@@ -99,17 +99,16 @@ std::vector<arma::vec> MatchEfflen(const std::vector<arma::uvec>& ecvec,
 //'
 //' @title Index species number
 //' @return A \code{arma::uvec}.
-//' @param spenum A \code{arma::uvec} indicated the transcript number in each species.
+//' @param spenumraw A \code{arma::uvec} indicated the transcript number in each species.
 //' @author Yulong Niu \email{yulong.niu@@hotmail.com}
 //' @keywords internal
 // [[Rcpp::export]]
-arma::uvec IdxSpenum(const arma::uvec& spenum) {
+arma::uvec IdxSpenum(const arma::uvec& spenumraw) {
 
-  uvec res(spenum.n_elem + 1, fill::zeros);
+  uword num = spenumraw.n_elem;
+  uvec res(num + 1, fill::zeros);
 
-  for (uword i = 0; i < spenum.n_elem; ++i) {
-    res(i+1) = spenum(i);
-  }
+  res.subvec(1, num) = spenumraw;
 
   return res;
 }

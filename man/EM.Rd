@@ -7,7 +7,7 @@
 EM(pseudo, spenum, maxiter = 10000, n = 2)
 }
 \arguments{
-\item{pseudo}{A \code{list} of equivalence class (ec), count of ec, and effective length of transcripts. It can be the outputs of kallisto.}
+\item{pseudo}{A \code{list} of ec, count of ec, and effective length of transcripts. It can be the outputs of kallisto.}
 
 \item{spenum}{A \code{arma::uvec} indicated number of transcripts.}
 
@@ -22,7 +22,7 @@ A \code{numeric vector} indicates probabilities of selecting a read from the dif
 Expectation maximization (EM) model for RNA-seq quantification.
 }
 \details{
-EM model for RNA-seq quantification.
+EM model for RNA-seq quantification. The equivalence class (ec) with 0 counts are removed, because these counts have no contributes to the final results.
 }
 \examples{
 ##    f1 f2 f3

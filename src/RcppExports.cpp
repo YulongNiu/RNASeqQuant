@@ -21,14 +21,51 @@ BEGIN_RCPP
 END_RCPP
 }
 // Estcount2Prob
-arma::vec Estcount2Prob(arma::vec& estcount, arma::uvec& spenum);
+arma::vec Estcount2Prob(const arma::vec& estcount, const arma::uvec& spenum);
 RcppExport SEXP _RNASeqEM_Estcount2Prob(SEXP estcountSEXP, SEXP spenumSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::vec& >::type estcount(estcountSEXP);
-    Rcpp::traits::input_parameter< arma::uvec& >::type spenum(spenumSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type estcount(estcountSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type spenum(spenumSEXP);
     rcpp_result_gen = Rcpp::wrap(Estcount2Prob(estcount, spenum));
+    return rcpp_result_gen;
+END_RCPP
+}
+// EMTest
+arma::vec EMTest(const arma::vec& efflenraw, const Rcpp::CharacterVector& ecraw, const arma::uvec& countraw, const arma::uvec& spenumraw, const arma::uword maxiter, const arma::uword miniter);
+RcppExport SEXP _RNASeqEM_EMTest(SEXP efflenrawSEXP, SEXP ecrawSEXP, SEXP countrawSEXP, SEXP spenumrawSEXP, SEXP maxiterSEXP, SEXP miniterSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type efflenraw(efflenrawSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::CharacterVector& >::type ecraw(ecrawSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type countraw(countrawSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type spenumraw(spenumrawSEXP);
+    Rcpp::traits::input_parameter< const arma::uword >::type maxiter(maxiterSEXP);
+    Rcpp::traits::input_parameter< const arma::uword >::type miniter(miniterSEXP);
+    rcpp_result_gen = Rcpp::wrap(EMTest(efflenraw, ecraw, countraw, spenumraw, maxiter, miniter));
+    return rcpp_result_gen;
+END_RCPP
+}
+// start_profiler
+SEXP start_profiler(SEXP str);
+RcppExport SEXP _RNASeqEM_start_profiler(SEXP strSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type str(strSEXP);
+    rcpp_result_gen = Rcpp::wrap(start_profiler(str));
+    return rcpp_result_gen;
+END_RCPP
+}
+// stop_profiler
+SEXP stop_profiler();
+RcppExport SEXP _RNASeqEM_stop_profiler() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(stop_profiler());
     return rcpp_result_gen;
 END_RCPP
 }
@@ -45,36 +82,36 @@ BEGIN_RCPP
 END_RCPP
 }
 // SplitEC
-std::vector<arma::uvec> SplitEC(const Rcpp::CharacterVector& ec);
-RcppExport SEXP _RNASeqEM_SplitEC(SEXP ecSEXP) {
+std::vector<arma::uvec> SplitEC(const Rcpp::CharacterVector& ecraw);
+RcppExport SEXP _RNASeqEM_SplitEC(SEXP ecrawSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Rcpp::CharacterVector& >::type ec(ecSEXP);
-    rcpp_result_gen = Rcpp::wrap(SplitEC(ec));
+    Rcpp::traits::input_parameter< const Rcpp::CharacterVector& >::type ecraw(ecrawSEXP);
+    rcpp_result_gen = Rcpp::wrap(SplitEC(ecraw));
     return rcpp_result_gen;
 END_RCPP
 }
 // MatchEfflen
-std::vector<arma::vec> MatchEfflen(const std::vector<arma::uvec>& ecvec, const arma::vec& efflen);
-RcppExport SEXP _RNASeqEM_MatchEfflen(SEXP ecvecSEXP, SEXP efflenSEXP) {
+std::vector<arma::vec> MatchEfflen(const std::vector<arma::uvec>& ec, const arma::vec& efflenraw);
+RcppExport SEXP _RNASeqEM_MatchEfflen(SEXP ecSEXP, SEXP efflenrawSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const std::vector<arma::uvec>& >::type ecvec(ecvecSEXP);
-    Rcpp::traits::input_parameter< const arma::vec& >::type efflen(efflenSEXP);
-    rcpp_result_gen = Rcpp::wrap(MatchEfflen(ecvec, efflen));
+    Rcpp::traits::input_parameter< const std::vector<arma::uvec>& >::type ec(ecSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type efflenraw(efflenrawSEXP);
+    rcpp_result_gen = Rcpp::wrap(MatchEfflen(ec, efflenraw));
     return rcpp_result_gen;
 END_RCPP
 }
 // IdxSpenum
-arma::uvec IdxSpenum(const arma::uvec& spenum);
-RcppExport SEXP _RNASeqEM_IdxSpenum(SEXP spenumSEXP) {
+arma::uvec IdxSpenum(const arma::uvec& spenumraw);
+RcppExport SEXP _RNASeqEM_IdxSpenum(SEXP spenumrawSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::uvec& >::type spenum(spenumSEXP);
-    rcpp_result_gen = Rcpp::wrap(IdxSpenum(spenum));
+    Rcpp::traits::input_parameter< const arma::uvec& >::type spenumraw(spenumrawSEXP);
+    rcpp_result_gen = Rcpp::wrap(IdxSpenum(spenumraw));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -82,6 +119,9 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_RNASeqEM_EMSingle", (DL_FUNC) &_RNASeqEM_EMSingle, 4},
     {"_RNASeqEM_Estcount2Prob", (DL_FUNC) &_RNASeqEM_Estcount2Prob, 2},
+    {"_RNASeqEM_EMTest", (DL_FUNC) &_RNASeqEM_EMTest, 6},
+    {"_RNASeqEM_start_profiler", (DL_FUNC) &_RNASeqEM_start_profiler, 1},
+    {"_RNASeqEM_stop_profiler", (DL_FUNC) &_RNASeqEM_stop_profiler, 0},
     {"_RNASeqEM_Strsplit", (DL_FUNC) &_RNASeqEM_Strsplit, 2},
     {"_RNASeqEM_SplitEC", (DL_FUNC) &_RNASeqEM_SplitEC, 1},
     {"_RNASeqEM_MatchEfflen", (DL_FUNC) &_RNASeqEM_MatchEfflen, 2},

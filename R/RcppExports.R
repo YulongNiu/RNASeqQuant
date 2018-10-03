@@ -31,6 +31,18 @@ Estcount2Prob <- function(estcount, spenum) {
     .Call(`_RNASeqEM_Estcount2Prob`, estcount, spenum)
 }
 
+EMTest <- function(efflenraw, ecraw, countraw, spenumraw, maxiter = 10000L, miniter = 50L) {
+    .Call(`_RNASeqEM_EMTest`, efflenraw, ecraw, countraw, spenumraw, maxiter, miniter)
+}
+
+start_profiler <- function(str) {
+    .Call(`_RNASeqEM_start_profiler`, str)
+}
+
+stop_profiler <- function() {
+    .Call(`_RNASeqEM_stop_profiler`)
+}
+
 #' Split strings and equivalence classes.
 #'
 #' \itemize{
@@ -54,11 +66,11 @@ Strsplit <- function(s, delim) {
     .Call(`_RNASeqEM_Strsplit`, s, delim)
 }
 
-#' @param ec A \code{character vector} and each element is a string with comma delimiter.
+#' @param ecraw A \code{character vector} and each element is a string with comma delimiter.
 #' @rdname strsplit
 #' @keywords internal
-SplitEC <- function(ec) {
-    .Call(`_RNASeqEM_SplitEC`, ec)
+SplitEC <- function(ecraw) {
+    .Call(`_RNASeqEM_SplitEC`, ecraw)
 }
 
 #' Match transcript effect length with equivalence classes.
@@ -67,12 +79,12 @@ SplitEC <- function(ec) {
 #'
 #' @title Match transcript effect length
 #' @return A \code{std::vector<arma::vec>} with the same length of \code{ecvec}.
-#' @param ecvec A \code{std::vector<arma::uvec>} containing separated vectors, such as the output of \code{SplitEC()} in this package.
-#' @param efflen A code{arma::vec} indicating the effect length of transcript.
+#' @param ec A \code{std::vector<arma::uvec>} containing separated vectors, such as the output of \code{SplitEC()} in this package.
+#' @param efflenraw A code{arma::vec} indicating the effect length of transcript.
 #' @author Yulong Niu \email{yulong.niu@@hotmail.com}
 #' @keywords internal
-MatchEfflen <- function(ecvec, efflen) {
-    .Call(`_RNASeqEM_MatchEfflen`, ecvec, efflen)
+MatchEfflen <- function(ec, efflenraw) {
+    .Call(`_RNASeqEM_MatchEfflen`, ec, efflenraw)
 }
 
 #' Index transcripts number of input species.
@@ -81,10 +93,10 @@ MatchEfflen <- function(ecvec, efflen) {
 #'
 #' @title Index species number
 #' @return A \code{arma::uvec}.
-#' @param spenum A \code{arma::uvec} indicated the transcript number in each species.
+#' @param spenumraw A \code{arma::uvec} indicated the transcript number in each species.
 #' @author Yulong Niu \email{yulong.niu@@hotmail.com}
 #' @keywords internal
-IdxSpenum <- function(spenum) {
-    .Call(`_RNASeqEM_IdxSpenum`, spenum)
+IdxSpenum <- function(spenumraw) {
+    .Call(`_RNASeqEM_IdxSpenum`, spenumraw)
 }
 

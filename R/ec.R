@@ -1,6 +1,6 @@
 ##' Read in kallisto output.
 ##'
-##' Read in output files generated from \code{kallisto pseudo} and \code{kallisto quant} (version 0.44.0). The output files include equivalence classes, count, and effective length data.
+##' Read in output files generated from \code{kallisto pseudo} and \code{kallisto quant} (version 0.44.0). The output files include equivalence class (ec), count, and effective length data.
 ##'
 ##' @title Standard read in equivalence class (ec) files
 ##' @param ecpath The path of ec file.
@@ -40,10 +40,10 @@ read_pseudo <- function(ecpath, countpath, abpath) {
 
 ##' Expectation maximization (EM) model for RNA-seq quantification.
 ##'
-##' EM model for RNA-seq quantification.
+##' EM model for RNA-seq quantification. The equivalence class (ec) with 0 counts are removed, because these counts have no contributes to the final results.
 ##'
 ##' @title EM model
-##' @param pseudo A \code{list} of equivalence class (ec), count of ec, and effective length of transcripts. It can be the outputs of kallisto.
+##' @param pseudo A \code{list} of ec, count of ec, and effective length of transcripts. It can be the outputs of kallisto.
 ##' @param maxiter The maximum iteration number with the default value of 10000.
 ##' @param n The number of CPUs or processors.
 ##' @inheritParams EMSingle
@@ -92,7 +92,7 @@ EM <- function(pseudo, spenum, maxiter = 10000, n = 2) {
     ## stop condition
     stopcond <- est > countChangeLimit &
       (abs(est - startcount)/est) > countChange
-    if (sum(stopcond, na.rm = TRUE) == 0) {
+    if (sum(stopcond) == 0) {
       ## print(cbind(est, startcount))
       ## print(startprob)
       ## print((abs(est - startcount)/est))
@@ -139,9 +139,11 @@ EM <- function(pseudo, spenum, maxiter = 10000, n = 2) {
 ## cp
 
 
-## library(magrittr)
-## library(Rcpp)
-## library(RcppParallel)
+## library('magrittr')
+## library('Rcpp')
+## library('RcppParallel')
+## library('profvis')
+## library('RNASeqEM')
 ## sourceCpp('../src/utilities.cpp')
 ## sourceCpp('../src/EM.cpp')
 
@@ -149,7 +151,15 @@ EM <- function(pseudo, spenum, maxiter = 10000, n = 2) {
 ## efflenmat <- read.table('/extDisk1/RESEARCH/RNASeqEMtest/athtest/abundance_ath.tsv', header = TRUE, stringsAsFactors = FALSE)
 ## plist <- list(ec = ecmat$Transcript, count = ecmat$Count, efflen = efflenmat$eff_length)
 
-## pseudo <- plist
-## spenum <- 41392
+## RNASeqEM:::start_profiler("profile.out")
+## EMTest(plist$efflen, plist$ec, plist$count, 41392)
+## RNASeqEM:::stop_profiler()
 
-## tmp1 <- EM(plist, 41392, n = 8)
+## profvis(tmp1 <- EM(plist, 41392, n = 8))
+## profvis(
+##   for (i in 1:2000) {
+##     est <- EMSingle(cp, effectlen, ec, ecnum)
+##     cp <- Estcount2Prob(est, spenum)
+##   }
+## )
+

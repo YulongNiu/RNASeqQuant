@@ -4,6 +4,8 @@
 #include <algorithm>
 #include <vector>
 
+#include "utilities.h"
+
 using namespace Rcpp;
 using namespace RcppParallel;
 using namespace arma;
@@ -77,8 +79,8 @@ arma::vec EMSingle(arma::vec& prob,
 //' @author Yulong Niu \email{yulong.niu@@hotmail.com}
 //' @keywords internal
 // [[Rcpp::export]]
-arma::vec Estcount2Prob(arma::vec& estcount,
-                        arma::uvec& spenum) {
+arma::vec Estcount2Prob(const arma::vec& estcount,
+                        const arma::uvec& spenum) {
 
   vec prob(estcount.n_elem, fill::zeros);
 
@@ -92,17 +94,49 @@ arma::vec Estcount2Prob(arma::vec& estcount,
 }
 
 
-// // [[Rcpp::export]]
-// arma::vec TestSub(arma::vec& estcount,
-//                   arma::uvec& spenum) {
+// [[Rcpp::export]]
+arma::vec EMTest(const arma::vec& efflenraw,
+                 const Rcpp::CharacterVector& ecraw,
+                 const arma::uvec& countraw,
+                 const arma::uvec& spenumraw,
+                 const arma::uword maxiter = 10000,
+                 const arma::uword miniter = 50) {
 
-//   vec prob(estcount.n_elem, fill::zeros);
+  // stop iteration params from kallisto
+  uword countChangeLimit = 1e-2;
+  uword countChange = 1e-2;
+  uword countLimit = 1e-8;
 
-//   // for (uword i = 0; i < spenum.n_elem - 1; ++i) {
-//   //   uword start = spenum(i);
-//   //   uword end = spenum(i) + spenum(i+1) - 1;
-//   //   prob.subvec(start, end) = estcount.subvec(start, end) / sum(estcount.subvec(start, end));
-//   // }
+  // step1: pseudo information
+  // remove zero counts
+  uvec zeros = find(countraw > 0);
+  IntegerVector zerosidx(zeros.begin(), zeros.end());
 
-//   return prob;
-// }
+  uvec count = countraw.elem(zeros);
+  vector<uvec> ec = SplitEC(ecraw[zerosidx]);
+  vector<vec> efflen = MatchEfflen(ec, efflenraw);
+  uvec spenum = IdxSpenum(spenumraw);
+
+  // step2: EM iteration
+  // start prob and est
+  uword tn = sum(spenumraw);
+  double cn = sum(count);
+  vec prob(tn);
+  vec est(tn);
+  for (uword i = 0; i < spenum.n_elem - 1; ++i) {
+    uword start = spenum(i);
+    uword end = spenum(i) + spenum(i+1) - 1;
+    prob.subvec(start, end).fill(1.0/spenum(i+1));
+    est.subvec(start, end).fill(cn/(spenum(i+1) * spenumraw.size()));
+  }
+
+  for (uword i = 0; i < maxiter; ++i) {
+
+    est = EMSingle(prob, efflen, ec, count);
+    prob = Estcount2Prob(est, spenum);
+  }
+
+  return est;
+
+}
+

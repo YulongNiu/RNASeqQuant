@@ -2,4 +2,4 @@ CXX_STD = CXX11
 
 PKG_CXXFLAGS = -DARMA_64BIT_WORD=1
 
-PKG_LIBS = `${R_HOME}/bin/Rscript -e "RcppParallel::RcppParallelLibs()"` $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)
+PKG_LIBS = `${R_HOME}/bin/Rscript -e "RcppParallel::RcppParallelLibs()"` $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) -lprofiler

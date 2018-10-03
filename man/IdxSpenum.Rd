@@ -4,10 +4,10 @@
 \alias{IdxSpenum}
 \title{Index species number}
 \usage{
-IdxSpenum(spenum)
+IdxSpenum(spenumraw)
 }
 \arguments{
-\item{spenum}{A \code{arma::uvec} indicated the transcript number in each species.}
+\item{spenumraw}{A \code{arma::uvec} indicated the transcript number in each species.}
 }
 \value{
 A \code{arma::uvec}.

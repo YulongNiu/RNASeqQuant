@@ -3,6 +3,8 @@
 
 #include <algorithm>
 #include <vector>
+#include <cmath>
+#include <iostream>
 
 #include "utilities.h"
 
@@ -30,12 +32,9 @@ struct ExpectEC : public Worker
 
   void operator()(std::size_t begin, std::size_t end) {
     for (std::size_t i = begin; i < end; ++i) {
-      if (count(i) > 0) {
-        vec eachcp = prob.elem(ec[i]) / efflen[i];
-        estcount.elem(ec[i]) += eachcp * count(i)/ sum(eachcp);
-      } else {}
+      vec eachcp = prob.elem(ec[i]) / efflen[i];
+      estcount.elem(ec[i]) += eachcp * count(i)/ sum(eachcp);
     }
-
   }
 };
 
@@ -68,6 +67,26 @@ arma::vec EMSingle(arma::vec& prob,
 }
 
 
+
+// [[Rcpp::export]]
+arma::vec EMSingle2(arma::vec& prob,
+                    const std::vector<arma::vec>& efflen,
+                    const std::vector<arma::uvec>& ec,
+                    arma::uvec& count) {
+
+  vec estcount(prob.n_elem, fill::zeros);
+
+  for (uword i = 0; i < count.n_elem; ++i) {
+    vec eachcp = prob.elem(ec[i]) / efflen[i];
+    estcount.elem(ec[i]) += eachcp * count(i)/ sum(eachcp);
+  }
+
+  return estcount;
+}
+
+
+
+
 //' Transform estimated count to probabilities.
 //'
 //' Use estimated counts as the outputs and EM stop conditions.
@@ -90,6 +109,9 @@ arma::vec Estcount2Prob(const arma::vec& estcount,
     prob.subvec(start, end) = estcount.subvec(start, end) / sum(estcount.subvec(start, end));
   }
 
+  // // reduce small number influence
+  // prob *= 1e+8;
+
   return prob;
 }
 
@@ -103,9 +125,9 @@ arma::vec EMTest(const arma::vec& efflenraw,
                  const arma::uword miniter = 50) {
 
   // stop iteration params from kallisto
-  uword countChangeLimit = 1e-2;
-  uword countChange = 1e-2;
-  uword countLimit = 1e-8;
+  double countChangeLimit = 1e-2;
+  double countChange = 1e-2;
+  double countLimit = 1e-8;
 
   // step1: pseudo information
   // remove zero counts
@@ -122,21 +144,46 @@ arma::vec EMTest(const arma::vec& efflenraw,
   uword tn = sum(spenumraw);
   double cn = sum(count);
   vec prob(tn);
-  vec est(tn);
+  vec startest(tn);
+  vec est(tn, fill::zeros);
   for (uword i = 0; i < spenum.n_elem - 1; ++i) {
     uword start = spenum(i);
     uword end = spenum(i) + spenum(i+1) - 1;
     prob.subvec(start, end).fill(1.0/spenum(i+1));
-    est.subvec(start, end).fill(cn/(spenum(i+1) * spenumraw.size()));
+    startest.subvec(start, end).fill(cn/(spenum(i+1) * spenumraw.size()));
   }
 
-  for (uword i = 0; i < maxiter; ++i) {
+  for (uword iter = 0; iter < maxiter; ++iter) {
 
-    est = EMSingle(prob, efflen, ec, count);
-    prob = Estcount2Prob(est, spenum);
+    est = EMSingle2(prob, efflen, ec, count);
+
+    cout << std::setprecision (20) << sum(est) << endl;
+    cout << sum(prob) << endl;
+    // for (auto eachest : est) {
+    //   cout << std::setprecision (20) << eachest << endl;
+    // }
+
+    // stop iteration condition
+    uword nopassn = 0;
+    for (uword t = 0; t < tn; ++t) {
+      if (est(t) > countChangeLimit && (fabs(est(t) - startest(t))/est(t)) > countChange) {
+        ++nopassn;
+        // std::cout << fabs(est(t) - startest(t))/est(t) << endl;
+      } else {}
+    }
+
+    if (nopassn == 0) {
+      std::cout << "The iteration number is " << iter << std::endl;
+      break;
+    } else {
+      prob = Estcount2Prob(est, spenum);
+      startest = est;
+    }
   }
+
+  // reset small est
+  est.elem(find(est < countLimit)).zeros();
 
   return est;
-
 }
 

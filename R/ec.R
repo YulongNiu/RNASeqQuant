@@ -17,7 +17,7 @@
 ##' read_pseudo(ecpath, countpath, abpath)
 ##' @author Yulong Niu \email{yulong.niu@@hotmail.com}
 ##' @importFrom utils read.table
-##' @importFrom magrittr %>%
+##' @importFrom magrittr %>% %<>%
 ##' @export
 ##'
 read_pseudo <- function(ecpath, countpath, abpath) {
@@ -30,6 +30,11 @@ read_pseudo <- function(ecpath, countpath, abpath) {
 
   efflen <- read.table(abpath, header = TRUE, stringsAsFactors = FALSE) %>%
     `[`(, 3)
+
+  ## remove zero counts
+  zeroidx <- count > 0
+  count %<>% `[`(zeroidx)
+  ec %<>% `[`(zeroidx)
 
   ecList <- list(ec = ec,
                  count = count,
@@ -81,10 +86,11 @@ EM <- function(pseudo, spenum, maxiter = 10000, n = 2) {
 
   ## EM iteration
   startprob <- rep(1/spenum[-1], spenum[-1])
-  startcount <- startprob / length(spenum[-1]) * sum(count)
+  startcount <- startprob * sum(count) / length(spenum[-1])
+  startprob  <- startprob
 
   for (i in seq_len(maxiter)) {
-    est <- EMSingle(prob = startprob,
+    est <- EMSingle2(prob = startprob,
                     efflen = efflen,
                     ec = ec,
                     count = count)
@@ -139,22 +145,41 @@ EM <- function(pseudo, spenum, maxiter = 10000, n = 2) {
 ## cp
 
 
-## library('magrittr')
-## library('Rcpp')
-## library('RcppParallel')
-## library('profvis')
+library('magrittr')
+library('Rcpp')
+library('RcppParallel')
+library('profvis')
 ## library('RNASeqEM')
-## sourceCpp('../src/utilities.cpp')
-## sourceCpp('../src/EM.cpp')
+sourceCpp('../src/utilities.cpp')
+sourceCpp('../src/EM.cpp')
 
-## ecmat <- read.table('/extDisk1/RESEARCH/RNASeqEMtest/athtest/pseudoalignments_ath.tsv', header = TRUE, stringsAsFactors = FALSE)
-## efflenmat <- read.table('/extDisk1/RESEARCH/RNASeqEMtest/athtest/abundance_ath.tsv', header = TRUE, stringsAsFactors = FALSE)
-## plist <- list(ec = ecmat$Transcript, count = ecmat$Count, efflen = efflenmat$eff_length)
+ecmat <- read.table('/extDisk1/RESEARCH/RNASeqEMtest/athtest/pseudoalignments_ath.tsv', header = TRUE, stringsAsFactors = FALSE)
+efflenmat <- read.table('/extDisk1/RESEARCH/RNASeqEMtest/athtest/abundance_ath.tsv', header = TRUE, stringsAsFactors = FALSE)
+plist <- list(ec = ecmat$Transcript, count = ecmat$Count, efflen = efflenmat$eff_length)
 
+## cpp
+tmp1 <- EMTest(plist$efflen, plist$ec, plist$count, 41392)
+
+## ## cpp profiler
 ## RNASeqEM:::start_profiler("profile.out")
-## EMTest(plist$efflen, plist$ec, plist$count, 41392)
+## tmp1 <- RNASeqEM:::EMTest(plist$efflen, plist$ec, plist$count, 41392)
 ## RNASeqEM:::stop_profiler()
 
+## R
+zeroidx <- ecmat$Count > 0
+plist <- list(ec = ecmat$Transcript[zeroidx], count = ecmat$Count[zeroidx], efflen = efflenmat$eff_length)
+tmp2 <- EM(plist, 41392)
+
+diffidx <- (tmp1 - tmp2)/tmp1 > 0.01
+diffidx <- which(diffidx)
+cbind(tmp1[diffidx], tmp2[diffidx])
+
+## compare
+diffidx <- (tmp1 - efflenmat$est_counts)/tmp1 > 0.01
+diffidx <- which(diffidx)
+cbind(tmp1[diffidx], efflenmat$est_counts[diffidx])
+
+## test R version
 ## profvis(tmp1 <- EM(plist, 41392, n = 8))
 ## profvis(
 ##   for (i in 1:2000) {
@@ -162,4 +187,3 @@ EM <- function(pseudo, spenum, maxiter = 10000, n = 2) {
 ##     cp <- Estcount2Prob(est, spenum)
 ##   }
 ## )
-

@@ -17,16 +17,16 @@ using namespace std;
 
 struct ExpectEC : public Worker
 {
-  arma::vec& prob;
+  const arma::vec& prob;
   const std::vector<arma::vec>& efflen;
   const std::vector<arma::uvec>& ec;
-  arma::uvec& count;
+  const arma::uvec& count;
   arma::vec& estcount;
 
-  ExpectEC(arma::vec& prob,
+  ExpectEC(const arma::vec& prob,
            const std::vector<arma::vec>& efflen,
            const std::vector<arma::uvec>& ec,
-           arma::uvec& count,
+           const arma::uvec& count,
            arma::vec& estcount)
     : prob(prob), efflen(efflen), ec(ec), count(count), estcount(estcount) {}
 
@@ -52,10 +52,10 @@ struct ExpectEC : public Worker
 //' @author Yulong Niu \email{yulong.niu@@hotmail.com}
 //' @keywords internal
 // [[Rcpp::export]]
-arma::vec EMSingle(arma::vec& prob,
+arma::vec EMSingle(const arma::vec& prob,
                    const std::vector<arma::vec>& efflen,
                    const std::vector<arma::uvec>& ec,
-                   arma::uvec& count) {
+                   const arma::uvec& count) {
 
   vec estcount(prob.n_elem, fill::zeros);
 
@@ -69,10 +69,10 @@ arma::vec EMSingle(arma::vec& prob,
 
 
 // [[Rcpp::export]]
-arma::vec EMSingle2(arma::vec& prob,
+arma::vec EMSingle2(const arma::vec& prob,
                     const std::vector<arma::vec>& efflen,
                     const std::vector<arma::uvec>& ec,
-                    arma::uvec& count) {
+                    const arma::uvec& count) {
 
   vec estcount(prob.n_elem, fill::zeros);
 
@@ -116,13 +116,52 @@ arma::vec Estcount2Prob(const arma::vec& estcount,
 }
 
 
+
+//' Expectation maximization (EM) model for RNA-seq quantification.
+//'
+//' EM model for RNA-seq quantification. The equivalence class (ec) with 0 counts are removed, because these counts have no contributes to the final results.
+//'
+//' @title EM model
+//' @param countraw A \code{arma::uvec} indicates the counts of ec.
+//' @param maxiter The maximum iteration number with the default value of 10000.
+//' @param miniter The minimum iteration number with the default value of 50.
+//' @inheritParams MatchEfflen
+//' @inheritParams SplitEC
+//' @inheritParams IdxSpenum
+//' @references \href{https://arxiv.org/abs/1104.3889}{Lior Pachter: Models for transcript quantification from RNA-Seq}
+//' @return A \code{numeric vector} indicates probabilities of selecting a read from the different transcripts.
+//' @examples
+//' ## Single species
+//' ##    f1 f2 f3
+//' ## ec1 1 1 1
+//' ## ec2 0 1 1
+//' ## ec3 1 0 1
+//' ## ec4 1 0 0
+//' ## ec5 1 1 0
+//' plist <- list(ec = c('0,1,2', '1,2', '0,2', '0', '0,1'), count = rep(1, 5), efflen = rep(1, 3))
+//' EM(plist$efflen, plist$ec, plist$count, spenum = 3)
+//'
+//' ## Two species
+//' ##    f1 f2 f3 f1' f2'
+//' ## ec1 1  1  0  0  1
+//' ## ec2 1  0  1  1  0
+//' ## ec3 0  1  1  0  0
+//' ## ec4 0  0  0  1  1
+//' ## ec5 1  0  1  0  1
+//' ## ec6 1  1  0  0  0
+//' plist <- list(ec = c('0,1,4', '0,2,3', '1,2', '3,4', '0,2,4', '0,1'), count = rep(1, 6), efflen = rep(1, 5))
+//' EM(plist$efflen, plist$ec, plist$count, c(3, 2))
+//' ## compare with single species
+//' EM(plist$efflen, plist$ec, plist$count, 5)
+//' @author Yulong Niu \email{yulong.niu@@hotmail.com}
+//' @export
 // [[Rcpp::export]]
-arma::vec EMTest(const arma::vec& efflenraw,
-                 const Rcpp::CharacterVector& ecraw,
-                 const arma::uvec& countraw,
-                 const arma::uvec& spenumraw,
-                 const arma::uword maxiter = 10000,
-                 const arma::uword miniter = 50) {
+arma::vec EM(const arma::vec& efflenraw,
+             const Rcpp::CharacterVector& ecraw,
+             const arma::uvec& countraw,
+             const arma::uvec& spenumraw,
+             const arma::uword maxiter = 10000,
+             const arma::uword miniter = 50) {
 
   // stop iteration params from kallisto
   double countChangeLimit = 1e-2;
@@ -155,7 +194,7 @@ arma::vec EMTest(const arma::vec& efflenraw,
 
   for (uword iter = 0; iter < maxiter; ++iter) {
 
-    est = EMSingle2(prob, efflen, ec, count);
+    est = EMSingle(prob, efflen, ec, count);
 
     cout << std::setprecision (20) << sum(est) << endl;
     cout << sum(prob) << endl;
@@ -172,7 +211,7 @@ arma::vec EMTest(const arma::vec& efflenraw,
       } else {}
     }
 
-    if (nopassn == 0) {
+    if (nopassn == 0 && iter >= miniter) {
       std::cout << "The iteration number is " << iter << std::endl;
       break;
     } else {
@@ -186,4 +225,3 @@ arma::vec EMTest(const arma::vec& efflenraw,
 
   return est;
 }
-

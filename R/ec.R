@@ -44,48 +44,38 @@ read_pseudo <- function(ecpath, countpath, abpath) {
 }
 
 
-library('magrittr')
-library('Rcpp')
-library('RcppParallel')
-library('profvis')
-## library('RNASeqEM')
-sourceCpp('../src/utilities.cpp')
-sourceCpp('../src/EM.cpp')
+## library('magrittr')
+## library('Rcpp')
+## library('RcppParallel')
+## library('profvis')
+## ## library('RNASeqEM')
+## sourceCpp('../src/utilities.cpp')
+## sourceCpp('../src/EM.cpp')
 
-ecmat <- read.table('/extDisk1/RESEARCH/RNASeqEMtest/athtest/pseudoalignments_ath.tsv', header = TRUE, stringsAsFactors = FALSE)
-efflenmat <- read.table('/extDisk1/RESEARCH/RNASeqEMtest/athtest/abundance_ath.tsv', header = TRUE, stringsAsFactors = FALSE)
-plist <- list(ec = ecmat$Transcript, count = ecmat$Count, efflen = efflenmat$eff_length)
+## ecmat <- read.table('/extDisk1/RESEARCH/RNASeqEMtest/athtest/pseudoalignments_ath.tsv', header = TRUE, stringsAsFactors = FALSE)
+## efflenmat <- read.table('/extDisk1/RESEARCH/RNASeqEMtest/athtest/abundance_ath.tsv', header = TRUE, stringsAsFactors = FALSE)
+## plist <- list(ec = ecmat$Transcript, count = ecmat$Count, efflen = efflenmat$eff_length)
 
-## cpp
-tmp1 <- EM(plist$efflen, plist$ec, plist$count, 41392)
+## ## cpp
+## tmp1 <- EM(plist$efflen, plist$ec, plist$count, 41392)
+
+## library('microbenchmark')
+## microbenchmark(tmp1 <- EM(plist$efflen, plist$ec, plist$count, 41392))
 
 ## ## cpp profiler
 ## RNASeqEM:::start_profiler("profile.out")
 ## tmp1 <- RNASeqEM:::EMTest(plist$efflen, plist$ec, plist$count, 41392)
 ## RNASeqEM:::stop_profiler()
 
-tmp2 <- EMTest(plist$efflen, plist$ec, plist$count, c(20000, 21392))
+## tmp2 <- EM(plist$efflen, plist$ec, plist$count, c(10000, 31392))
 
-diffidx <- abs((tmp1 - tmp2))/tmp1 > 0.01
-diffidx <- which(diffidx)
-cbind(tmp1[diffidx], tmp2[diffidx])
+## diffidx <- abs((tmp1 - tmp2))/tmp1 > 0.01 | (tmp1 == 0 & tmp2 != 0)
+## diffidx <- which(diffidx)
+## cbind(tmp1[diffidx], tmp2[diffidx])
 
-## compare
-diffidx <- abs((tmp1 - efflenmat$est_counts))/tmp1 > 0.01
-diffidx <- which(diffidx)
-cbind(tmp1[diffidx], efflenmat$est_counts[diffidx])
-
-
+## ## compare
+## diffidx <- abs((tmp1 - efflenmat$est_counts))/tmp1 > 0.01
+## diffidx <- which(diffidx)
+## cbind(tmp1[diffidx], efflenmat$est_counts[diffidx])
 
 
-## test share
-sourceCpp('../src/TestParal.cpp')
-
-n <- 10
-g <- 1000
-ecin <- sample(0:9, g*n, replace = TRUE) %>%
-  split(1:g)
-
-ecin %>% unlist %>% table
-
-TestShare(ecin, 10)

@@ -5,7 +5,6 @@
 #include <algorithm>
 #include <vector>
 #include <cmath>
-#include <iostream>
 
 #include "utilities.h"
 
@@ -15,6 +14,8 @@ using namespace arma;
 using namespace std;
 
 // [[Rcpp::depends(RcppArmadillo, RcppParallel)]]
+
+#if RCPP_PARALLEL_USE_TBB
 
 tbb::mutex countMutex;
 
@@ -43,20 +44,6 @@ struct ExpectEC : public Worker
   }
 };
 
-
-//' Parallel a single EM iteration.
-//'
-//' One iteration of EM model.
-//'
-//' @title Single EM iteration
-//' @return A updated \code{arma::vec} estimated counts of different transcripts.
-//' @param prob A \code{arma::vec} of probabilities of selecting a read from the different transcripts.
-//' @param efflen A \code{std::vector<arma::vec>} indicated the effective length of transcripts.
-//' @param ec A \code{std::vector<arma::vec>} indicated equivalence classes with the same length of \code{efflen}.
-//' @param count A \code{arma::uvec} indicated the mapped count number of equivalence class with the same length of \code{efflen}.
-//' @author Yulong Niu \email{yulong.niu@@hotmail.com}
-//' @keywords internal
-// [[Rcpp::export]]
 arma::vec EMSingle(const arma::vec& prob,
                    const std::vector<arma::vec>& efflen,
                    const std::vector<arma::uvec>& ec,
@@ -66,18 +53,19 @@ arma::vec EMSingle(const arma::vec& prob,
 
   // create parallel worker and call
   ExpectEC expectEC(prob, efflen, ec, count, estcount);
-  parallelFor(0, efflen.size(), expectEC);
+
+  // grain size is 1k
+  parallelFor(0, efflen.size(), expectEC, 1000);
 
   return estcount;
 }
 
+#else
 
-
-// [[Rcpp::export]]
-arma::vec EMSingle2(const arma::vec& prob,
-                    const std::vector<arma::vec>& efflen,
-                    const std::vector<arma::uvec>& ec,
-                    const arma::uvec& count) {
+arma::vec EMSingle(const arma::vec& prob,
+                   const std::vector<arma::vec>& efflen,
+                   const std::vector<arma::uvec>& ec,
+                   const arma::uvec& count) {
 
   vec estcount(prob.n_elem, fill::zeros);
 
@@ -89,8 +77,7 @@ arma::vec EMSingle2(const arma::vec& prob,
   return estcount;
 }
 
-
-
+#endif
 
 //' Transform estimated count to probabilities.
 //'
@@ -119,7 +106,6 @@ arma::vec Estcount2Prob(const arma::vec& estcount,
 
   return prob;
 }
-
 
 
 //' Expectation maximization (EM) model for RNA-seq quantification.
@@ -154,7 +140,8 @@ arma::vec Estcount2Prob(const arma::vec& estcount,
 //' ## ec4 0  0  0  1  1
 //' ## ec5 1  0  1  0  1
 //' ## ec6 1  1  0  0  0
-//' plist <- list(ec = c('0,1,4', '0,2,3', '1,2', '3,4', '0,2,4', '0,1'), count = rep(1, 6), efflen = rep(1, 5))
+//' plist <- list(ec = c('0,1,4', '0,2,3', '1,2', '3,4', '0,2,4', '0,1'),
+//'               count = rep(1, 6), efflen = rep(1, 5))
 //' EM(plist$efflen, plist$ec, plist$count, c(3, 2))
 //' ## compare with single species
 //' EM(plist$efflen, plist$ec, plist$count, 5)
@@ -203,16 +190,12 @@ arma::vec EM(const arma::vec& efflenraw,
 
     // cout << std::setprecision (20) << sum(est) << endl;
     // cout << sum(prob) << endl;
-    // for (auto eachest : est) {
-    //   cout << std::setprecision (20) << eachest << endl;
-    // }
 
     // stop iteration condition
     uword nopassn = 0;
     for (uword t = 0; t < tn; ++t) {
       if (est(t) > countChangeLimit && (fabs(est(t) - startest(t))/est(t)) > countChange) {
         ++nopassn;
-        // std::cout << fabs(est(t) - startest(t))/est(t) << endl;
       } else {}
     }
 

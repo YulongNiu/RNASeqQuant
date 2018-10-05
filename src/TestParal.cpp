@@ -1,10 +1,12 @@
 #include <RcppArmadillo.h>
 #include <RcppParallel.h>
 
+#include <tthread/tinythread.h>
 #include <algorithm>
 #include <vector>
 #include <cmath>
 #include <iostream>
+
 
 using namespace Rcpp;
 using namespace RcppParallel;
@@ -12,6 +14,8 @@ using namespace arma;
 using namespace std;
 
 // [[Rcpp::depends(RcppArmadillo, RcppParallel)]]
+
+tbb::mutex countMutex;
 
 struct TestShareMem : public Worker
 {
@@ -23,9 +27,11 @@ struct TestShareMem : public Worker
     : ec(ec), estcount(estcount) {}
 
   void operator()(std::size_t begin, std::size_t end) {
+    countMutex.lock();
     for (std::size_t i = begin; i < end; ++i) {
       estcount.elem(ec[i]) += 1;
     }
+    countMutex.unlock();
   }
 };
 

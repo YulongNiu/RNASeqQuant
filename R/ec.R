@@ -82,7 +82,7 @@ cbind(tmp1[diffidx], efflenmat$est_counts[diffidx])
 sourceCpp('../src/TestParal.cpp')
 
 n <- 10
-g <- 100000
+g <- 1000
 ecin <- sample(0:9, g*n, replace = TRUE) %>%
   split(1:g)
 

@@ -1,6 +1,7 @@
 #include <RcppArmadillo.h>
 #include <RcppParallel.h>
 
+#include <tthread/tinythread.h>
 #include <algorithm>
 #include <vector>
 #include <cmath>
@@ -14,6 +15,8 @@ using namespace arma;
 using namespace std;
 
 // [[Rcpp::depends(RcppArmadillo, RcppParallel)]]
+
+tbb::mutex countMutex;
 
 struct ExpectEC : public Worker
 {
@@ -31,10 +34,12 @@ struct ExpectEC : public Worker
     : prob(prob), efflen(efflen), ec(ec), count(count), estcount(estcount) {}
 
   void operator()(std::size_t begin, std::size_t end) {
+    countMutex.lock();
     for (std::size_t i = begin; i < end; ++i) {
       vec eachcp = prob.elem(ec[i]) / efflen[i];
       estcount.elem(ec[i]) += eachcp * count(i)/ sum(eachcp);
     }
+    countMutex.unlock();
   }
 };
 
@@ -196,8 +201,8 @@ arma::vec EM(const arma::vec& efflenraw,
 
     est = EMSingle(prob, efflen, ec, count);
 
-    cout << std::setprecision (20) << sum(est) << endl;
-    cout << sum(prob) << endl;
+    // cout << std::setprecision (20) << sum(est) << endl;
+    // cout << sum(prob) << endl;
     // for (auto eachest : est) {
     //   cout << std::setprecision (20) << eachest << endl;
     // }

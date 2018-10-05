@@ -7,14 +7,14 @@
 \usage{
 Strsplit(s, delim)
 
-SplitEC(ec)
+SplitEC(ecraw)
 }
 \arguments{
 \item{s}{A \code{string}.}
 
 \item{delim}{The delimiter}
 
-\item{ec}{A \code{character vector} and each element is a string with comma delimiter.}
+\item{ecraw}{A \code{character vector} and each element is a string with comma delimiter.}
 }
 \value{
 \itemize{

@@ -20,7 +20,7 @@ A \code{list}. 1st element is ec, 2nd element is count of ec, and the 3rd elemen
 Read in kallisto output.
 }
 \details{
-Read in output files generated from \code{kallisto pseudo} and \code{kallisto quant} (version 0.44.0). The output files include equivalence classes, count, and effective length data.
+Read in output files generated from \code{kallisto pseudo} and \code{kallisto quant} (version 0.44.0). The output files include equivalence class (ec), count, and effective length data.
 }
 \examples{
 require('magrittr')

@@ -43,39 +43,3 @@ read_pseudo <- function(ecpath, countpath, abpath) {
   return(ecList)
 }
 
-
-## library('magrittr')
-## library('Rcpp')
-## library('RcppParallel')
-## library('profvis')
-## ## library('RNASeqEM')
-## sourceCpp('../src/utilities.cpp')
-## sourceCpp('../src/EM.cpp')
-
-## ecmat <- read.table('/extDisk1/RESEARCH/RNASeqEMtest/athtest/pseudoalignments_ath.tsv', header = TRUE, stringsAsFactors = FALSE)
-## efflenmat <- read.table('/extDisk1/RESEARCH/RNASeqEMtest/athtest/abundance_ath.tsv', header = TRUE, stringsAsFactors = FALSE)
-## plist <- list(ec = ecmat$Transcript, count = ecmat$Count, efflen = efflenmat$eff_length)
-
-## ## cpp
-## tmp1 <- EM(plist$efflen, plist$ec, plist$count, 41392)
-
-## library('microbenchmark')
-## microbenchmark(tmp1 <- EM(plist$efflen, plist$ec, plist$count, 41392))
-
-## ## cpp profiler
-## RNASeqEM:::start_profiler("profile.out")
-## tmp1 <- RNASeqEM:::EMTest(plist$efflen, plist$ec, plist$count, 41392)
-## RNASeqEM:::stop_profiler()
-
-## tmp2 <- EM(plist$efflen, plist$ec, plist$count, c(10000, 31392))
-
-## diffidx <- abs((tmp1 - tmp2))/tmp1 > 0.01 | (tmp1 == 0 & tmp2 != 0)
-## diffidx <- which(diffidx)
-## cbind(tmp1[diffidx], tmp2[diffidx])
-
-## ## compare
-## diffidx <- abs((tmp1 - efflenmat$est_counts))/tmp1 > 0.01
-## diffidx <- which(diffidx)
-## cbind(tmp1[diffidx], efflenmat$est_counts[diffidx])
-
-

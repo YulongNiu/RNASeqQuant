@@ -44,19 +44,25 @@ read_pseudo <- function(ecpath, countpath, abpath) {
 }
 
 
-## library('Rcpp')
-## library('magrittr')
-## sourceCpp('../src/utilities.cpp')
-## sourceCpp('../src/likelihood.cpp')
-## sourceCpp('../src/EM.cpp')
+library('Rcpp')
+library('magrittr')
+sourceCpp('../src/utilities.cpp')
+sourceCpp('../src/likelihood.cpp')
+sourceCpp('../src/GD.cpp')
+sourceCpp('../src/EM.cpp')
 
 
 
-## plist <- list(ec = c('0,1,2', '1,2', '0,2', '0', '0,1'), count = rep(1, 5), efflen = rep(1, 3))
-## EM(plist$efflen, plist$ec, plist$count, spenum = 3)
+plist <- list(ec = c('0,1,2', '1,2', '0,2', '0', '0,1'), count = rep(1, 5), efflen = rep(1, 3))
 
-## ecpath <- '/extDisk1/RESEARCH/RNASeqEMtest/athtest/testpseudo/pseudoalignments.ec'
-## countpath <- '/extDisk1/RESEARCH/RNASeqEMtest/athtest/testpseudo/pseudoalignments.tsv'
-## abpath  <- '/extDisk1/RESEARCH/RNASeqEMtest/athtest/testquant/abundance.tsv'
-## plist <- read_pseudo(ecpath, countpath, abpath)
-## tmp1 <- EM(plist$efflen, plist$ec, plist$count, 41392)
+Gradient(rep(1, 3), MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count)
+
+EM(plist$efflen, plist$ec, plist$count, spenum = 3)
+
+
+
+ecpath <- '/extDisk1/RESEARCH/RNASeqEMtest/athtest/testpseudo/pseudoalignments.ec'
+countpath <- '/extDisk1/RESEARCH/RNASeqEMtest/athtest/testpseudo/pseudoalignments.tsv'
+abpath  <- '/extDisk1/RESEARCH/RNASeqEMtest/athtest/testquant/abundance.tsv'
+plist <- read_pseudo(ecpath, countpath, abpath)
+tmp1 <- EM(plist$efflen, plist$ec, plist$count, 41392)

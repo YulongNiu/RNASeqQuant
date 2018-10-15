@@ -200,7 +200,7 @@ arma::vec EM(const arma::vec& efflenraw,
     }
 
     if (nopassn == 0 && iter >= miniter) {
-      std::cout << "The iteration number is " << iter + 1 << std::endl;
+      Rcout << "The iteration number is " << iter + 1 << std::endl;
       break;
     } else {
       prob = Estcount2Prob(est, spenum);

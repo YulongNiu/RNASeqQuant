@@ -43,3 +43,11 @@ read_pseudo <- function(ecpath, countpath, abpath) {
   return(ecList)
 }
 
+
+## library('Rcpp')
+## sourceCpp('../src/EM.cpp')
+## sourceCpp('../src/utilities.cpp')
+
+
+## plist <- list(ec = c('0,1,2', '1,2', '0,2', '0', '0,1'), count = rep(1, 5), efflen = rep(1, 3))
+## EM(plist$efflen, plist$ec, plist$count, spenum = 3)

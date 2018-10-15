@@ -58,6 +58,10 @@ EM <- function(efflenraw, ecraw, countraw, spenumraw, maxiter = 10000L, miniter 
     .Call(`_RNASeqEM_EM`, efflenraw, ecraw, countraw, spenumraw, maxiter, miniter)
 }
 
+LL <- function(prob, efflen, ec, count) {
+    .Call(`_RNASeqEM_LL`, prob, efflen, ec, count)
+}
+
 start_profiler <- function(str) {
     .Call(`_RNASeqEM_start_profiler`, str)
 }

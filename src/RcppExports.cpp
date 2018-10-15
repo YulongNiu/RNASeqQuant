@@ -34,6 +34,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// LL
+double LL(const arma::vec& prob, const std::vector<arma::vec>& efflen, const std::vector<arma::uvec>& ec, const arma::uvec& count);
+RcppExport SEXP _RNASeqEM_LL(SEXP probSEXP, SEXP efflenSEXP, SEXP ecSEXP, SEXP countSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type prob(probSEXP);
+    Rcpp::traits::input_parameter< const std::vector<arma::vec>& >::type efflen(efflenSEXP);
+    Rcpp::traits::input_parameter< const std::vector<arma::uvec>& >::type ec(ecSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type count(countSEXP);
+    rcpp_result_gen = Rcpp::wrap(LL(prob, efflen, ec, count));
+    return rcpp_result_gen;
+END_RCPP
+}
 // start_profiler
 SEXP start_profiler(SEXP str);
 RcppExport SEXP _RNASeqEM_start_profiler(SEXP strSEXP) {
@@ -105,6 +119,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_RNASeqEM_Estcount2Prob", (DL_FUNC) &_RNASeqEM_Estcount2Prob, 2},
     {"_RNASeqEM_EM", (DL_FUNC) &_RNASeqEM_EM, 6},
+    {"_RNASeqEM_LL", (DL_FUNC) &_RNASeqEM_LL, 4},
     {"_RNASeqEM_start_profiler", (DL_FUNC) &_RNASeqEM_start_profiler, 1},
     {"_RNASeqEM_stop_profiler", (DL_FUNC) &_RNASeqEM_stop_profiler, 0},
     {"_RNASeqEM_Strsplit", (DL_FUNC) &_RNASeqEM_Strsplit, 2},

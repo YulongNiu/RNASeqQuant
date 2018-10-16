@@ -24,17 +24,17 @@ arma::vec Gradient(const arma::vec& w,
   vec grad(w.n_elem, fill::zeros);
 
   for (uword i = 0; i < count.n_elem; ++i) {
-    grad.elem(ec[i]) += count(i) * LogSumExpRatio(w.elem(ec[i]), 1/efflen[i]);
+    grad.elem(ec[i]) += count(i) * Softmax(w.elem(ec[i]), 1/efflen[i]);
   }
 
-  return sum(count) * LogSumExpRatio1(w) - grad;
+  return sum(count) * Softmax1(w) - grad;
 }
 
 
 // [[Rcpp::export]]
 arma::vec Estw2Estcount(const arma::vec& estw,
                         double cn) {
-  return exp(estw) / sum(exp(estw)) * cn;
+  return Softmax1(estw) * cn;
 }
 
 
@@ -76,7 +76,7 @@ arma::vec BGD(const arma::vec& efflenraw,
 
     w = startw - alpha * Gradient(startw, efflen, ec, count);
     est = Estw2Estcount(w, cn);
-    prob = exp(w) / sum(exp(w));
+    prob = Softmax1(w);
 
     Rcout << std::setprecision (20) << LL(prob, efflen, ec, count) << std::endl;
     // cout << std::setprecision (20) << sum(est) << endl;

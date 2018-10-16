@@ -65,14 +65,45 @@ EM(plist$efflen, plist$ec, plist$count, spenum = 3)
 
 ecpath <- '/extDisk1/RESEARCH/RNASeqEMtest/athtest/testpseudo/pseudoalignments.ec'
 countpath <- '/extDisk1/RESEARCH/RNASeqEMtest/athtest/testpseudo/pseudoalignments.tsv'
-abpath  <- '/extDisk1/RESEARCH/RNASeqEMtest/athtest/testquant/abundance.tsv'
+abpath <- '/extDisk1/RESEARCH/RNASeqEMtest/athtest/testquant/abundance.tsv'
 plist <- read_pseudo(ecpath, countpath, abpath)
 tmp1 <- EM(plist$efflen, plist$ec, plist$count, 41392)
 
+
 w <- rep(1, 41392)
-for (i in 1:1) {
-  w <- w - 0.1 * Gradient(w, MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count)
+
+for (i in 1:1000) {
+  w <- w - 0.5 * Gradient(w, MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count)
 }
 
-tmp1 <- BGD(plist$efflen, plist$ec, plist$count, spenum = 41392, alpha = 0.5, 4)
+## est <- Estw2Estcount(startw, sum(plist$count))
+## prob <- LogSumExpRatio1(w)
+
+tmp1 <- BGD(plist$efflen, plist$ec, plist$count, spenum = 41392, alpha = 0.5, 2)
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+RNASeqEM:::start_profiler("profile.out")
+tmp1 <- RNASeqEM:::LogSumExpRatio1(rnorm(1:10000))
+RNASeqEM:::stop_profiler()
+
+LogSumExp1R <- function(x) {
+  return(max(x) + log(sum(exp(x - max(x)))))
+}
+
+LogSumExpRatio1R <- function(x) {
+  sapply(x, function(i) {
+    return(1 / exp(LogSumExp1R(x - i)))
+  })
+}
+
+library(microbenchmark)
+
+set.seed(12345)
+test1 <- rnorm(10000)
+
+microbenchmark(LogSumExpRatio1(test1),
+               LogSumExpRatio1R(test1))
+
+tmp1 <- LogSumExpRatio1(test1)
+tmp2 <- LogSumExpRatio1R(test1)

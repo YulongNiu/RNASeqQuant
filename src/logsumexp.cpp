@@ -9,17 +9,18 @@ using namespace arma;
 //'
 //' \itemize{
 //'   \item \code{LogSumExp()}: Weighted log-sum-exp.
-//'   \item \code{LogSumExpRatio()}: Numerator is the exponent of every element of input \code{x}, and denominator is the sum of \code{exp(x)}.
+//'   \item \code{LogSumExp1()}: log-sum-exp without weight.
+//'   \item \code{Softmax()}: Numerator is the exponent of every element of input \code{x}, and denominator is the sum of \code{exp(x)}.
 //' }
-//'   \item \code{LogSumExpRatio1()}: \code{weight} is 1.
+//'   \item \code{Softmax1()}: \code{weight} is 1.
 //' }
 //'
 //' @title LogSumExp
 //' @return
 //' \itemize{
-//'   \item \code{LogSumExp()}: A \code{double} indicating log-sum-exp.
-//'   \item \code{LogSumExpRatio()}: A \code{arma::vec} number indicate the exp(x_i * weight_i) / sum(exp(x_i * weight_i)).
-//'   \item \code{LogSumExpRatio1()}: A \code{arma::vec} number indicate the exp(x_1) / sum(exp(x_i)).
+//'   \item \code{LogSumExp()} and \code{LogSumExp1(): A \code{double} indicating log-sum-exp.
+//'   \item \code{Softmax()}: A \code{arma::vec} number indicate the exp(x_i * weight_i) / sum(exp(x_i * weight_i)).
+//'   \item \code{Softmax1()}: A \code{arma::vec} number indicate the exp(x_i) / sum(exp(x_i)).
 //' }
 //' @param x A \code{arma::vec}.
 //' @param weight A \code{arma::vec} indicating the weight.
@@ -30,10 +31,8 @@ using namespace arma;
 double LogSumExp(const arma::vec& x,
                  const arma::vec& weight) {
 
-  vec res(x.n_elem, fill::zeros);
   double maxx = max(x);
-
-  res = exp(x - maxx) % weight;
+  vec res = exp(x - maxx) % weight;
 
   return maxx + log(sum(res));
 }
@@ -43,16 +42,12 @@ double LogSumExp(const arma::vec& x,
 //' @rdname logsumexp
 //' @keywords internal
 // [[Rcpp::export]]
-arma::vec LogSumExpRatio(const arma::vec& x,
-                         const arma::vec& weight) {
+double LogSumExp1(const arma::vec& x) {
 
-  vec res(x.n_elem, fill::zeros);
+  double maxx = max(x);
+  vec res = exp(x - maxx);
 
-  for (uword i = 0; i < x.n_elem; ++i) {
-    res(i) =  weight(i) / exp(LogSumExp(x - x(i), weight));
-  }
-
-  return res;
+  return maxx + log(sum(res));
 }
 
 
@@ -60,10 +55,21 @@ arma::vec LogSumExpRatio(const arma::vec& x,
 //' @rdname logsumexp
 //' @keywords internal
 // [[Rcpp::export]]
-arma::vec LogSumExpRatio1(const arma::vec& x) {
+arma::vec Softmax(const arma::vec& x,
+                  const arma::vec& weight) {
 
-  vec weight(x.n_elem, fill::ones);
+  return exp(log(weight) + x - LogSumExp(x, weight));
 
-  return LogSumExpRatio(x, weight);
+}
+
+
+//' @inheritParams LogSumExp
+//' @rdname logsumexp
+//' @keywords internal
+// [[Rcpp::export]]
+arma::vec Softmax1(const arma::vec& x) {
+
+  return exp(x - LogSumExp1(x));
+
 }
 

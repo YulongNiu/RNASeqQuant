@@ -6,9 +6,11 @@
 double LogSumExp(const arma::vec& x,
                  const arma::vec& weight);
 
-arma::vec LogSumExpRatio(const arma::vec& x,
-                         const arma::vec& weight);
+double LogSumExp1(const arma::vec& x);
 
-arma::vec LogSumExpRatio1(const arma::vec& x);
+arma::vec Softmax(const arma::vec& x,
+                  const arma::vec& weight);
+
+arma::vec Softmax1(const arma::vec& x);
 
 #endif

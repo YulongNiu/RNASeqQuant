@@ -44,9 +44,12 @@ read_pseudo <- function(ecpath, countpath, abpath) {
 }
 
 
+
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~test codes~~~~~~~~~~~~~~~~~~~~~~~
 library('Rcpp')
 library('magrittr')
 sourceCpp('../src/utilities.cpp')
+sourceCpp('../src/logsumexp.cpp')
 sourceCpp('../src/likelihood.cpp')
 sourceCpp('../src/GD.cpp')
 sourceCpp('../src/EM.cpp')
@@ -65,3 +68,11 @@ countpath <- '/extDisk1/RESEARCH/RNASeqEMtest/athtest/testpseudo/pseudoalignment
 abpath  <- '/extDisk1/RESEARCH/RNASeqEMtest/athtest/testquant/abundance.tsv'
 plist <- read_pseudo(ecpath, countpath, abpath)
 tmp1 <- EM(plist$efflen, plist$ec, plist$count, 41392)
+
+w <- rep(1, 41392)
+for (i in 1:1) {
+  w <- w - 0.1 * Gradient(w, MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count)
+}
+
+tmp1 <- BGD(plist$efflen, plist$ec, plist$count, spenum = 41392, alpha = 0.5, 4)
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

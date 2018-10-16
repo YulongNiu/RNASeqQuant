@@ -20,7 +20,7 @@ using namespace arma;
 //'   \item \code{SplitEC()}: Split batch of equivalence classes in \code{string} format.
 //' }
 //'
-//' @title Preprocess equivalence classes.
+//' @title Preprocess equivalence classes
 //' @return
 //' \itemize{
 //'   \item \code{Strsplit()}: A \code{arma::uvec} indicating the corresponding transcripts ID (starts from 0).
@@ -112,3 +112,5 @@ arma::uvec IdxSpenum(const arma::uvec& spenumraw) {
 
   return res;
 }
+
+

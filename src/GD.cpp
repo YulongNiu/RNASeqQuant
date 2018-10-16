@@ -6,6 +6,7 @@
 
 #include "utilities.h"
 #include "likelihood.h"
+#include "logsumexp.h"
 
 using namespace Rcpp;
 using namespace RcppParallel;
@@ -22,16 +23,11 @@ arma::vec Gradient(const arma::vec& w,
 
   vec grad(w.n_elem, fill::zeros);
 
-  // exponent
-  vec ew = exp(w);
-  double Z = sum(ew);
-
   for (uword i = 0; i < count.n_elem; ++i) {
-    vec eachewp = ew.elem(ec[i]) / efflen[i];
-    grad.elem(ec[i]) += eachewp * count(i) / sum(eachewp);
+    grad.elem(ec[i]) += count(i) * LogSumExpRatio(w.elem(ec[i]), 1/efflen[i]);
   }
 
-  return sum(count) * ew / Z - grad;
+  return sum(count) * LogSumExpRatio1(w) - grad;
 }
 
 

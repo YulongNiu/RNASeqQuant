@@ -189,7 +189,7 @@ arma::vec EM(const arma::vec& efflenraw,
 
     est = EMSingle(prob, efflen, ec, count);
 
-    //Rcout << LL(prob, efflen, ec, count) << "." << std::endl;
+    //Rcout << std::setprecision (20) << LL(prob, efflen, ec, count) << std::endl;
     // cout << std::setprecision (20) << sum(est) << endl;
     // cout << sum(prob) << endl;
 

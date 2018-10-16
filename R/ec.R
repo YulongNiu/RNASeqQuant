@@ -51,11 +51,10 @@ sourceCpp('../src/likelihood.cpp')
 sourceCpp('../src/GD.cpp')
 sourceCpp('../src/EM.cpp')
 
-
-
 plist <- list(ec = c('0,1,2', '1,2', '0,2', '0', '0,1'), count = rep(1, 5), efflen = rep(1, 3))
 
 Gradient(rep(1, 3), MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count)
+BGD(plist$efflen, plist$ec, plist$count, spenum = 3, alpha = 0.5)
 
 EM(plist$efflen, plist$ec, plist$count, spenum = 3)
 

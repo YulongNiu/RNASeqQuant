@@ -1,5 +1,5 @@
-Package: RNASeqEM
-Title: RNASeqEM: The expectation maximization step of single and multiple species RNA-Seq data
+Package: RNASeqQuant
+Title: RNASeqQuant: Quantification of RNA-Seq data. The expectation maximization step of single and multiple species RNA-Seq data
 Description: It is used to run the expectation-maximization step for RNA-Seq data.
 Version: 0.0.4
 Authors@R: person("Yulong", "Niu", email = "yulong.niu@hotmail.com", role = c("aut", "cre"))

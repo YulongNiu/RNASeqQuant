@@ -12,7 +12,7 @@
 #' @author Yulong Niu \email{yulong.niu@@hotmail.com}
 #' @keywords internal
 Estcount2Prob <- function(estcount, spenum) {
-    .Call(`_RNASeqEM_Estcount2Prob`, estcount, spenum)
+    .Call(`_RNASeqQuant_Estcount2Prob`, estcount, spenum)
 }
 
 #' Expectation maximization (EM) model for RNA-seq quantification.
@@ -55,19 +55,19 @@ Estcount2Prob <- function(estcount, spenum) {
 #' @author Yulong Niu \email{yulong.niu@@hotmail.com}
 #' @export
 EM <- function(efflenraw, ecraw, countraw, spenumraw, maxiter = 10000L, miniter = 50L) {
-    .Call(`_RNASeqEM_EM`, efflenraw, ecraw, countraw, spenumraw, maxiter, miniter)
+    .Call(`_RNASeqQuant_EM`, efflenraw, ecraw, countraw, spenumraw, maxiter, miniter)
 }
 
 Gradient <- function(w, efflen, ec, count) {
-    .Call(`_RNASeqEM_Gradient`, w, efflen, ec, count)
+    .Call(`_RNASeqQuant_Gradient`, w, efflen, ec, count)
 }
 
 Estw2Estcount <- function(estw, cn) {
-    .Call(`_RNASeqEM_Estw2Estcount`, estw, cn)
+    .Call(`_RNASeqQuant_Estw2Estcount`, estw, cn)
 }
 
 BGD <- function(efflenraw, ecraw, countraw, spenumraw, maxiter = 10000L, miniter = 50L, alpha = 0.01) {
-    .Call(`_RNASeqEM_BGD`, efflenraw, ecraw, countraw, spenumraw, maxiter, miniter, alpha)
+    .Call(`_RNASeqQuant_BGD`, efflenraw, ecraw, countraw, spenumraw, maxiter, miniter, alpha)
 }
 
 #' Logistic likelihood.
@@ -83,7 +83,7 @@ BGD <- function(efflenraw, ecraw, countraw, spenumraw, maxiter = 10000L, miniter
 #' @author Yulong Niu \email{yulong.niu@@hotmail.com}
 #' @keywords internal
 LL <- function(prob, efflen, ec, count) {
-    .Call(`_RNASeqEM_LL`, prob, efflen, ec, count)
+    .Call(`_RNASeqQuant_LL`, prob, efflen, ec, count)
 }
 
 #' Calculate the log-sum-exp calculator
@@ -108,36 +108,36 @@ LL <- function(prob, efflen, ec, count) {
 #' @rdname logsumexp
 #' @keywords internal
 LogSumExp <- function(x, weight) {
-    .Call(`_RNASeqEM_LogSumExp`, x, weight)
+    .Call(`_RNASeqQuant_LogSumExp`, x, weight)
 }
 
 #' @inheritParams LogSumExp
 #' @rdname logsumexp
 #' @keywords internal
 LogSumExp1 <- function(x) {
-    .Call(`_RNASeqEM_LogSumExp1`, x)
+    .Call(`_RNASeqQuant_LogSumExp1`, x)
 }
 
 #' @inheritParams LogSumExp
 #' @rdname logsumexp
 #' @keywords internal
 Softmax <- function(x, weight) {
-    .Call(`_RNASeqEM_Softmax`, x, weight)
+    .Call(`_RNASeqQuant_Softmax`, x, weight)
 }
 
 #' @inheritParams LogSumExp
 #' @rdname logsumexp
 #' @keywords internal
 Softmax1 <- function(x) {
-    .Call(`_RNASeqEM_Softmax1`, x)
+    .Call(`_RNASeqQuant_Softmax1`, x)
 }
 
 start_profiler <- function(str) {
-    .Call(`_RNASeqEM_start_profiler`, str)
+    .Call(`_RNASeqQuant_start_profiler`, str)
 }
 
 stop_profiler <- function() {
-    .Call(`_RNASeqEM_stop_profiler`)
+    .Call(`_RNASeqQuant_stop_profiler`)
 }
 
 #' Split strings and equivalence classes.
@@ -160,14 +160,14 @@ stop_profiler <- function() {
 #' @rdname strsplit
 #' @keywords internal
 Strsplit <- function(s, delim) {
-    .Call(`_RNASeqEM_Strsplit`, s, delim)
+    .Call(`_RNASeqQuant_Strsplit`, s, delim)
 }
 
 #' @param ecraw A \code{character vector} and each element is a string with comma delimiter.
 #' @rdname strsplit
 #' @keywords internal
 SplitEC <- function(ecraw) {
-    .Call(`_RNASeqEM_SplitEC`, ecraw)
+    .Call(`_RNASeqQuant_SplitEC`, ecraw)
 }
 
 #' Match transcript effect length with equivalence classes.
@@ -181,7 +181,7 @@ SplitEC <- function(ecraw) {
 #' @author Yulong Niu \email{yulong.niu@@hotmail.com}
 #' @keywords internal
 MatchEfflen <- function(ec, efflenraw) {
-    .Call(`_RNASeqEM_MatchEfflen`, ec, efflenraw)
+    .Call(`_RNASeqQuant_MatchEfflen`, ec, efflenraw)
 }
 
 #' Index transcripts number of input species.
@@ -194,6 +194,6 @@ MatchEfflen <- function(ec, efflenraw) {
 #' @author Yulong Niu \email{yulong.niu@@hotmail.com}
 #' @keywords internal
 IdxSpenum <- function(spenumraw) {
-    .Call(`_RNASeqEM_IdxSpenum`, spenumraw)
+    .Call(`_RNASeqQuant_IdxSpenum`, spenumraw)
 }
 

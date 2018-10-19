@@ -19,12 +19,14 @@ using namespace std;
 arma::vec Gradient(const arma::vec& w,
                    const std::vector<arma::vec>& efflen,
                    const std::vector<arma::uvec>& ec,
-                   const arma::uvec& count) {
+                   const arma::uvec& count,
+                   const arma::uvec& idx) {
 
   vec grad(w.n_elem, fill::zeros);
 
-  for (uword i = 0; i < count.n_elem; ++i) {
-    grad.elem(ec[i]) += count(i) * Softmax(w.elem(ec[i]), 1/efflen[i]);
+  for (uword i = 0; i < idx.n_elem; ++i) {
+    uword ei = idx(i);
+    grad.elem(ec[ei]) += count(ei) * Softmax(w.elem(ec[ei]), 1/efflen[ei]);
   }
 
   // mean of LL
@@ -40,18 +42,23 @@ arma::vec Estw2Estcount(const arma::vec& estw,
 
 
 // [[Rcpp::export]]
-arma::vec BGD(const arma::vec& efflenraw,
-              const Rcpp::CharacterVector& ecraw,
-              const arma::uvec& countraw,
-              const arma::uvec& spenumraw,
-              const arma::uword maxiter = 10000,
-              const arma::uword miniter = 50,
-              const double alpha = 0.01) {
+arma::vec Adam(const arma::vec& efflenraw,
+               const Rcpp::CharacterVector& ecraw,
+               const arma::uvec& countraw,
+               const arma::uvec& spenumraw,
+               const arma::uword epochs = 200,
+               const arma::uword batchsize = 1000) {
 
-  // stop iteration params from kallisto
+  // stop iteration settings from kallisto
   double countChangeLimit = 1e-2;
   double countChange = 1e-2;
   double countLimit = 1e-8;
+
+  // adam settings
+  double alpha = 0.01;
+  double beta1 = 0.9;
+  double beta2 = 0.999;
+  double epsilon = 1e-8;
 
   // step1: pseudo information
   // remove zero counts
@@ -63,47 +70,58 @@ arma::vec BGD(const arma::vec& efflenraw,
   vector<vec> efflen = MatchEfflen(ec, efflenraw);
   uvec spenum = IdxSpenum(spenumraw);
 
-  // step2: EM iteration
+  // step2: Adam
   // start w and estcount
   uword tn = sum(spenumraw);
-  double cn = sum(count);
-  vec startw(tn, fill::ones);
-  vec w(tn, fill::zeros);
-  vec startest = Estw2Estcount(w, cn);
-  vec est(tn, fill::zeros);
-  vec prob(tn, fill::zeros);
+  uword cn = sum(count);
+  uword ecnum = ec.size();
+  // Glorot normal initializer/Xavier normal initializer
+  vec w = randn<vec>(tn) / tn;
+  vec m = vec(tn, fill::zeros);
+  vec v = vec(tn, fill::zeros);
+  uword t = 0;
+  // gradient and shuffled index
+  vec grad = vec(tn);
+  uvec idx = linspace<uvec>(0, ecnum - 1, ecnum);
 
-  for (uword iter = 0; iter < maxiter; ++iter) {
+  for (uword iter = 0; iter < epochs; ++iter) {
 
-    w = startw - alpha * Gradient(startw, efflen, ec, count);
-    est = Estw2Estcount(w, cn);
-    prob = Softmax1(w);
+    idx = shuffle(idx);
+    uword biter = 0;
 
-    Rcout << std::setprecision (20) << LL(prob, efflen, ec, count) << std::endl;
-    // cout << std::setprecision (20) << sum(est) << endl;
-    // cout << sum(prob) << endl;
+    // mini-batch
+    while (biter < ecnum) {
+      ++t;
+      uword endi = biter + batchsize - 1;
+      endi = (endi >= ecnum) ? (ecnum - 1) : endi;
+      uvec eachidx = idx.subvec(biter, endi);
 
-    // stop iteration condition
-    uword nopassn = 0;
-    for (uword t = 0; t < tn; ++t) {
-      if (est(t) > countChangeLimit && (fabs(est(t) - startest(t))/est(t)) > countChange) {
-        ++nopassn;
-      } else {}
-    }
+      // adam for each batch
+      grad = Gradient(w, efflen, ec, count, eachidx);
+      m = beta1 * m + (1 - beta1) * grad;
+      v = beta2 * v + (1 - beta2) * square(grad);
+      double alphat = alpha * sqrt(1 - pow(beta2, t)) / (1 - pow(beta1, t));
+      w -= alphat * m / (sqrt(v) + epsilon);
 
-    if (nopassn == 0 && iter >= miniter) {
-      Rcout << "The iteration number is " << iter + 1
-            << ". The log likelihood is " << LL(prob, efflen, ec, count)
-            << "." << std::endl;
-      break;
-    } else {
-      startw = w;
-      startest = est;
+      std::cout << std::setprecision (20) << alphat << "|" << LL(Softmax1(w), efflen, ec, count) << "|" << t << std::endl;
+
+      biter += batchsize;
     }
   }
 
   // reset small est
+  vec est = Softmax1(w) * cn;
   est.elem(find(est < countLimit)).zeros();
 
   return est;
+}
+
+
+
+// [[Rcpp::export]]
+void TestInit(arma::vec v1,
+              arma::vec v2) {
+
+  std::cout << v1 / v2 << std::endl;
+
 }

@@ -113,4 +113,3 @@ arma::uvec IdxSpenum(const arma::uvec& spenumraw) {
   return res;
 }
 
-

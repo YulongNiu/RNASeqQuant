@@ -16,7 +16,7 @@ LL(Softmax1(w), MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec),
 
 EM(plist$efflen, plist$ec, plist$count, spenum = 3)
 
-Adam(plist$efflen, plist$ec, plist$count, spenum = 3, 50)
+Adam(plist$efflen, plist$ec, plist$count, spenum = 3, 400)
 
 
 
@@ -36,29 +36,15 @@ plist$count %<>% `[`(zeroidx)
 plist$ec %<>% `[`(zeroidx)
 
 tmp1 <- EM(plist$efflen, plist$ec, plist$count, 41392)
-tmp2 <- Adam(plist$efflen, plist$ec, plist$count, 41392, 1)
-
-for (i in 1:10) {
-  print(0.01 * sqrt(1 - 0.999^i) / (1 - 0.9^i))
-}
+tmp2 <- Adam(plist$efflen, plist$ec, plist$count, 41392, 100, 1000, 0.01)
 
 set.seed(12345)
 w <- rnorm(41392, 0, sqrt(1/41392))
 LL(Softmax1(w), MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count)
 
+idx <- 0:99
 w <- rep(1, 41392)
-for (i in 1:2) {
-  w <- w - 0.01 * Gradient(w, MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count)
-}
-
-head(Softmax1(w))
-sum(Softmax1(w) * sum(plist$count))
-head(Softmax1(w) * sum(plist$count))
-
-
-idx <- 36000:36099
-w <- rep(1, 41392)
-Gradient(w, MatchEfflen(SplitEC(plist$ec), plist$efflen)[idx], SplitEC(plist$ec)[idx], plist$count[idx])[idx]
+Gradient(w, MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count, idx)[idx+1]
 
 for (i in 1:10) {
   batchSize <- 10000

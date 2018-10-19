@@ -31,9 +31,8 @@ double LogSumExp(const arma::vec& x,
                  const arma::vec& weight) {
 
   double maxx = max(x);
-  vec res = exp(x - maxx) % weight;
 
-  return maxx + log(sum(res));
+  return maxx + log(sum(exp(x - maxx) % weight));
 }
 
 
@@ -44,9 +43,8 @@ double LogSumExp(const arma::vec& x,
 double LogSumExp1(const arma::vec& x) {
 
   double maxx = max(x);
-  vec res = exp(x - maxx);
 
-  return maxx + log(sum(res));
+  return maxx + log(sum(exp(x - maxx)));
 }
 
 

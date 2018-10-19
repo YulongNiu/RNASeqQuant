@@ -30,7 +30,7 @@ arma::vec Gradient(const arma::vec& w,
   }
 
   // mean of LL
-  return sum(count) * Softmax1(w) - grad;
+  return sum(count.elem(idx)) * Softmax1(w) - grad;
 }
 
 
@@ -47,7 +47,8 @@ arma::vec Adam(const arma::vec& efflenraw,
                const arma::uvec& countraw,
                const arma::uvec& spenumraw,
                const arma::uword epochs = 200,
-               const arma::uword batchsize = 1000) {
+               const arma::uword batchsize = 3000,
+               const double alpha = 0.01) {
 
   // stop iteration settings from kallisto
   double countChangeLimit = 1e-2;
@@ -55,7 +56,6 @@ arma::vec Adam(const arma::vec& efflenraw,
   double countLimit = 1e-8;
 
   // adam settings
-  double alpha = 0.01;
   double beta1 = 0.9;
   double beta2 = 0.999;
   double epsilon = 1e-8;
@@ -76,7 +76,8 @@ arma::vec Adam(const arma::vec& efflenraw,
   uword cn = sum(count);
   uword ecnum = ec.size();
   // Glorot normal initializer/Xavier normal initializer
-  vec w = randn<vec>(tn) / tn;
+  vec w = randn<vec>(tn) / sqrt(tn);
+  // vec w(tn); w.fill(0.01);
   vec m = vec(tn, fill::zeros);
   vec v = vec(tn, fill::zeros);
   uword t = 0;
@@ -85,6 +86,8 @@ arma::vec Adam(const arma::vec& efflenraw,
   uvec idx = linspace<uvec>(0, ecnum - 1, ecnum);
 
   for (uword iter = 0; iter < epochs; ++iter) {
+
+    std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(Softmax1(w), efflen, ec, count) << "|" << t << std::endl;
 
     idx = shuffle(idx);
     uword biter = 0;
@@ -103,8 +106,6 @@ arma::vec Adam(const arma::vec& efflenraw,
       double alphat = alpha * sqrt(1 - pow(beta2, t)) / (1 - pow(beta1, t));
       w -= alphat * m / (sqrt(v) + epsilon);
 
-      std::cout << std::setprecision (20) << alphat << "|" << LL(Softmax1(w), efflen, ec, count) << "|" << t << std::endl;
-
       biter += batchsize;
     }
   }
@@ -119,9 +120,6 @@ arma::vec Adam(const arma::vec& efflenraw,
 
 
 // [[Rcpp::export]]
-void TestInit(arma::vec v1,
-              arma::vec v2) {
-
-  std::cout << v1 / v2 << std::endl;
-
+arma::vec TestInit(uword n) {
+  return randn<vec>(n) / sqrt(n);
 }

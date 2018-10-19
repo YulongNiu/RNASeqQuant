@@ -26,11 +26,13 @@ double LL(const arma::vec& prob,
           const arma::uvec& count) {
 
   uword ecnum = ec.size();
-  vec eachll(ecnum, fill::zeros);
+  vec eachll(ecnum);
 
   for (uword i = 0; i < ecnum; ++i) {
     eachll(i) = count(i) * log(sum(prob.elem(ec[i]) / efflen[i]));
   }
+
+  // std::cout << std::setprecision (20) << sum(eachll) << std::endl;
 
   return sum(eachll);
 }

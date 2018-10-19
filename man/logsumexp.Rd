@@ -3,25 +3,40 @@
 \name{LogSumExp}
 \alias{LogSumExp}
 \alias{LogSumExp1}
-\alias{LogSumExpRatio}
-\alias{LogSumExpRatio1}
+\alias{Softmax}
+\alias{Softmax1}
 \title{LogSumExp}
 \usage{
 LogSumExp(x, weight)
 
 LogSumExp1(x)
 
-LogSumExpRatio(x, weight)
+Softmax(x, weight)
 
-LogSumExpRatio1(x)
+Softmax1(x)
 }
 \arguments{
 \item{x}{A \code{arma::vec}.}
 
 \item{weight}{A \code{arma::vec} indicating the weight.}
 }
+\value{
+\itemize{
+  \item \code{LogSumExp()} and \code{LogSumExp1()}: A \code{double} indicating log-sum-exp.
+  \item \code{Softmax()}: A \code{arma::vec} number indicate the exp(x_i * weight_i) / sum(exp(x_i * weight_i)).
+  \item \code{Softmax1()}: A \code{arma::vec} number indicate the exp(x_i) / sum(exp(x_i)).
+}
+}
 \description{
 Calculate the log-sum-exp calculator
+}
+\details{
+\itemize{
+  \item \code{LogSumExp()}: Weighted log-sum-exp.
+  \item \code{LogSumExp1()}: log-sum-exp without weight.
+  \item \code{Softmax()}: Numerator is the exponent of every element of input \code{x}, and denominator is the sum of \code{exp(x)}.
+  \item \code{Softmax1()}: \code{weight} is 1.
+}
 }
 \author{
 Yulong Niu \email{yulong.niu@hotmail.com}

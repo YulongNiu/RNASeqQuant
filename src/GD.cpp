@@ -27,6 +27,7 @@ arma::vec Gradient(const arma::vec& w,
     grad.elem(ec[i]) += count(i) * Softmax(w.elem(ec[i]), 1/efflen[i]);
   }
 
+  // mean of LL
   return sum(count) * Softmax1(w) - grad;
 }
 

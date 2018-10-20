@@ -3,7 +3,7 @@
 \name{Strsplit}
 \alias{Strsplit}
 \alias{SplitEC}
-\title{Preprocess equivalence classes.}
+\title{Preprocess equivalence classes}
 \usage{
 Strsplit(s, delim)
 

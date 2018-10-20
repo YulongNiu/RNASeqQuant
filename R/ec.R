@@ -42,4 +42,3 @@ read_pseudo <- function(ecpath, countpath, abpath) {
 
   return(ecList)
 }
-

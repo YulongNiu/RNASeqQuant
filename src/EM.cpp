@@ -7,6 +7,7 @@
 #include <cmath>
 
 #include "utilities.h"
+#include "likelihood.h"
 
 using namespace Rcpp;
 using namespace RcppParallel;
@@ -188,6 +189,7 @@ arma::vec EM(const arma::vec& efflenraw,
 
     est = EMSingle(prob, efflen, ec, count);
 
+    //Rcout << std::setprecision (20) << LL(prob, efflen, ec, count) << std::endl;
     // cout << std::setprecision (20) << sum(est) << endl;
     // cout << sum(prob) << endl;
 
@@ -200,7 +202,9 @@ arma::vec EM(const arma::vec& efflenraw,
     }
 
     if (nopassn == 0 && iter >= miniter) {
-      std::cout << "The iteration number is " << iter << std::endl;
+      Rcout << "The iteration number is " << iter + 1
+            << ". The log likelihood is " << std::setprecision (20) << LL(prob, efflen, ec, count)
+            << "." << std::endl;
       break;
     } else {
       prob = Estcount2Prob(est, spenum);

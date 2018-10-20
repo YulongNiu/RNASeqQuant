@@ -46,13 +46,13 @@ arma::vec Adam(const arma::vec& efflenraw,
                const Rcpp::CharacterVector& ecraw,
                const arma::uvec& countraw,
                const arma::uvec& spenumraw,
-               const arma::uword epochs = 200,
-               const arma::uword batchsize = 3000,
+               const arma::uword epochs = 300,
+               const arma::uword batchsize = 1000,
                const double alpha = 0.01) {
 
   // stop iteration settings from kallisto
-  double countChangeLimit = 1e-2;
-  double countChange = 1e-2;
+  // double countChangeLimit = 1e-2;
+  // double countChange = 1e-2;
   double countLimit = 1e-8;
 
   // adam settings
@@ -117,9 +117,3 @@ arma::vec Adam(const arma::vec& efflenraw,
   return est;
 }
 
-
-
-// [[Rcpp::export]]
-arma::vec TestInit(uword n) {
-  return randn<vec>(n) / sqrt(n);
-}

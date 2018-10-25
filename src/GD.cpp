@@ -29,7 +29,6 @@ arma::vec Gradient(const arma::vec& w,
     grad.elem(ec[ei]) += count(ei) * Softmax(w.elem(ec[ei]), 1/efflen[ei]);
   }
 
-  // mean of LL
   return sum(count.elem(idx)) * Softmax1(w) - grad;
 }
 
@@ -113,6 +112,9 @@ arma::vec Adam(const arma::vec& efflenraw,
   // reset small est
   vec est = Softmax1(w) * cn;
   est.elem(find(est < countLimit)).zeros();
+
+  Rcout << "The log likelihood is " << std::setprecision (20) << LL(Softmax1(w), efflen, ec, count)
+        << "." << std::endl;
 
   return est;
 }

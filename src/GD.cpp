@@ -6,7 +6,7 @@
 
 #include "utilities.h"
 #include "likelihood.h"
-#include "logsumexp.h"
+#include "softmax.h"
 
 using namespace Rcpp;
 using namespace RcppParallel;

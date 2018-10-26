@@ -1,5 +1,5 @@
-#ifndef _LOGSUMEXP_H_
-#define _LOGSUMEXP_H_
+#ifndef _SOFTMAX_H_
+#define _SOFTMAX_H_
 
 #include <RcppArmadillo.h>
 

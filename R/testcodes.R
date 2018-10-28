@@ -29,29 +29,28 @@ Adam(plist$efflen, plist$ec, plist$count, spenum = 3, 400)
 ## plist <- read_pseudo(ecpath, countpath, abpath)
 
 plist <- list()
-plist$efflen <- read.table('/home/Yulong/RESEARCH/RNASeqQuantTest/GD/abundance_ath.tsv', stringsAsFactors = FALSE, header = TRUE)[, 3]
-plist$ec <- read.table('/home/Yulong/RESEARCH/RNASeqQuantTest/GD/pseudoalignments_ath.tsv', stringsAsFactors = FALSE, header = TRUE)[, 3]
-plist$count <- read.table('/home/Yulong/RESEARCH/RNASeqQuantTest/GD/pseudoalignments_ath.tsv', stringsAsFactors = FALSE, header = TRUE)[, 2]
+plist$efflen <- read.table('/extDisk1/RESEARCH/RNASeqQuantTest/GD/abundance_ath.tsv', stringsAsFactors = FALSE, header = TRUE)[, 3]
+plist$ec <- read.table('/extDisk1/RESEARCH/RNASeqQuantTest/GD/pseudoalignments_ath.tsv', stringsAsFactors = FALSE, header = TRUE)[, 3]
+plist$count <- read.table('/extDisk1/RESEARCH/RNASeqQuantTest/GD/pseudoalignments_ath.tsv', stringsAsFactors = FALSE, header = TRUE)[, 2]
 
 zeroidx <- plist$count > 0
 plist$count %<>% `[`(zeroidx)
 plist$ec %<>% `[`(zeroidx)
 
-
 ## kallisto EM
-kallistoest <- read.table('/home/Yulong/RESEARCH/RNASeqQuantTest/GD/abundance_ath.tsv', stringsAsFactors = FALSE, header = TRUE)[, 4]
+kallistoest <- read.table('/extDisk1/RESEARCH/RNASeqQuantTest/GD/abundance_ath.tsv', stringsAsFactors = FALSE, header = TRUE)[, 4]
 
 ## RNASeqQuant EM
 emest <- EM(plist$efflen, plist$ec, plist$count, 41392)
 
 ## RNASeqQuant GD
-gdest <- Adam(plist$efflen, plist$ec, plist$count, 41392, 200, 1000, 0.01)
+gdest <- Adam(plist$efflen, plist$ec, plist$count, 41392, 500, 1000, 0.01)
 
 ## merge res
 mergeres <- cbind(kallistoest, emest, gdest)
 colnames(mergeres) <- c('kallistoest', 'emest', 'gdest')
 
-## correlation corefficient
+## correlation coefficient
 cor(mergeres, method = 'pearson')
 cor(mergeres, method = 'spearman')
 

@@ -1,5 +1,7 @@
 #include <RcppArmadillo.h>
 
+#include "softmax.h"
+
 using namespace arma;
 
 // [[Rcpp::depends(RcppArmadillo)]]
@@ -24,7 +26,7 @@ using namespace arma;
 //' @param x A \code{arma::vec}.
 //' @param weight A \code{arma::vec} indicating the weight.
 //' @author Yulong Niu \email{yulong.niu@@hotmail.com}
-//' @rdname logsumexp
+//' @rdname softmax
 //' @keywords internal
 // [[Rcpp::export]]
 double LogSumExp(const arma::vec& x,
@@ -37,7 +39,7 @@ double LogSumExp(const arma::vec& x,
 
 
 //' @inheritParams LogSumExp
-//' @rdname logsumexp
+//' @rdname softmax
 //' @keywords internal
 // [[Rcpp::export]]
 double LogSumExp1(const arma::vec& x) {
@@ -49,7 +51,7 @@ double LogSumExp1(const arma::vec& x) {
 
 
 //' @inheritParams LogSumExp
-//' @rdname logsumexp
+//' @rdname softmax
 //' @keywords internal
 // [[Rcpp::export]]
 arma::vec Softmax(const arma::vec& x,
@@ -61,7 +63,7 @@ arma::vec Softmax(const arma::vec& x,
 
 
 //' @inheritParams LogSumExp
-//' @rdname logsumexp
+//' @rdname softmax
 //' @keywords internal
 // [[Rcpp::export]]
 arma::vec Softmax1(const arma::vec& x) {

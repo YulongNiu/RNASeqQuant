@@ -45,7 +45,7 @@ kallistoest <- read.table('/extDisk1/RESEARCH/RNASeqQuantTest/GD/abundance_ath.t
 emest <- EM(plist$efflen, plist$ec, plist$count, 41392)
 
 ## RNASeqQuant GD
-gdest <- Adam(plist$efflen, plist$ec, plist$count, 41392, 500, 1000, 0.01)
+gdest <- Adam(plist$efflen, plist$ec, plist$count, 41392, 200, 1000, 0.01)
 
 ## merge res
 mergeres <- cbind(kallistoest, emest, gdest)
@@ -55,11 +55,18 @@ colnames(mergeres) <- c('kallistoest', 'emest', 'gdest')
 cor(mergeres, method = 'pearson')
 cor(mergeres, method = 'spearman')
 
+
+## test full batch
 set.seed(12345)
 w <- rnorm(41392, 0, sqrt(1/41392))
-LL(Softmax1(w), MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count)
-w <- w - 0.01 * Gradient(w, MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count, 0:30000)
 
+LL(Softmax1(w), MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count)
+w <- w - 0.01 * GradientSM(w, MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count, 0:30000)
+
+LL(Softplus1(w)/sum(Softplus1(w)), MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count)
+w <- w - 0.01 * GradientSP(w, MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count, 0:30000)
+
+## check gradient
 idx <- 0:99
 ## w <- rep(1, 41392)
 w <- rnorm(41392, 0, sqrt(1/41392))

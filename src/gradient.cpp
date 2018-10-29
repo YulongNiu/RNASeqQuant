@@ -44,8 +44,8 @@ arma::vec GradientSP(const arma::vec& w,
 
   for (uword i = 0; i < idx.n_elem; ++i) {
     uword ei = idx(i);
-    grad.elem(ec[ei]) += count(ei) * Softplus(w.elem(ec[ei]), 1/efflen[ei]);
+    grad.elem(ec[ei]) += count(ei) * SoftplusGrad(w.elem(ec[ei]), 1/efflen[ei]);
   }
 
-  return sum(count.elem(idx)) * Softplus1(w) - grad;
+  return sum(count.elem(idx)) * SoftplusGrad1(w) - grad;
 }

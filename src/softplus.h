@@ -12,7 +12,7 @@ arma::vec Softplus(const arma::vec& x,
 
 arma::vec SoftplusGrad1(const arma::vec& x);
 
-arma::vec SoftplusGrad1(const arma::vec& x,
-                        const arma::vec& weight);
+arma::vec SoftplusGrad(const arma::vec& x,
+                       const arma::vec& weight);
 
 #endif

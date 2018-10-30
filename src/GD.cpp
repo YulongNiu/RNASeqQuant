@@ -64,6 +64,7 @@ arma::vec Adam(const arma::vec& efflenraw,
 
   for (uword iter = 0; iter < epochs; ++iter) {
 
+    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(Softmax1(w), efflen, ec, count) << "|" << t << std::endl;
     std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(Softplus1(w) / sum(Softplus1(w)), efflen, ec, count) << "|" << t << std::endl;
 
     idx = shuffle(idx);
@@ -91,8 +92,8 @@ arma::vec Adam(const arma::vec& efflenraw,
   vec est = Softplus1(w) / sum(Softplus1(w)) * cn;
   est.elem(find(est < countLimit)).zeros();
 
-  Rcout << "The log likelihood is " << std::setprecision (20) << LL(Softplus1(w) / sum(Softplus1(w)), efflen, ec, count)
-        << "." << std::endl;
+  // Rcout << "The log likelihood is " << std::setprecision (20) << LL(Softmax1(w), efflen, ec, count) << "." << std::endl;
+  Rcout << "The log likelihood is " << std::setprecision (20) << LL(Softplus1(w) / sum(Softplus1(w)), efflen, ec, count) << "." << std::endl;
 
   return est;
 }

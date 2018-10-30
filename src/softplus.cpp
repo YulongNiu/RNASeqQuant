@@ -8,6 +8,26 @@ using namespace arma;
 
 // [[Rcpp::depends(RcppArmadillo)]]
 
+
+//' Calculate the logistic and softplus calculator
+//'
+//' \itemize{
+//'   \item \code{Logistic()}: The logistic function.
+//'   \item \item \code{Softplus()} and \code{Softplus1()}: The softplus function.
+//'   \item \code{SoftplusGrad()} and \code{SoftplusGrad1()}: Internal functions for partial derivation.
+//' }
+//'
+//' @title Softplus
+//' @return
+//' \itemize{
+//'   \item \code{Logisitc()}: A \code{arma::vec} indicates the logistic function \eqn{\frac{1}{1 + \mathrm{e}^{-x}}}.
+//'   \item \code{Softplus()} and \code{Softplus1()}: A \code{arma::vec} indicates softplus with (\eqn{\log(1 + \mathrm{e}^{x_i}) * weight_i} or without weight (\eqn{\log(1 + \mathrm{e}^{x_i})}).
+//'   \item \code{SoftplusGrad()} and \code{SoftplusGrad1()}: A \code{arma::vec} indicates \eqn{\frac{logistic * weight_i}{\sum{softplus}}} or \eqn{\frac{logistic}{\sum{softplus1}}}.
+//' }
+//' @inheritParams LogSumExp
+//' @author Yulong Niu \email{yulong.niu@@hotmail.com}
+//' @rdname softplus
+//' @keywords internal
 // [[Rcpp::export]]
 arma::vec Logistic(const arma::vec& x) {
 
@@ -21,6 +41,9 @@ arma::vec Logistic(const arma::vec& x) {
 }
 
 
+//' @inheritParams LogSumExp
+//' @rdname softplus
+//' @keywords internal
 // [[Rcpp::export]]
 arma::vec Softplus1(const arma::vec& x) {
 
@@ -34,6 +57,9 @@ arma::vec Softplus1(const arma::vec& x) {
 }
 
 
+//' @inheritParams LogSumExp
+//' @rdname softplus
+//' @keywords internal
 // [[Rcpp::export]]
 arma::vec Softplus(const arma::vec& x,
                    const arma::vec& weight) {
@@ -48,7 +74,9 @@ arma::vec Softplus(const arma::vec& x,
 }
 
 
-
+//' @inheritParams LogSumExp
+//' @rdname softplus
+//' @keywords internal
 // [[Rcpp::export]]
 arma::vec SoftplusGrad1(const arma::vec& x) {
 
@@ -56,6 +84,9 @@ arma::vec SoftplusGrad1(const arma::vec& x) {
 
 }
 
+//' @inheritParams LogSumExp
+//' @rdname softplus
+//' @keywords internal
 // [[Rcpp::export]]
 arma::vec SoftplusGrad(const arma::vec& x,
                        const arma::vec& weight) {

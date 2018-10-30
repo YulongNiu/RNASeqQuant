@@ -58,16 +58,16 @@ EM <- function(efflenraw, ecraw, countraw, spenumraw, maxiter = 10000L, miniter 
     .Call(`_RNASeqQuant_EM`, efflenraw, ecraw, countraw, spenumraw, maxiter, miniter)
 }
 
-Gradient <- function(w, efflen, ec, count, idx) {
-    .Call(`_RNASeqQuant_Gradient`, w, efflen, ec, count, idx)
-}
-
-Estw2Estcount <- function(estw, cn) {
-    .Call(`_RNASeqQuant_Estw2Estcount`, estw, cn)
-}
-
 Adam <- function(efflenraw, ecraw, countraw, spenumraw, epochs = 300L, batchsize = 1000L, alpha = 0.01) {
     .Call(`_RNASeqQuant_Adam`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, alpha)
+}
+
+GradientSM <- function(w, efflen, ec, count, idx) {
+    .Call(`_RNASeqQuant_GradientSM`, w, efflen, ec, count, idx)
+}
+
+GradientSP <- function(w, efflen, ec, count, idx) {
+    .Call(`_RNASeqQuant_GradientSP`, w, efflen, ec, count, idx)
 }
 
 #' Logistic likelihood.
@@ -86,7 +86,15 @@ LL <- function(prob, efflen, ec, count) {
     .Call(`_RNASeqQuant_LL`, prob, efflen, ec, count)
 }
 
-#' Calculate the log-sum-exp calculator
+start_profiler <- function(str) {
+    .Call(`_RNASeqQuant_start_profiler`, str)
+}
+
+stop_profiler <- function() {
+    .Call(`_RNASeqQuant_stop_profiler`)
+}
+
+#' Calculate the log-sum-exp and softmax calculator
 #'
 #' \itemize{
 #'   \item \code{LogSumExp()}: Weighted log-sum-exp.
@@ -95,49 +103,92 @@ LL <- function(prob, efflen, ec, count) {
 #'   \item \code{Softmax1()}: \code{weight} is 1.
 #' }
 #'
-#' @title LogSumExp
+#' @title Softmax
 #' @return
 #' \itemize{
-#'   \item \code{LogSumExp()} and \code{LogSumExp1()}: A \code{double} indicating log-sum-exp.
-#'   \item \code{Softmax()}: A \code{arma::vec} number indicate the exp(x_i * weight_i) / sum(exp(x_i * weight_i)).
-#'   \item \code{Softmax1()}: A \code{arma::vec} number indicate the exp(x_i) / sum(exp(x_i)).
+#'   \item \code{LogSumExp()} and \code{LogSumExp1()}: A \code{double} indicates log-sum-exp.
+#'   \item \code{Softmax()}: A \code{arma::vec} indicates the \eqn{\frac{\mathrm{e}^{x_i} * weight_i}{\sum{\mathrm{e}^{x_i} * weight_i}}}.
+#'   \item \code{Softmax1()}: A \code{arma::vec} indicates the \eqn{\frac{\mathrm{e}^{x_i}}{\sum{\mathrm{e}^{x_i}}}}.
 #' }
 #' @param x A \code{arma::vec}.
 #' @param weight A \code{arma::vec} indicating the weight.
 #' @author Yulong Niu \email{yulong.niu@@hotmail.com}
-#' @rdname logsumexp
+#' @rdname softmax
 #' @keywords internal
 LogSumExp <- function(x, weight) {
     .Call(`_RNASeqQuant_LogSumExp`, x, weight)
 }
 
 #' @inheritParams LogSumExp
-#' @rdname logsumexp
+#' @rdname softmax
 #' @keywords internal
 LogSumExp1 <- function(x) {
     .Call(`_RNASeqQuant_LogSumExp1`, x)
 }
 
 #' @inheritParams LogSumExp
-#' @rdname logsumexp
+#' @rdname softmax
 #' @keywords internal
 Softmax <- function(x, weight) {
     .Call(`_RNASeqQuant_Softmax`, x, weight)
 }
 
 #' @inheritParams LogSumExp
-#' @rdname logsumexp
+#' @rdname softmax
 #' @keywords internal
 Softmax1 <- function(x) {
     .Call(`_RNASeqQuant_Softmax1`, x)
 }
 
-start_profiler <- function(str) {
-    .Call(`_RNASeqQuant_start_profiler`, str)
+#' Calculate the logistic and softplus calculator
+#'
+#' \itemize{
+#'   \item \code{Logistic()}: The logistic function.
+#'   \item \item \code{Softplus()} and \code{Softplus1()}: The softplus function.
+#'   \item \code{SoftplusGrad()} and \code{SoftplusGrad1()}: Internal functions for partial derivation.
+#' }
+#'
+#' @title Softplus
+#' @return
+#' \itemize{
+#'   \item \code{Logisitc()}: A \code{arma::vec} indicates the logistic function \eqn{\frac{1}{1 + \mathrm{e}^{-x}}}.
+#'   \item \code{Softplus()} and \code{Softplus1()}: A \code{arma::vec} indicates softplus with (\eqn{\log(1 + \mathrm{e}^{x_i}) * weight_i} or without weight (\eqn{\log(1 + \mathrm{e}^{x_i})}).
+#'   \item \code{SoftplusGrad()} and \code{SoftplusGrad1()}: A \code{arma::vec} indicates \eqn{\frac{logistic * weight_i}{\sum{softplus}}} or \eqn{\frac{logistic}{\sum{softplus1}}}.
+#' }
+#' @inheritParams LogSumExp
+#' @author Yulong Niu \email{yulong.niu@@hotmail.com}
+#' @rdname softplus
+#' @keywords internal
+Logistic <- function(x) {
+    .Call(`_RNASeqQuant_Logistic`, x)
 }
 
-stop_profiler <- function() {
-    .Call(`_RNASeqQuant_stop_profiler`)
+#' @inheritParams LogSumExp
+#' @rdname softplus
+#' @keywords internal
+Softplus1 <- function(x) {
+    .Call(`_RNASeqQuant_Softplus1`, x)
+}
+
+#' @inheritParams LogSumExp
+#' @rdname softplus
+#' @keywords internal
+Softplus <- function(x, weight) {
+    .Call(`_RNASeqQuant_Softplus`, x, weight)
+}
+
+#' @inheritParams LogSumExp
+#' @rdname softplus
+#' @keywords internal
+SoftplusGrad1 <- function(x) {
+    .Call(`_RNASeqQuant_SoftplusGrad1`, x)
+}
+
+#' @inheritParams LogSumExp
+#' @rdname softplus
+#' @keywords internal
+SoftplusGrad <- function(x, weight) {
+    .Call(`_RNASeqQuant_SoftplusGrad`, x, weight)
 }
 
 #' Split strings and equivalence classes.

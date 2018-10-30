@@ -1,11 +1,13 @@
 #include <RcppArmadillo.h>
 
+#include "softmax.h"
+
 using namespace arma;
 
 // [[Rcpp::depends(RcppArmadillo)]]
 
 
-//' Calculate the log-sum-exp calculator
+//' Calculate the log-sum-exp and softmax calculator
 //'
 //' \itemize{
 //'   \item \code{LogSumExp()}: Weighted log-sum-exp.
@@ -14,17 +16,17 @@ using namespace arma;
 //'   \item \code{Softmax1()}: \code{weight} is 1.
 //' }
 //'
-//' @title LogSumExp
+//' @title Softmax
 //' @return
 //' \itemize{
-//'   \item \code{LogSumExp()} and \code{LogSumExp1()}: A \code{double} indicating log-sum-exp.
-//'   \item \code{Softmax()}: A \code{arma::vec} number indicate the exp(x_i * weight_i) / sum(exp(x_i * weight_i)).
-//'   \item \code{Softmax1()}: A \code{arma::vec} number indicate the exp(x_i) / sum(exp(x_i)).
+//'   \item \code{LogSumExp()} and \code{LogSumExp1()}: A \code{double} indicates log-sum-exp.
+//'   \item \code{Softmax()}: A \code{arma::vec} indicates the \eqn{\frac{\mathrm{e}^{x_i} * weight_i}{\sum{\mathrm{e}^{x_i} * weight_i}}}.
+//'   \item \code{Softmax1()}: A \code{arma::vec} indicates the \eqn{\frac{\mathrm{e}^{x_i}}{\sum{\mathrm{e}^{x_i}}}}.
 //' }
 //' @param x A \code{arma::vec}.
 //' @param weight A \code{arma::vec} indicating the weight.
 //' @author Yulong Niu \email{yulong.niu@@hotmail.com}
-//' @rdname logsumexp
+//' @rdname softmax
 //' @keywords internal
 // [[Rcpp::export]]
 double LogSumExp(const arma::vec& x,
@@ -37,7 +39,7 @@ double LogSumExp(const arma::vec& x,
 
 
 //' @inheritParams LogSumExp
-//' @rdname logsumexp
+//' @rdname softmax
 //' @keywords internal
 // [[Rcpp::export]]
 double LogSumExp1(const arma::vec& x) {
@@ -49,7 +51,7 @@ double LogSumExp1(const arma::vec& x) {
 
 
 //' @inheritParams LogSumExp
-//' @rdname logsumexp
+//' @rdname softmax
 //' @keywords internal
 // [[Rcpp::export]]
 arma::vec Softmax(const arma::vec& x,
@@ -61,7 +63,7 @@ arma::vec Softmax(const arma::vec& x,
 
 
 //' @inheritParams LogSumExp
-//' @rdname logsumexp
+//' @rdname softmax
 //' @keywords internal
 // [[Rcpp::export]]
 arma::vec Softmax1(const arma::vec& x) {

@@ -34,33 +34,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// Gradient
-arma::vec Gradient(const arma::vec& w, const std::vector<arma::vec>& efflen, const std::vector<arma::uvec>& ec, const arma::uvec& count, const arma::uvec& idx);
-RcppExport SEXP _RNASeqQuant_Gradient(SEXP wSEXP, SEXP efflenSEXP, SEXP ecSEXP, SEXP countSEXP, SEXP idxSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::vec& >::type w(wSEXP);
-    Rcpp::traits::input_parameter< const std::vector<arma::vec>& >::type efflen(efflenSEXP);
-    Rcpp::traits::input_parameter< const std::vector<arma::uvec>& >::type ec(ecSEXP);
-    Rcpp::traits::input_parameter< const arma::uvec& >::type count(countSEXP);
-    Rcpp::traits::input_parameter< const arma::uvec& >::type idx(idxSEXP);
-    rcpp_result_gen = Rcpp::wrap(Gradient(w, efflen, ec, count, idx));
-    return rcpp_result_gen;
-END_RCPP
-}
-// Estw2Estcount
-arma::vec Estw2Estcount(const arma::vec& estw, double cn);
-RcppExport SEXP _RNASeqQuant_Estw2Estcount(SEXP estwSEXP, SEXP cnSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::vec& >::type estw(estwSEXP);
-    Rcpp::traits::input_parameter< double >::type cn(cnSEXP);
-    rcpp_result_gen = Rcpp::wrap(Estw2Estcount(estw, cn));
-    return rcpp_result_gen;
-END_RCPP
-}
 // Adam
 arma::vec Adam(const arma::vec& efflenraw, const Rcpp::CharacterVector& ecraw, const arma::uvec& countraw, const arma::uvec& spenumraw, const arma::uword epochs, const arma::uword batchsize, const double alpha);
 RcppExport SEXP _RNASeqQuant_Adam(SEXP efflenrawSEXP, SEXP ecrawSEXP, SEXP countrawSEXP, SEXP spenumrawSEXP, SEXP epochsSEXP, SEXP batchsizeSEXP, SEXP alphaSEXP) {
@@ -78,6 +51,36 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// GradientSM
+arma::vec GradientSM(const arma::vec& w, const std::vector<arma::vec>& efflen, const std::vector<arma::uvec>& ec, const arma::uvec& count, const arma::uvec& idx);
+RcppExport SEXP _RNASeqQuant_GradientSM(SEXP wSEXP, SEXP efflenSEXP, SEXP ecSEXP, SEXP countSEXP, SEXP idxSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type w(wSEXP);
+    Rcpp::traits::input_parameter< const std::vector<arma::vec>& >::type efflen(efflenSEXP);
+    Rcpp::traits::input_parameter< const std::vector<arma::uvec>& >::type ec(ecSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type count(countSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type idx(idxSEXP);
+    rcpp_result_gen = Rcpp::wrap(GradientSM(w, efflen, ec, count, idx));
+    return rcpp_result_gen;
+END_RCPP
+}
+// GradientSP
+arma::vec GradientSP(const arma::vec& w, const std::vector<arma::vec>& efflen, const std::vector<arma::uvec>& ec, const arma::uvec& count, const arma::uvec& idx);
+RcppExport SEXP _RNASeqQuant_GradientSP(SEXP wSEXP, SEXP efflenSEXP, SEXP ecSEXP, SEXP countSEXP, SEXP idxSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type w(wSEXP);
+    Rcpp::traits::input_parameter< const std::vector<arma::vec>& >::type efflen(efflenSEXP);
+    Rcpp::traits::input_parameter< const std::vector<arma::uvec>& >::type ec(ecSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type count(countSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type idx(idxSEXP);
+    rcpp_result_gen = Rcpp::wrap(GradientSP(w, efflen, ec, count, idx));
+    return rcpp_result_gen;
+END_RCPP
+}
 // LL
 double LL(const arma::vec& prob, const std::vector<arma::vec>& efflen, const std::vector<arma::uvec>& ec, const arma::uvec& count);
 RcppExport SEXP _RNASeqQuant_LL(SEXP probSEXP, SEXP efflenSEXP, SEXP ecSEXP, SEXP countSEXP) {
@@ -89,6 +92,27 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const std::vector<arma::uvec>& >::type ec(ecSEXP);
     Rcpp::traits::input_parameter< const arma::uvec& >::type count(countSEXP);
     rcpp_result_gen = Rcpp::wrap(LL(prob, efflen, ec, count));
+    return rcpp_result_gen;
+END_RCPP
+}
+// start_profiler
+SEXP start_profiler(SEXP str);
+RcppExport SEXP _RNASeqQuant_start_profiler(SEXP strSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type str(strSEXP);
+    rcpp_result_gen = Rcpp::wrap(start_profiler(str));
+    return rcpp_result_gen;
+END_RCPP
+}
+// stop_profiler
+SEXP stop_profiler();
+RcppExport SEXP _RNASeqQuant_stop_profiler() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(stop_profiler());
     return rcpp_result_gen;
 END_RCPP
 }
@@ -138,24 +162,60 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// start_profiler
-SEXP start_profiler(SEXP str);
-RcppExport SEXP _RNASeqQuant_start_profiler(SEXP strSEXP) {
+// Logistic
+arma::vec Logistic(const arma::vec& x);
+RcppExport SEXP _RNASeqQuant_Logistic(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type str(strSEXP);
-    rcpp_result_gen = Rcpp::wrap(start_profiler(str));
+    Rcpp::traits::input_parameter< const arma::vec& >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(Logistic(x));
     return rcpp_result_gen;
 END_RCPP
 }
-// stop_profiler
-SEXP stop_profiler();
-RcppExport SEXP _RNASeqQuant_stop_profiler() {
+// Softplus1
+arma::vec Softplus1(const arma::vec& x);
+RcppExport SEXP _RNASeqQuant_Softplus1(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(stop_profiler());
+    Rcpp::traits::input_parameter< const arma::vec& >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(Softplus1(x));
+    return rcpp_result_gen;
+END_RCPP
+}
+// Softplus
+arma::vec Softplus(const arma::vec& x, const arma::vec& weight);
+RcppExport SEXP _RNASeqQuant_Softplus(SEXP xSEXP, SEXP weightSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type weight(weightSEXP);
+    rcpp_result_gen = Rcpp::wrap(Softplus(x, weight));
+    return rcpp_result_gen;
+END_RCPP
+}
+// SoftplusGrad1
+arma::vec SoftplusGrad1(const arma::vec& x);
+RcppExport SEXP _RNASeqQuant_SoftplusGrad1(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(SoftplusGrad1(x));
+    return rcpp_result_gen;
+END_RCPP
+}
+// SoftplusGrad
+arma::vec SoftplusGrad(const arma::vec& x, const arma::vec& weight);
+RcppExport SEXP _RNASeqQuant_SoftplusGrad(SEXP xSEXP, SEXP weightSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type weight(weightSEXP);
+    rcpp_result_gen = Rcpp::wrap(SoftplusGrad(x, weight));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -209,16 +269,21 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_RNASeqQuant_Estcount2Prob", (DL_FUNC) &_RNASeqQuant_Estcount2Prob, 2},
     {"_RNASeqQuant_EM", (DL_FUNC) &_RNASeqQuant_EM, 6},
-    {"_RNASeqQuant_Gradient", (DL_FUNC) &_RNASeqQuant_Gradient, 5},
-    {"_RNASeqQuant_Estw2Estcount", (DL_FUNC) &_RNASeqQuant_Estw2Estcount, 2},
     {"_RNASeqQuant_Adam", (DL_FUNC) &_RNASeqQuant_Adam, 7},
+    {"_RNASeqQuant_GradientSM", (DL_FUNC) &_RNASeqQuant_GradientSM, 5},
+    {"_RNASeqQuant_GradientSP", (DL_FUNC) &_RNASeqQuant_GradientSP, 5},
     {"_RNASeqQuant_LL", (DL_FUNC) &_RNASeqQuant_LL, 4},
+    {"_RNASeqQuant_start_profiler", (DL_FUNC) &_RNASeqQuant_start_profiler, 1},
+    {"_RNASeqQuant_stop_profiler", (DL_FUNC) &_RNASeqQuant_stop_profiler, 0},
     {"_RNASeqQuant_LogSumExp", (DL_FUNC) &_RNASeqQuant_LogSumExp, 2},
     {"_RNASeqQuant_LogSumExp1", (DL_FUNC) &_RNASeqQuant_LogSumExp1, 1},
     {"_RNASeqQuant_Softmax", (DL_FUNC) &_RNASeqQuant_Softmax, 2},
     {"_RNASeqQuant_Softmax1", (DL_FUNC) &_RNASeqQuant_Softmax1, 1},
-    {"_RNASeqQuant_start_profiler", (DL_FUNC) &_RNASeqQuant_start_profiler, 1},
-    {"_RNASeqQuant_stop_profiler", (DL_FUNC) &_RNASeqQuant_stop_profiler, 0},
+    {"_RNASeqQuant_Logistic", (DL_FUNC) &_RNASeqQuant_Logistic, 1},
+    {"_RNASeqQuant_Softplus1", (DL_FUNC) &_RNASeqQuant_Softplus1, 1},
+    {"_RNASeqQuant_Softplus", (DL_FUNC) &_RNASeqQuant_Softplus, 2},
+    {"_RNASeqQuant_SoftplusGrad1", (DL_FUNC) &_RNASeqQuant_SoftplusGrad1, 1},
+    {"_RNASeqQuant_SoftplusGrad", (DL_FUNC) &_RNASeqQuant_SoftplusGrad, 2},
     {"_RNASeqQuant_Strsplit", (DL_FUNC) &_RNASeqQuant_Strsplit, 2},
     {"_RNASeqQuant_SplitEC", (DL_FUNC) &_RNASeqQuant_SplitEC, 1},
     {"_RNASeqQuant_MatchEfflen", (DL_FUNC) &_RNASeqQuant_MatchEfflen, 2},

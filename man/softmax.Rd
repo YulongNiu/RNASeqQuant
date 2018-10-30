@@ -5,7 +5,7 @@
 \alias{LogSumExp1}
 \alias{Softmax}
 \alias{Softmax1}
-\title{LogSumExp}
+\title{Softmax}
 \usage{
 LogSumExp(x, weight)
 
@@ -22,13 +22,13 @@ Softmax1(x)
 }
 \value{
 \itemize{
-  \item \code{LogSumExp()} and \code{LogSumExp1()}: A \code{double} indicating log-sum-exp.
-  \item \code{Softmax()}: A \code{arma::vec} number indicate the exp(x_i * weight_i) / sum(exp(x_i * weight_i)).
-  \item \code{Softmax1()}: A \code{arma::vec} number indicate the exp(x_i) / sum(exp(x_i)).
+  \item \code{LogSumExp()} and \code{LogSumExp1()}: A \code{double} indicates log-sum-exp.
+  \item \code{Softmax()}: A \code{arma::vec} indicates the \eqn{\frac{\mathrm{e}^{x_i} * weight_i}{\sum{\mathrm{e}^{x_i} * weight_i}}}.
+  \item \code{Softmax1()}: A \code{arma::vec} indicates the \eqn{\frac{\mathrm{e}^{x_i}}{\sum{\mathrm{e}^{x_i}}}}.
 }
 }
 \description{
-Calculate the log-sum-exp calculator
+Calculate the log-sum-exp and softmax calculator
 }
 \details{
 \itemize{

@@ -77,27 +77,43 @@ arma::vec Softmax1(const arma::vec& x) {
 
 
 // [[Rcpp::export]]
-arma::vec EachGradSM(const std::vector<arma::vec>& wsplit,
-                     const std::vector<arma::vec>& efflen,
-                     const std::vector<arma::vec>& w,
+arma::vec EachGradSM(const std::vector<arma::vec>& wnew,
+                     const std::vector<arma::vec>& ecefflen,
+                     const std::vector<arma::vec>& ecw,
                      const arma::vec wratio,
                      const uword idx) {
+
+  // efflen of wnew
+  uword sn = wnew.size();
+  vector<vec> wnewEfflen(sn);
+  for (uword i = 0; i < sn; ++i) {
+    wnewEfflen[i] = wratio(wnew[i].n_elem).fill(wratio(i));
+  }
+
+  // numerator
+  vec nr = ecw[idx] + log(1 / ecefflen[idx] + sum(wratio) - wratio(idx));
   // denominator
 
+
+  return nr;
 }
 
 
+
+// CutSM(list(1:3, 4:5), c(LogSumExp1(1:3), LogSumExp1(4:5)), c(1.1, 2.2), c(0, 2), c(0, 3, 2))
+// CutSM(list(1:3, 4:5), c(LogSumExp1(1:3), LogSumExp1(4:5)), c(1.1, 2.2, 1.3, 3.4), c(0, 2, 3, 4), c(0, 3, 2))
 // [[Rcpp::export]]
-arma::vec CutSM(const std::vector<arma::vec>& wsplit,
+arma::vec CutSM(const std::vector<arma::vec>& w,
+                const arma::vec wlse,
                 const arma::vec& efflensg,
                 const arma::uvec& ecsg,
                 const arma::uvec& spenum) {
 
   // initialization
   uword sn = spenum.n_elem - 1;
-  vector<vec> efflen;
-  vector<vec> w;
-  vector<vec> wsplitnew;
+  vector<vec> ecefflen;
+  vector<vec> ecw;
+  vector<vec> wnew;
   vec wratio(sn, fill::zeros);
 
   // split each ec
@@ -110,28 +126,28 @@ arma::vec CutSM(const std::vector<arma::vec>& wsplit,
     if (eachidx.n_elem > 0) {
       uvec eachec = ecsg.elem(eachidx);
       vec eachefflen = efflensg.elem(eachidx);
-      vec eachw = wsplit[i].elem(eachec - start);
-      efflen.push_back(eachefflen);
-      w.push_back(eachw);
-      wsplitnew.push_back(wsplit[i]);
-      wratio(i) = exp(LogSumExp(eachw, 1 / eachefflen) - LogSumExp1(wsplit[i]));
+      vec eachw = w[i].elem(eachec - start);
+      ecefflen.push_back(eachefflen);
+      ecw.push_back(eachw);
+      wnew.push_back(w[i]);
+      wratio(i) = exp(LogSumExp(eachw, 1 / eachefflen) - wlse(i));
     } else {}
-
   }
+  wratio = wratio.elem(find(wratio != 0));
 
-  for (auto s : w) {
+  for (auto s : ecw) {
     std::cout << s << std::endl;
   }
 
-  for (auto s : efflen) {
+  for (auto s : ecefflen) {
     std::cout << s << std::endl;
   }
 
-  for (auto s : wsplitnew) {
+  for (auto s : wnew) {
     std::cout << s << std::endl;
   }
 
-  std::cout << wratio.elem(find(wratio != 0)) << std::endl;
+  std::cout << wratio << std::endl;
 
   return efflensg;
 }

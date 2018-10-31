@@ -77,6 +77,17 @@ arma::vec Softmax1(const arma::vec& x) {
 
 
 // [[Rcpp::export]]
+arma::vec EachGradSM(const std::vector<arma::vec>& wsplit,
+                     const std::vector<arma::vec>& efflen,
+                     const std::vector<arma::vec>& w,
+                     const arma::vec wratio,
+                     const uword idx) {
+  // denominator
+
+}
+
+
+// [[Rcpp::export]]
 arma::vec CutSM(const std::vector<arma::vec>& wsplit,
                 const arma::vec& efflensg,
                 const arma::uvec& ecsg,
@@ -84,13 +95,14 @@ arma::vec CutSM(const std::vector<arma::vec>& wsplit,
 
   // initialization
   uword sn = spenum.n_elem - 1;
-  vector<vec> efflen(sn);
-  vector<vec> w(sn);
-  vec logecratio(sn, fill::zeros);
+  vector<vec> efflen;
+  vector<vec> w;
+  vector<vec> wsplitnew;
+  vec wratio(sn, fill::zeros);
 
+  // split each ec
   for (uword i = 0; i < sn; ++i) {
 
-    // split each ec
     uword start = spenum(i);
     uword end = spenum(i) + spenum(i+1) - 1;
     uvec eachidx = find(ecsg >= start && ecsg <= end);
@@ -99,9 +111,10 @@ arma::vec CutSM(const std::vector<arma::vec>& wsplit,
       uvec eachec = ecsg.elem(eachidx);
       vec eachefflen = efflensg.elem(eachidx);
       vec eachw = wsplit[i].elem(eachec - start);
-      efflen[i] = eachefflen;
-      w[i] = eachw;
-      logecratio(i) = LogSumExp(eachw, 1 / eachefflen) - LogSumExp1(wsplit[i]);
+      efflen.push_back(eachefflen);
+      w.push_back(eachw);
+      wsplitnew.push_back(wsplit[i]);
+      wratio(i) = exp(LogSumExp(eachw, 1 / eachefflen) - LogSumExp1(wsplit[i]));
     } else {}
 
   }
@@ -114,7 +127,11 @@ arma::vec CutSM(const std::vector<arma::vec>& wsplit,
     std::cout << s << std::endl;
   }
 
-  std::cout << logecratio << std::endl;
+  for (auto s : wsplitnew) {
+    std::cout << s << std::endl;
+  }
+
+  std::cout << wratio.elem(find(wratio != 0)) << std::endl;
 
   return efflensg;
 }

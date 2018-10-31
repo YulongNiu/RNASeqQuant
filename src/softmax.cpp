@@ -1,7 +1,9 @@
 #include <RcppArmadillo.h>
 
 #include <vector>
+#include <numeric>
 
+#include "utilities.h"
 #include "softmax.h"
 
 using namespace std;
@@ -77,25 +79,23 @@ arma::vec Softmax1(const arma::vec& x) {
 
 
 // [[Rcpp::export]]
-arma::vec EachGradSM(const std::vector<arma::vec>& wnew,
-                     const std::vector<arma::vec>& ecefflen,
+arma::vec EachGradSM(const std::vector<arma::vec>& wnewEfflen,
+                     const std::vector<arma::vec>& wnew,
+                     const std::vector<arma::vec>& ecEfflen,
                      const std::vector<arma::vec>& ecw,
-                     const arma::vec wratio,
+                     const std::vector<double>& wratio,
                      const uword idx) {
 
-  // efflen of wnew
-  uword sn = wnew.size();
-  vector<vec> wnewEfflen(sn);
-  for (uword i = 0; i < sn; ++i) {
-    wnewEfflen[i] = wratio(wnew[i].n_elem).fill(wratio(i));
-  }
-
   // numerator
-  vec nr = ecw[idx] + log(1 / ecefflen[idx] + sum(wratio) - wratio(idx));
+  vec nr = ecw[idx] + log(1 / ecEfflen[idx] + accumulate(wratio.begin(), wratio.end(), 0.0) - wratio[idx]);
+
   // denominator
+  vec dnw = join_cols(ecw[idx], CbindVector(wnew, idx));
+  vec dnweight = join_cols(ecEfflen[idx], CbindVector(wnewEfflen, idx));
+  double dn = LogSumExp(dnw, dnweight);
 
 
-  return nr;
+  return exp(nr - dn);
 }
 
 
@@ -111,10 +111,10 @@ arma::vec CutSM(const std::vector<arma::vec>& w,
 
   // initialization
   uword sn = spenum.n_elem - 1;
-  vector<vec> ecefflen;
+  vector<vec> ecEfflen;
   vector<vec> ecw;
   vector<vec> wnew;
-  vec wratio(sn, fill::zeros);
+  vector<double> wratio;
 
   // split each ec
   for (uword i = 0; i < sn; ++i) {
@@ -127,27 +127,20 @@ arma::vec CutSM(const std::vector<arma::vec>& w,
       uvec eachec = ecsg.elem(eachidx);
       vec eachefflen = efflensg.elem(eachidx);
       vec eachw = w[i].elem(eachec - start);
-      ecefflen.push_back(eachefflen);
+      ecEfflen.push_back(eachefflen);
       ecw.push_back(eachw);
       wnew.push_back(w[i]);
-      wratio(i) = exp(LogSumExp(eachw, 1 / eachefflen) - wlse(i));
+      wratio.push_back(exp(LogSumExp(eachw, 1 / eachefflen) - wlse(i)));
     } else {}
   }
-  wratio = wratio.elem(find(wratio != 0));
+  // size equal: ecEfflen ecw wnew wratio wnewEfflen
 
-  for (auto s : ecw) {
-    std::cout << s << std::endl;
+  // efflen of wnew
+  vector<vec> wnewEfflen(wnew.size());
+  for (uword i = 0; i < wnew.size(); ++i) {
+    wnewEfflen[i] = vec(wnew[i].n_elem).fill(wratio[i]);
   }
 
-  for (auto s : ecefflen) {
-    std::cout << s << std::endl;
-  }
-
-  for (auto s : wnew) {
-    std::cout << s << std::endl;
-  }
-
-  std::cout << wratio << std::endl;
 
   return efflensg;
 }

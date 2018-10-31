@@ -115,16 +115,17 @@ arma::uvec IdxSpenum(const arma::uvec& spenumraw) {
 
 
 // [[Rcpp::export]]
-arma::vec CbindVector(const std::vector<arma::vec> v,
-                      uword idx) {
+arma::vec CbindVector(const std::vector<arma::vec>& v,
+                      arma::uword idx) {
 
   // vector length
   uword len = 0;
-
   for (uword i = 0; i < v.size(); ++i) {
+
     if (i != idx) {
       len += v[i].n_elem;
     } else {}
+
   }
 
   vec res(len);
@@ -135,7 +136,6 @@ arma::vec CbindVector(const std::vector<arma::vec> v,
     if (i != idx) {
       vec eachv = v[i];
       uword eachlen = eachv.n_elem;
-
       res.subvec(start, eachlen + start - 1) = eachv;
       start += eachlen;
     } else {}
@@ -144,3 +144,4 @@ arma::vec CbindVector(const std::vector<arma::vec> v,
 
   return res;
 }
+

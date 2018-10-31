@@ -1,7 +1,10 @@
 #include <RcppArmadillo.h>
 
+#include <vector>
+
 #include "softmax.h"
 
+using namespace std;
 using namespace arma;
 
 // [[Rcpp::depends(RcppArmadillo)]]
@@ -70,5 +73,49 @@ arma::vec Softmax1(const arma::vec& x) {
 
   return exp(x - LogSumExp1(x));
 
+}
+
+
+// [[Rcpp::export]]
+arma::vec CutSM(const std::vector<arma::vec>& wsplit,
+                const arma::vec& efflensg,
+                const arma::uvec& ecsg,
+                const arma::uvec& spenum) {
+
+  // initialization
+  uword sn = spenum.n_elem - 1;
+  vector<vec> efflen(sn);
+  vector<vec> w(sn);
+  vec logecratio(sn, fill::zeros);
+
+  for (uword i = 0; i < sn; ++i) {
+
+    // split each ec
+    uword start = spenum(i);
+    uword end = spenum(i) + spenum(i+1) - 1;
+    uvec eachidx = find(ecsg >= start && ecsg <= end);
+
+    if (eachidx.n_elem > 0) {
+      uvec eachec = ecsg.elem(eachidx);
+      vec eachefflen = efflensg.elem(eachidx);
+      vec eachw = wsplit[i].elem(eachec - start);
+      efflen[i] = eachefflen;
+      w[i] = eachw;
+      logecratio(i) = LogSumExp(eachw, 1 / eachefflen) - LogSumExp1(wsplit[i]);
+    } else {}
+
+  }
+
+  for (auto s : w) {
+    std::cout << s << std::endl;
+  }
+
+  for (auto s : efflen) {
+    std::cout << s << std::endl;
+  }
+
+  std::cout << logecratio << std::endl;
+
+  return efflensg;
 }
 

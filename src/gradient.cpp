@@ -35,19 +35,37 @@ arma::vec GradientSM(const arma::vec& w,
 
 // [[Rcpp::export]]
 arma::vec GradientSM2(const arma::vec& w,
-                     const std::vector<arma::vec>& efflen,
-                     const std::vector<arma::uvec>& ec,
-                     const arma::uvec& count,
-                     const arma::uvec& idx) {
+                      const std::vector<arma::vec>& efflen,
+                      const std::vector<arma::uvec>& ec,
+                      const arma::uvec& count,
+                      const arma::uvec& spenum,
+                      const arma::uvec& idx) {
 
+  // split species number
+  uword sn = spenum.n_elem - 1;
+  vector<vec> wsplit(sn);
+  vec wlse(sn);
+  vec wsf(w.n_elem);
+
+  for (uword i = 0; i < sn; ++i) {
+
+    uword start = spenum(i);
+    uword end = spenum(i) + spenum(i+1) - 1;
+    vec eachw = w.subvec(start, end);
+    wsplit[i] = eachw;
+    wlse(i) = LogSumExp1(eachw);
+    wsf.subvec(start, end) = Softmax1(eachw);
+  }
+
+  // compute gradient
   vec grad(w.n_elem, fill::zeros);
 
   for (uword i = 0; i < idx.n_elem; ++i) {
     uword ei = idx(i);
-    grad.elem(ec[ei]) += count(ei) * Softmax(w.elem(ec[ei]), 1/efflen[ei]);
+    grad.elem(ec[ei]) += count(ei) * ECGradSM(wsplit, wlse, efflen[ei], ec[ei], spenum);
   }
 
-  return sum(count.elem(idx)) * Softmax1(w) - grad;
+  return sum(count.elem(idx)) * wsf - grad;
 }
 
 

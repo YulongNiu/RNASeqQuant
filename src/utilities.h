@@ -14,7 +14,4 @@ std::vector<arma::vec> MatchEfflen(const std::vector<arma::uvec>& ec,
 
 arma::uvec IdxSpenum(const arma::uvec& spenumraw);
 
-arma::vec CbindVector(const std::vector<arma::vec>& v,
-                      arma::uword idx);
-
 #endif

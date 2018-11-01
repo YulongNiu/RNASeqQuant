@@ -78,7 +78,8 @@ arma::vec Adam(const arma::vec& efflenraw,
       uvec eachidx = idx.subvec(biter, endi);
 
       // adam for each batch
-      grad = GradientSP(w, efflen, ec, count, eachidx);
+      // grad = GradientSM(w, efflen, ec, count, eachidx);
+      grad = GradientSM2(w, efflen, ec, count, spenum, eachidx);
       m = beta1 * m + (1 - beta1) * grad;
       v = beta2 * v + (1 - beta2) * square(grad);
       double alphat = alpha * sqrt(1 - pow(beta2, t)) / (1 - pow(beta1, t));

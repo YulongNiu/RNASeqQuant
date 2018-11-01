@@ -13,8 +13,7 @@ arma::vec Softmax(const arma::vec& x,
 
 arma::vec Softmax1(const arma::vec& x);
 
-arma::vec SingleSpeGradSM(const std::vector<arma::vec>& wnewEfflen,
-                          const std::vector<arma::vec>& wnew,
+arma::vec SingleSpeGradSM(const std::vector<arma::vec>& wnew,
                           const std::vector<arma::vec>& ecEfflen,
                           const std::vector<arma::vec>& ecw,
                           const std::vector<double>& wratio,

@@ -104,7 +104,12 @@ arma::vec SingleSpeGradSM(const std::vector<arma::vec>& wnew,
   }
 
   vec dnw = join_cols(ecw[idx], resw);
-  vec dnweight = join_cols(ecEfflen[idx], reswEfflen);
+  vec dnweight = join_cols(1 / ecEfflen[idx], reswEfflen);
+
+  // std::cout << nr << std::endl;
+  // std::cout << dnw << std::endl;
+  // std::cout << dnweight << std::endl;
+
   double dn = LogSumExp(dnw, dnweight);
 
   return exp(nr - dn);
@@ -147,6 +152,22 @@ arma::vec ECGradSM(const std::vector<arma::vec>& w,
     } else {}
   }
   // size equal: ecEfflen ecw wnew wratio
+
+  // for (auto x : wnew) {
+  //   std::cout << x.subvec(0, 9) << std::endl;
+  // }
+
+  // for (auto x : ecEfflen) {
+  //   std::cout << x << std::endl;
+  // }
+
+  // for (auto x : ecw) {
+  //   std::cout << x << std::endl;
+  // }
+
+  // for (auto x : wratio) {
+  //   std::cout << x << std::endl;
+  // }
 
   // calculate each species
   vec res(ecsg.n_elem);

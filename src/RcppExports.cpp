@@ -66,6 +66,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// GradientSM2
+arma::vec GradientSM2(const arma::vec& w, const std::vector<arma::vec>& efflen, const std::vector<arma::uvec>& ec, const arma::uvec& count, const arma::uvec& spenum, const arma::uvec& idx);
+RcppExport SEXP _RNASeqQuant_GradientSM2(SEXP wSEXP, SEXP efflenSEXP, SEXP ecSEXP, SEXP countSEXP, SEXP spenumSEXP, SEXP idxSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type w(wSEXP);
+    Rcpp::traits::input_parameter< const std::vector<arma::vec>& >::type efflen(efflenSEXP);
+    Rcpp::traits::input_parameter< const std::vector<arma::uvec>& >::type ec(ecSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type count(countSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type spenum(spenumSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type idx(idxSEXP);
+    rcpp_result_gen = Rcpp::wrap(GradientSM2(w, efflen, ec, count, spenum, idx));
+    return rcpp_result_gen;
+END_RCPP
+}
 // GradientSP
 arma::vec GradientSP(const arma::vec& w, const std::vector<arma::vec>& efflen, const std::vector<arma::uvec>& ec, const arma::uvec& count, const arma::uvec& idx);
 RcppExport SEXP _RNASeqQuant_GradientSP(SEXP wSEXP, SEXP efflenSEXP, SEXP ecSEXP, SEXP countSEXP, SEXP idxSEXP) {
@@ -159,6 +175,36 @@ BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const arma::vec& >::type x(xSEXP);
     rcpp_result_gen = Rcpp::wrap(Softmax1(x));
+    return rcpp_result_gen;
+END_RCPP
+}
+// SingleSpeGradSM
+arma::vec SingleSpeGradSM(const std::vector<arma::vec>& wnew, const std::vector<arma::vec>& ecEfflen, const std::vector<arma::vec>& ecw, const std::vector<double>& wratio, const arma::uword idx);
+RcppExport SEXP _RNASeqQuant_SingleSpeGradSM(SEXP wnewSEXP, SEXP ecEfflenSEXP, SEXP ecwSEXP, SEXP wratioSEXP, SEXP idxSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::vector<arma::vec>& >::type wnew(wnewSEXP);
+    Rcpp::traits::input_parameter< const std::vector<arma::vec>& >::type ecEfflen(ecEfflenSEXP);
+    Rcpp::traits::input_parameter< const std::vector<arma::vec>& >::type ecw(ecwSEXP);
+    Rcpp::traits::input_parameter< const std::vector<double>& >::type wratio(wratioSEXP);
+    Rcpp::traits::input_parameter< const arma::uword >::type idx(idxSEXP);
+    rcpp_result_gen = Rcpp::wrap(SingleSpeGradSM(wnew, ecEfflen, ecw, wratio, idx));
+    return rcpp_result_gen;
+END_RCPP
+}
+// ECGradSM
+arma::vec ECGradSM(const std::vector<arma::vec>& w, const arma::vec wlse, const arma::vec& efflensg, const arma::uvec& ecsg, const arma::uvec& spenum);
+RcppExport SEXP _RNASeqQuant_ECGradSM(SEXP wSEXP, SEXP wlseSEXP, SEXP efflensgSEXP, SEXP ecsgSEXP, SEXP spenumSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::vector<arma::vec>& >::type w(wSEXP);
+    Rcpp::traits::input_parameter< const arma::vec >::type wlse(wlseSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type efflensg(efflensgSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type ecsg(ecsgSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type spenum(spenumSEXP);
+    rcpp_result_gen = Rcpp::wrap(ECGradSM(w, wlse, efflensg, ecsg, spenum));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -271,6 +317,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RNASeqQuant_EM", (DL_FUNC) &_RNASeqQuant_EM, 6},
     {"_RNASeqQuant_Adam", (DL_FUNC) &_RNASeqQuant_Adam, 7},
     {"_RNASeqQuant_GradientSM", (DL_FUNC) &_RNASeqQuant_GradientSM, 5},
+    {"_RNASeqQuant_GradientSM2", (DL_FUNC) &_RNASeqQuant_GradientSM2, 6},
     {"_RNASeqQuant_GradientSP", (DL_FUNC) &_RNASeqQuant_GradientSP, 5},
     {"_RNASeqQuant_LL", (DL_FUNC) &_RNASeqQuant_LL, 4},
     {"_RNASeqQuant_start_profiler", (DL_FUNC) &_RNASeqQuant_start_profiler, 1},
@@ -279,6 +326,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RNASeqQuant_LogSumExp1", (DL_FUNC) &_RNASeqQuant_LogSumExp1, 1},
     {"_RNASeqQuant_Softmax", (DL_FUNC) &_RNASeqQuant_Softmax, 2},
     {"_RNASeqQuant_Softmax1", (DL_FUNC) &_RNASeqQuant_Softmax1, 1},
+    {"_RNASeqQuant_SingleSpeGradSM", (DL_FUNC) &_RNASeqQuant_SingleSpeGradSM, 5},
+    {"_RNASeqQuant_ECGradSM", (DL_FUNC) &_RNASeqQuant_ECGradSM, 5},
     {"_RNASeqQuant_Logistic", (DL_FUNC) &_RNASeqQuant_Logistic, 1},
     {"_RNASeqQuant_Softplus1", (DL_FUNC) &_RNASeqQuant_Softplus1, 1},
     {"_RNASeqQuant_Softplus", (DL_FUNC) &_RNASeqQuant_Softplus, 2},

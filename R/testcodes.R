@@ -14,7 +14,9 @@
 ## plist <- list(ec = c('0,1,2', '1,2', '0,2', '0', '0,1'), count = rep(1, 5), efflen = rep(1, 3))
 
 ## w <- c(1, 1, 1)
-## Gradient(w, MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count, 0:4)
+## GradientSM2(w, MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count, IdxSpenum(c(2, 1)), 0:4)
+## GradientSM(w, MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count, 0:4)
+
 ## LL(Softmax1(w), MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count)
 
 ## EM(plist$efflen, plist$ec, plist$count, spenum = 3)
@@ -67,10 +69,15 @@
 ## w <- w - 0.01 * GradientSP(w, MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count, 0:30000)
 
 ## ## check gradient
-## idx <- 0:99
-## ## w <- rep(1, 41392)
-## w <- rnorm(41392, 0, sqrt(1/41392))
-## w <- w - 0.01 * Gradient(w, MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count, idx)[idx]
+## idx <- 0:20
+## w <- rep(1, 41392)
+## GradientSM(w, MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count, idx)[idx+1]
+
+## w <- rep(1, 413292)
+## GradientSM2(w, MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count, c(0, 41392), idx)[idx+1]
+
+## ## w <- rnorm(41392, 0, sqrt(1/41392))
+## w <- w - 0.01 * GradientSM(w, MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count, idx)[idx+1]
 ## ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 

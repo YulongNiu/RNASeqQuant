@@ -66,6 +66,10 @@ GradientSM <- function(w, efflen, ec, count, idx) {
     .Call(`_RNASeqQuant_GradientSM`, w, efflen, ec, count, idx)
 }
 
+GradientSM2 <- function(w, efflen, ec, count, spenum, idx) {
+    .Call(`_RNASeqQuant_GradientSM2`, w, efflen, ec, count, spenum, idx)
+}
+
 GradientSP <- function(w, efflen, ec, count, idx) {
     .Call(`_RNASeqQuant_GradientSP`, w, efflen, ec, count, idx)
 }
@@ -138,6 +142,14 @@ Softmax <- function(x, weight) {
 #' @keywords internal
 Softmax1 <- function(x) {
     .Call(`_RNASeqQuant_Softmax1`, x)
+}
+
+SingleSpeGradSM <- function(wnew, ecEfflen, ecw, wratio, idx) {
+    .Call(`_RNASeqQuant_SingleSpeGradSM`, wnew, ecEfflen, ecw, wratio, idx)
+}
+
+ECGradSM <- function(w, wlse, efflensg, ecsg, spenum) {
+    .Call(`_RNASeqQuant_ECGradSM`, w, wlse, efflensg, ecsg, spenum)
 }
 
 #' Calculate the logistic and softplus calculator

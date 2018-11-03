@@ -122,6 +122,8 @@ std::vector< std::vector< arma::vec > > InitialSplitSpe(const uword en,
 }
 
 
+
+
 // [[Rcpp::export]]
 void EC2SpeSg(std::vector< arma::uvec >& ecsg,
               std::vector< arma::vec >& efflensg,
@@ -146,23 +148,40 @@ void EC2SpeSg(std::vector< arma::uvec >& ecsg,
 
 }
 
+// [[Rcpp::export]]
+void EC2Spe(std::vector< std::vector< arma::uvec > >& ec,
+            std::vector< std::vector< arma::vec > >& efflen,
+            const Rcpp::CharacterVector& ecraw,
+            const arma::vec& efflenraw,
+            const arma::uvec& spenum) {
+
+  for (uword i = 0; i < ecraw.size(); ++i) {
+    EC2SpeSg(ec.at(i), efflen.at(i), string(ecraw(i)), efflenraw, spenum);
+  }
+
+}
 
 // [[Rcpp::export]]
-void Test(const std::string& ecsgraw,
+void Test(const Rcpp::CharacterVector& ecraw,
           const arma::vec& efflenraw,
-          const arma::uvec& spenum) {
+          const arma::uvec& spenum,
+          const arma::uword ecnum) {
 
-  vector< uvec > ec(spenum.n_elem - 1);
-  vector< vec > efflen(spenum.n_elem - 1);
+  vector< vector< uvec > > ec(ecnum, vector< uvec >(spenum.n_elem - 1));
+  vector< vector< vec > > efflen(ecnum, vector< vec >(spenum.n_elem - 1));
 
-  EC2SpeSg(ec, efflen, ecsgraw, efflenraw, spenum);
+  EC2Spe(ec, efflen, ecraw, efflenraw, spenum);
 
   for (auto x : ec) {
-    std::cout << x << std::endl;
+    for (auto y : x) {
+      std::cout << y << std::endl;
+    }
   }
 
   for (auto x : efflen) {
-    std::cout << x << std::endl;
+    for (auto y : x) {
+      std::cout << y << std::endl;
+    }
   }
 
 }

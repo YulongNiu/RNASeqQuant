@@ -42,10 +42,10 @@ arma::vec Adam(const arma::vec& efflenraw,
   uvec zeros = find(countraw > 0);
   IntegerVector zerosidx(zeros.begin(), zeros.end());
 
+  uvec spenum = IdxSpenum(spenumraw);
   uvec count = countraw.elem(zeros);
   vector<uvec> ec = SplitEC(ecraw[zerosidx]);
   vector<vec> efflen = MatchEfflen(ec, efflenraw);
-  uvec spenum = IdxSpenum(spenumraw);
 
   // step2: Adam
   // start w and estcount

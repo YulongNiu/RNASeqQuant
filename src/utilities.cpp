@@ -148,6 +148,7 @@ void EC2SpeSg(std::vector< arma::uvec >& ecsg,
 
 }
 
+
 // [[Rcpp::export]]
 void EC2Spe(std::vector< std::vector< arma::uvec > >& ec,
             std::vector< std::vector< arma::vec > >& efflen,
@@ -164,11 +165,10 @@ void EC2Spe(std::vector< std::vector< arma::uvec > >& ec,
 // [[Rcpp::export]]
 void Test(const Rcpp::CharacterVector& ecraw,
           const arma::vec& efflenraw,
-          const arma::uvec& spenum,
-          const arma::uword ecnum) {
+          const arma::uvec& spenum) {
 
-  vector< vector< uvec > > ec(ecnum, vector< uvec >(spenum.n_elem - 1));
-  vector< vector< vec > > efflen(ecnum, vector< vec >(spenum.n_elem - 1));
+  vector< vector< uvec > > ec(ecraw.size(), vector< uvec >(spenum.n_elem - 1));
+  vector< vector< vec > > efflen(ecraw.size(), vector< vec >(spenum.n_elem - 1));
 
   EC2Spe(ec, efflen, ecraw, efflenraw, spenum);
 

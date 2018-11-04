@@ -22,6 +22,8 @@ LL(Softmax1(w), MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec),
 EM(plist$efflen, plist$ec, plist$count, spenum = 3)
 
 Adam(plist$efflen, plist$ec, plist$count, spenum = 3, 400)
+
+## Test(plist$ec, plist$efflen, c(0, 5))
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -39,6 +41,8 @@ plist$count <- read.table('/extDisk1/RESEARCH/RNASeqQuantTest/GD/pseudoalignment
 zeroidx <- plist$count > 0
 plist$count %<>% `[`(zeroidx)
 plist$ec %<>% `[`(zeroidx)
+
+## Test(plist$ec, plist$efflen, c(0, 41392))
 
 ## kallisto EM
 kallistoest <- read.table('/extDisk1/RESEARCH/RNASeqQuantTest/GD/abundance_ath.tsv', stringsAsFactors = FALSE, header = TRUE)[, 4]

@@ -96,7 +96,7 @@ arma::vec SingleSpeGradSM(const std::vector<arma::vec>& w,
   // wratio is 0 if one species has no transcripts in the ec
   // if tratio == 0, then only one species
   double tratio = sum(ecratio) - ecratio(idx);
-  vec nr = dnw + log(1 / dnweight + tratio);
+  vec nr = dnw + log(dnweight + tratio);
 
   // denominator
   if (tratio > 0) {
@@ -132,7 +132,7 @@ arma::vec ECGradSM(const std::vector< arma::vec >& w,
   // split each ec
   for (uword i = 0; i < sn; ++i) {
     if (wsg[i].n_elem > 0) {
-      ecratio(i) = exp(LogSumExp(wsg[i], 1 / efflensg[i])  - wlse(i));
+      ecratio(i) = exp(LogSumExp(wsg[i], 1 / efflensg[i]) - wlse(i));
     } else {}
   }
 

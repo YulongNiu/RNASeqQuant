@@ -26,6 +26,8 @@ void EC2Spe(std::vector< std::vector< arma::uvec > >& ec,
             const arma::vec& efflenraw,
             const arma::uvec& spenum);
 
-arma::uvec CompressVec(const std::vector< arma::uvec >& x);
+arma::uvec CmpUvec(const std::vector< arma::uvec >& x);
+
+arma::vec CmpVec(const std::vector< arma::vec >& x);
 
 #endif

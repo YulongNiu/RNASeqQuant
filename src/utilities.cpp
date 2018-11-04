@@ -164,15 +164,26 @@ void EC2Spe(std::vector< std::vector< arma::uvec > >& ec,
 
 
 // [[Rcpp::export]]
-arma::uvec CompressVec(const std::vector< arma::uvec >& x) {
+arma::uvec CmpUvec(const std::vector< arma::uvec >& x) {
 
   uvec res;
 
-  for (uword i = 0; i < x.size(); ++i) {
-    res = join_cols(res, x[i]);
+  for (auto i : x) {
+    res = join_cols(res, i);
   }
 
   return res;
 }
 
 
+// [[Rcpp::export]]
+arma::vec CmpVec(const std::vector< arma::vec >& x) {
+
+  vec res;
+
+  for (auto i : x) {
+    res = join_cols(res, i);
+  }
+
+  return res;
+}

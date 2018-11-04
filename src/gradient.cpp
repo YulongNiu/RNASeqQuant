@@ -25,9 +25,8 @@ arma::vec GradientSM(const arma::vec& w,
 
   vec grad(w.n_elem, fill::zeros);
 
-  for (uword i = 0; i < idx.n_elem; ++i) {
-    uword ei = idx(i);
-    grad.elem(ec[ei]) += count(ei) * Softmax(w.elem(ec[ei]), 1/efflen[ei]);
+  for (auto i : idx) {
+    grad.elem(ec[i]) += count(i) * Softmax(w.elem(ec[i]), 1/efflen[i]);
   }
 
   // std::cout << grad.subvec(0, 9) << std::endl;
@@ -72,7 +71,7 @@ arma::vec GradientSM2(const arma::vec& w,
   // compute gradient
   vec grad(w.n_elem, fill::zeros);
   for (auto i : idx) {
-    grad.elem(CompressVec(ec.at(i))) += count(i) * ECGradSM(wsplit, wlse, efflen[i], ecw[i]);
+    grad.elem(CmpUvec(ec.at(i))) += count(i) * ECGradSM(wsplit, wlse, efflen[i], ecw[i]);
   }
 
   return sum(count.elem(idx)) * wsf - grad;

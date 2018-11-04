@@ -189,7 +189,7 @@ arma::vec EM(const arma::vec& efflenraw,
 
     est = EMSingle(prob, efflen, ec, count);
 
-    //Rcout << std::setprecision (20) << LL(prob, efflen, ec, count) << std::endl;
+    //Rcout << std::setprecision (20) << LLEM(prob, efflen, ec, count) << std::endl;
     // cout << std::setprecision (20) << sum(est) << endl;
     // cout << sum(prob) << endl;
 
@@ -203,7 +203,7 @@ arma::vec EM(const arma::vec& efflenraw,
 
     if (nopassn == 0 && iter >= miniter) {
       Rcout << "The iteration number is " << iter + 1
-            << ". The log likelihood is " << std::setprecision (20) << LL(prob, efflen, ec, count)
+            << ". The log likelihood is " << std::setprecision (20) << LLEM(prob, efflen, ec, count)
             << "." << std::endl;
       break;
     } else {

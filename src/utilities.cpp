@@ -113,3 +113,77 @@ arma::uvec IdxSpenum(const arma::uvec& spenumraw) {
   return res;
 }
 
+// [[Rcpp::export]]
+std::vector< std::vector< arma::vec > > InitialSplitSpe(const uword en,
+                                                        const uword sn) {
+  vector< vector< vec > > res(en, vector< vec >(sn));
+
+  return res;
+}
+
+
+
+
+// [[Rcpp::export]]
+void EC2SpeSg(std::vector< arma::uvec >& ecsg,
+              std::vector< arma::vec >& efflensg,
+              const std::string& ecsgraw,
+              const arma::vec& efflenraw,
+              const arma::uvec& spenum) {
+
+  uvec ecvec = Strsplit(ecsgraw, ',');
+  uword sn = spenum.n_elem - 1;
+
+  for  (uword i = 0; i < sn; ++i) {
+
+    uword start = spenum(i);
+    uword end = spenum(i) + spenum(i+1) - 1;
+    uvec eachidx = find(ecvec >= start && ecvec <= end);
+
+    uvec eachec = ecvec.elem(eachidx);
+    efflensg[i] = efflenraw.elem(eachec);
+    ecsg[i] = eachec;
+
+  }
+
+}
+
+
+// [[Rcpp::export]]
+void EC2Spe(std::vector< std::vector< arma::uvec > >& ec,
+            std::vector< std::vector< arma::vec > >& efflen,
+            const Rcpp::CharacterVector& ecraw,
+            const arma::vec& efflenraw,
+            const arma::uvec& spenum) {
+
+  for (uword i = 0; i < ecraw.size(); ++i) {
+    EC2SpeSg(ec.at(i), efflen.at(i), string(ecraw(i)), efflenraw, spenum);
+  }
+
+}
+
+
+// [[Rcpp::export]]
+arma::uvec CmpUvec(const std::vector< arma::uvec >& x) {
+
+  uvec res;
+
+  for (auto i : x) {
+    res = join_cols(res, i);
+  }
+
+  return res;
+}
+
+
+// [[Rcpp::export]]
+arma::vec CmpVec(const std::vector< arma::vec >& x) {
+
+  vec res;
+
+  for (auto i : x) {
+    res = join_cols(res, i);
+  }
+
+  return res;
+}

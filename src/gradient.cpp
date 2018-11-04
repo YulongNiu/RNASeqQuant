@@ -7,6 +7,7 @@
 #include "softmax.h"
 #include "softplus.h"
 #include "gradient.h"
+#include "utilities.h"
 
 using namespace Rcpp;
 using namespace RcppParallel;
@@ -24,9 +25,8 @@ arma::vec GradientSM(const arma::vec& w,
 
   vec grad(w.n_elem, fill::zeros);
 
-  for (uword i = 0; i < idx.n_elem; ++i) {
-    uword ei = idx(i);
-    grad.elem(ec[ei]) += count(ei) * Softmax(w.elem(ec[ei]), 1/efflen[ei]);
+  for (auto i : idx) {
+    grad.elem(ec[i]) += count(i) * Softmax(w.elem(ec[i]), 1/efflen[i]);
   }
 
   // std::cout << grad.subvec(0, 9) << std::endl;
@@ -37,8 +37,8 @@ arma::vec GradientSM(const arma::vec& w,
 
 // [[Rcpp::export]]
 arma::vec GradientSM2(const arma::vec& w,
-                      const std::vector<arma::vec>& efflen,
-                      const std::vector<arma::uvec>& ec,
+                      const std::vector< std::vector< arma::vec > >& efflen,
+                      const std::vector< std::vector< arma::uvec > >& ec,
                       const arma::uvec& count,
                       const arma::uvec& spenum,
                       const arma::uvec& idx) {
@@ -59,21 +59,20 @@ arma::vec GradientSM2(const arma::vec& w,
     wsf.subvec(start, end) = Softmax1(eachw);
   }
 
-  // for (auto x : wsplit) {
-  //   std::cout << x.subvec(0, 9) << std::endl;
-  // }
-  // std::cout << wlse << std::endl;
-  // std::cout << wsf.subvec(0, 9) << std::endl;
+  // split w
+  uword ecn = ec.size();
+  vector< vector< vec > > ecw(ecn, vector< vec >(sn));
+  for (uword i = 0; i < ecn; ++i) {
+    for (uword j = 0; j < sn; ++j) {
+      ecw[i][j] = w.elem(ec[i][j]);
+    }
+  }
 
   // compute gradient
   vec grad(w.n_elem, fill::zeros);
-
-  for (uword i = 0; i < idx.n_elem; ++i) {
-    uword ei = idx(i);
-    grad.elem(ec[ei]) += count(ei) * ECGradSM(wsplit, wlse, efflen[ei], ec[ei], spenum);
+  for (auto i : idx) {
+    grad.elem(CmpUvec(ec.at(i))) += count(i) * ECGradSM(wsplit, wlse, efflen[i], ecw[i]);
   }
-
-  // std::cout << grad.subvec(0, 9) << std::endl;
 
   return sum(count.elem(idx)) * wsf - grad;
 }

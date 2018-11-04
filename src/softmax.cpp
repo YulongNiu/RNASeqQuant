@@ -1,7 +1,6 @@
 #include <RcppArmadillo.h>
 
 #include <vector>
-#include <numeric>
 
 #include "utilities.h"
 #include "softmax.h"
@@ -78,33 +77,36 @@ arma::vec Softmax1(const arma::vec& x) {
 }
 
 
+// emp <- matrix(ncol = 1, nrow = 0)
+// SingleSpeGradSM(list(c(1, 1), 1), list(c(1, 1), 1), list(c(1, 1), 1), c(1, 1), 0)
+// SingleSpeGradSM(list(c(1, 1), 1), list(1, 1), list(1, 1), c(0.5, 1), 0)
+// SingleSpeGradSM(list(c(1, 1), 1), list(1, emp), list(1, emp), c(0.5, 0), 0)
+// SingleSpeGradSM(list(c(1, 1), 1), list(c(1, 1), emp), list(c(1, 1), emp), c(1, 0), 0)
 // [[Rcpp::export]]
-arma::vec SingleSpeGradSM(const std::vector<arma::vec>& wnew,
-                          const std::vector<arma::vec>& ecEfflen,
-                          const std::vector<arma::vec>& ecw,
-                          const std::vector<double>& wratio,
+arma::vec SingleSpeGradSM(const std::vector<arma::vec>& w,
+                          const std::vector< arma::vec >& efflensg,
+                          const std::vector< arma::vec >& wsg,
+                          const arma::vec& wratio,
                           const arma::uword idx) {
 
   // numerator
-  vec nr = ecw[idx] + log(1 / ecEfflen[idx] + accumulate(wratio.begin(), wratio.end(), 0.0) - wratio[idx]);
+  vec nr = wsg[idx] + log(1 / efflensg[idx] + sum(wratio) - wratio(idx));
 
   // denominator
-  vec tw = wnew[idx];
+  vec tw = w[idx];
   uword tn = tw.n_elem;
-  uword sn = wnew.size();
-  vec resw(tn * (sn - 1));
-  vec reswEfflen(tn * (sn - 1));
-  uword start = 0;
+  uword sn = wsg.size();
+  vec resw;
+  vec reswEfflen;
   for (uword i = 0; i < sn; ++i) {
-    if (i != idx) {
-      resw.subvec(start, start + tn - 1) = tw;
-      reswEfflen.subvec(start, start + tn - 1) = vec(tn).fill(wratio[i]);
-      start = start + tn;
+    if (i != idx && wsg[i].n_elem > 0) {
+      resw = join_cols(resw, tw);
+      reswEfflen = join_cols(reswEfflen, vec(tn).fill(wratio(i)));
     } else {}
   }
 
-  vec dnw = join_cols(ecw[idx], resw);
-  vec dnweight = join_cols(1 / ecEfflen[idx], reswEfflen);
+  vec dnw = join_cols(wsg[idx], resw);
+  vec dnweight = join_cols(1 / efflensg[idx], reswEfflen);
 
   // std::cout << nr << std::endl;
   // std::cout << dnw << std::endl;
@@ -115,67 +117,36 @@ arma::vec SingleSpeGradSM(const std::vector<arma::vec>& wnew,
   return exp(nr - dn);
 }
 
-// ECGradSM(list(c(1, 1), 1), c(log(2)+1, 1), c(1, 1, 1), c(0, 1, 2), c(0, 2, 1))
-// ECGradSM(list(c(1, 1), 1), c(log(2)+1, 1), c(1, 1), c(1, 2), c(0, 2, 1))
-// ECGradSM(list(c(1, 1), 1), c(log(2)+1, 1), c(1, 1), c(0, 2), c(0, 2, 1))
-// ECGradSM(list(c(1, 1), 1), c(log(2)+1, 1), c(1), c(0), c(0, 2, 1))
-// ECGradSM(list(c(1, 1), 1), c(log(2)+1, 1), c(1, 1), c(0, 1), c(0, 2, 1))
+
+// emp <- matrix(ncol = 1, nrow = 0)
+// ECGradSM(list(c(1, 1), 1), c(log(2)+1, 1), list(c(1, 1), 1), list(c(1, 1), 1))
+// ECGradSM(list(c(1, 1), 1), c(log(2)+1, 1), list(1, 1), list(1, 1))
+// ECGradSM(list(c(1, 1), 1), c(log(2)+1, 1), list(1, 1), list(1, 1))
+// ECGradSM(list(c(1, 1), 1), c(log(2)+1, 1), list(1, emp), list(1, emp))
+// ECGradSM(list(c(1, 1), 1), c(log(2)+1, 1), list(c(1, 1), emp), list(c(1, 1), emp))
 // [[Rcpp::export]]
-arma::vec ECGradSM(const std::vector<arma::vec>& w,
+arma::vec ECGradSM(const std::vector< arma::vec >& w,
                    const arma::vec wlse,
-                   const arma::vec& efflensg,
-                   const arma::uvec& ecsg,
-                   const arma::uvec& spenum) {
+                   const std::vector< arma::vec >& efflensg,
+                   const std::vector< arma::vec >& wsg) {
 
   // initialization
-  uword sn = spenum.n_elem - 1;
-  vector<vec> ecEfflen;
-  vector<vec> ecw;
-  vector<vec> wnew;
-  vector<double> wratio;
+  uword sn = wsg.size();
+  vec wratio(sn, fill::zeros);
 
   // split each ec
   for (uword i = 0; i < sn; ++i) {
-
-    uword start = spenum(i);
-    uword end = spenum(i) + spenum(i+1) - 1;
-    uvec eachidx = find(ecsg >= start && ecsg <= end);
-
-    if (eachidx.n_elem > 0) {
-      uvec eachec = ecsg.elem(eachidx);
-      vec eachefflen = efflensg.elem(eachidx);
-      vec eachw = w[i].elem(eachec - start);
-      ecEfflen.push_back(eachefflen);
-      ecw.push_back(eachw);
-      wnew.push_back(w[i]);
-      wratio.push_back(exp(LogSumExp(eachw, 1 / eachefflen) - wlse(i)));
+    if (wsg[i].n_elem > 0) {
+      wratio(i) = exp(LogSumExp(wsg[i], 1 / efflensg[i]) - wlse(i));
     } else {}
   }
-  // size equal: ecEfflen ecw wnew wratio
-
-  // for (auto x : wnew) {
-  //   std::cout << x.subvec(0, 9) << std::endl;
-  // }
-
-  // for (auto x : ecEfflen) {
-  //   std::cout << x << std::endl;
-  // }
-
-  // for (auto x : ecw) {
-  //   std::cout << x << std::endl;
-  // }
-
-  // for (auto x : wratio) {
-  //   std::cout << x << std::endl;
-  // }
 
   // calculate each species
-  vec res(ecsg.n_elem);
-  uword start = 0;
-  for (uword i = 0; i < wnew.size(); ++i) {
-    uword eachlen = ecw[i].n_elem;
-    res.subvec(start, eachlen + start - 1) = SingleSpeGradSM(wnew, ecEfflen, ecw, wratio, i);
-    start += eachlen;
+  vec res;
+  for (uword i = 0; i < sn; ++i) {
+    if (wsg[i].n_elem > 0) {
+      res = join_cols(res, SingleSpeGradSM(w, efflensg, wsg, wratio, i));
+    }
   }
 
   return res;

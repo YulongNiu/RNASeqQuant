@@ -14,4 +14,18 @@ std::vector<arma::vec> MatchEfflen(const std::vector<arma::uvec>& ec,
 
 arma::uvec IdxSpenum(const arma::uvec& spenumraw);
 
+void EC2SpeSg(std::vector< arma::uvec >& ecsg,
+              std::vector< arma::vec >& efflensg,
+              const std::string& ecsgraw,
+              const arma::vec& efflenraw,
+              const arma::uvec& spenum);
+
+void EC2Spe(std::vector< std::vector< arma::uvec > >& ec,
+            std::vector< std::vector< arma::vec > >& efflen,
+            const Rcpp::CharacterVector& ecraw,
+            const arma::vec& efflenraw,
+            const arma::uvec& spenum);
+
+arma::uvec CompressVec(const std::vector< arma::uvec >& x);
+
 #endif

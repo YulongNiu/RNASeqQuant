@@ -162,26 +162,17 @@ void EC2Spe(std::vector< std::vector< arma::uvec > >& ec,
 
 }
 
+
 // [[Rcpp::export]]
-void Test(const Rcpp::CharacterVector& ecraw,
-          const arma::vec& efflenraw,
-          const arma::uvec& spenum) {
+arma::uvec CompressVec(const std::vector< arma::uvec >& x) {
 
-  vector< vector< uvec > > ec(ecraw.size(), vector< uvec >(spenum.n_elem - 1));
-  vector< vector< vec > > efflen(ecraw.size(), vector< vec >(spenum.n_elem - 1));
+  uvec res;
 
-  EC2Spe(ec, efflen, ecraw, efflenraw, spenum);
-
-  for (auto x : ec) {
-    for (auto y : x) {
-      std::cout << y << std::endl;
-    }
+  for (uword i = 0; i < x.size(); ++i) {
+    res = join_cols(res, x[i]);
   }
 
-  for (auto x : efflen) {
-    for (auto y : x) {
-      std::cout << y << std::endl;
-    }
-  }
-
+  return res;
 }
+
+

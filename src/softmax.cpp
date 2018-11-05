@@ -113,12 +113,7 @@ arma::vec SingleSpeGradSM(const std::vector<arma::vec>& w,
 }
 
 
-// emp <- matrix(ncol = 1, nrow = 0)
-// ECGradSM(list(c(1, 1), 1), c(log(2)+1, 1), list(c(1, 1), 1), list(c(1, 1), 1))
-// ECGradSM(list(c(1, 1), 1), c(log(2)+1, 1), list(1, 1), list(1, 1))
-// ECGradSM(list(c(1, 1), 1), c(log(2)+1, 1), list(1, 1), list(1, 1))
-// ECGradSM(list(c(1, 1), 1), c(log(2)+1, 1), list(1, emp), list(1, emp))
-// ECGradSM(list(c(1, 1), 1), c(log(2)+1, 1), list(c(1, 1), emp), list(c(1, 1), emp))
+
 // [[Rcpp::export]]
 arma::vec ECGradSM(const std::vector< arma::vec >& w,
                    const arma::vec wlse,

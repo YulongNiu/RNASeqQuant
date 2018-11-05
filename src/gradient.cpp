@@ -29,8 +29,6 @@ arma::vec GradientSM(const arma::vec& w,
     grad.elem(ec[i]) += count(i) * Softmax(w.elem(ec[i]), 1/efflen[i]);
   }
 
-  // std::cout << grad.subvec(0, 9) << std::endl;
-
   return sum(count.elem(idx)) * Softmax1(w) - grad;
 }
 
@@ -47,16 +45,15 @@ arma::vec GradientSM2(const arma::vec& w,
   uword sn = spenum.n_elem - 1;
   vector<vec> wsplit(sn);
   vec wlse(sn);
-  vec wsf(w.n_elem);
+  vec wsm(w.n_elem);
 
   for (uword i = 0; i < sn; ++i) {
-
     uword start = spenum(i);
     uword end = spenum(i) + spenum(i+1) - 1;
     vec eachw = w.subvec(start, end);
     wsplit[i] = eachw;
     wlse(i) = LogSumExp1(eachw);
-    wsf.subvec(start, end) = Softmax1(eachw);
+    wsm.subvec(start, end) = Softmax1(eachw);
   }
 
   // split w
@@ -74,7 +71,7 @@ arma::vec GradientSM2(const arma::vec& w,
     grad.elem(CmpUvec(ec.at(i))) += count(i) * ECGradSM(wsplit, wlse, efflen[i], ecw[i]);
   }
 
-  return sum(count.elem(idx)) * wsf - grad;
+  return sum(count.elem(idx)) * wsm - grad;
 }
 
 

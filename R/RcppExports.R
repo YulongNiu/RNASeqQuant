@@ -62,12 +62,8 @@ Adam <- function(efflenraw, ecraw, countraw, spenumraw, epochs = 300L, batchsize
     .Call(`_RNASeqQuant_Adam`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, alpha)
 }
 
-GradientSM <- function(w, efflen, ec, count, idx) {
-    .Call(`_RNASeqQuant_GradientSM`, w, efflen, ec, count, idx)
-}
-
-GradientSM2 <- function(w, efflen, ec, count, spenum, idx) {
-    .Call(`_RNASeqQuant_GradientSM2`, w, efflen, ec, count, spenum, idx)
+GradientSM <- function(w, efflen, ec, count, spenum, idx) {
+    .Call(`_RNASeqQuant_GradientSM`, w, efflen, ec, count, spenum, idx)
 }
 
 GradientSP <- function(w, efflen, ec, count, idx) {
@@ -207,8 +203,12 @@ SoftplusGrad <- function(x, weight) {
     .Call(`_RNASeqQuant_SoftplusGrad`, x, weight)
 }
 
-Test <- function(ecraw, efflenraw, spenum, w, count, idx) {
-    .Call(`_RNASeqQuant_Test`, ecraw, efflenraw, spenum, w, count, idx)
+GradientSMSS <- function(w, efflen, ec, count, idx) {
+    .Call(`_RNASeqQuant_GradientSMSS`, w, efflen, ec, count, idx)
+}
+
+TestGradientSM <- function(ecraw, efflenraw, spenum, w, count, idx) {
+    .Call(`_RNASeqQuant_TestGradientSM`, ecraw, efflenraw, spenum, w, count, idx)
 }
 
 #' Split strings and equivalence classes.

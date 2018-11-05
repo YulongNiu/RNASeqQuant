@@ -1,3 +1,5 @@
+context('gradient')
+
 ####################softmax gradient for each ec###############
 emp <- matrix(ncol = 1, nrow = 0)
 
@@ -54,3 +56,23 @@ test_that('0, 0 | 1', {
 })
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ###############################################################
+
+
+####################softmax gradient for single species###############
+ecpath <- system.file('extdata', 'ath_ec.ec', package = 'RNASeqQuant')
+countpath <- system.file('extdata', 'ath_count.tsv', package = 'RNASeqQuant')
+abpath <- system.file('extdata', 'ath_abundance.tsv', package = 'RNASeqQuant')
+plist <- read_pseudo(ecpath, countpath, abpath)
+
+## check gradient for all ec
+tn <- length(plist$efflen)
+idx <- 0:(length(plist$ec) - 1)
+w <- rnorm(tn, 0, sqrt(1/tn))
+
+estw1 <- GradientSMSS(w, MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count, idx)[idx+1]
+estw2 <- TestGradientSM(plist$ec, plist$efflen, c(0, 41392), w, plist$count, idx)[idx+1]
+
+test_that('softmax gradient for single species', {
+  expect_equal(estw1, estw2)
+})
+######################################################################

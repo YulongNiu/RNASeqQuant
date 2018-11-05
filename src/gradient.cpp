@@ -16,25 +16,9 @@ using namespace std;
 
 // [[Rcpp::depends(RcppArmadillo, RcppParallel)]]
 
+
 // [[Rcpp::export]]
 arma::vec GradientSM(const arma::vec& w,
-                     const std::vector<arma::vec>& efflen,
-                     const std::vector<arma::uvec>& ec,
-                     const arma::uvec& count,
-                     const arma::uvec& idx) {
-
-  vec grad(w.n_elem, fill::zeros);
-
-  for (auto i : idx) {
-    grad.elem(ec[i]) += count(i) * Softmax(w.elem(ec[i]), 1/efflen[i]);
-  }
-
-  return sum(count.elem(idx)) * Softmax1(w) - grad;
-}
-
-
-// [[Rcpp::export]]
-arma::vec GradientSM2(const arma::vec& w,
                       const std::vector< std::vector< arma::vec > >& efflen,
                       const std::vector< std::vector< arma::uvec > >& ec,
                       const arma::uvec& count,

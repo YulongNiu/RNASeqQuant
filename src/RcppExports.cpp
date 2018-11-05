@@ -52,23 +52,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // GradientSM
-arma::vec GradientSM(const arma::vec& w, const std::vector<arma::vec>& efflen, const std::vector<arma::uvec>& ec, const arma::uvec& count, const arma::uvec& idx);
-RcppExport SEXP _RNASeqQuant_GradientSM(SEXP wSEXP, SEXP efflenSEXP, SEXP ecSEXP, SEXP countSEXP, SEXP idxSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::vec& >::type w(wSEXP);
-    Rcpp::traits::input_parameter< const std::vector<arma::vec>& >::type efflen(efflenSEXP);
-    Rcpp::traits::input_parameter< const std::vector<arma::uvec>& >::type ec(ecSEXP);
-    Rcpp::traits::input_parameter< const arma::uvec& >::type count(countSEXP);
-    Rcpp::traits::input_parameter< const arma::uvec& >::type idx(idxSEXP);
-    rcpp_result_gen = Rcpp::wrap(GradientSM(w, efflen, ec, count, idx));
-    return rcpp_result_gen;
-END_RCPP
-}
-// GradientSM2
-arma::vec GradientSM2(const arma::vec& w, const std::vector< std::vector< arma::vec > >& efflen, const std::vector< std::vector< arma::uvec > >& ec, const arma::uvec& count, const arma::uvec& spenum, const arma::uvec& idx);
-RcppExport SEXP _RNASeqQuant_GradientSM2(SEXP wSEXP, SEXP efflenSEXP, SEXP ecSEXP, SEXP countSEXP, SEXP spenumSEXP, SEXP idxSEXP) {
+arma::vec GradientSM(const arma::vec& w, const std::vector< std::vector< arma::vec > >& efflen, const std::vector< std::vector< arma::uvec > >& ec, const arma::uvec& count, const arma::uvec& spenum, const arma::uvec& idx);
+RcppExport SEXP _RNASeqQuant_GradientSM(SEXP wSEXP, SEXP efflenSEXP, SEXP ecSEXP, SEXP countSEXP, SEXP spenumSEXP, SEXP idxSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -78,7 +63,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const arma::uvec& >::type count(countSEXP);
     Rcpp::traits::input_parameter< const arma::uvec& >::type spenum(spenumSEXP);
     Rcpp::traits::input_parameter< const arma::uvec& >::type idx(idxSEXP);
-    rcpp_result_gen = Rcpp::wrap(GradientSM2(w, efflen, ec, count, spenum, idx));
+    rcpp_result_gen = Rcpp::wrap(GradientSM(w, efflen, ec, count, spenum, idx));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -278,9 +263,24 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// Test
-arma::vec Test(const Rcpp::CharacterVector& ecraw, const arma::vec& efflenraw, const arma::uvec& spenum, const arma::vec& w, const arma::uvec& count, const arma::uvec& idx);
-RcppExport SEXP _RNASeqQuant_Test(SEXP ecrawSEXP, SEXP efflenrawSEXP, SEXP spenumSEXP, SEXP wSEXP, SEXP countSEXP, SEXP idxSEXP) {
+// GradientSMSS
+arma::vec GradientSMSS(const arma::vec& w, const std::vector<arma::vec>& efflen, const std::vector<arma::uvec>& ec, const arma::uvec& count, const arma::uvec& idx);
+RcppExport SEXP _RNASeqQuant_GradientSMSS(SEXP wSEXP, SEXP efflenSEXP, SEXP ecSEXP, SEXP countSEXP, SEXP idxSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type w(wSEXP);
+    Rcpp::traits::input_parameter< const std::vector<arma::vec>& >::type efflen(efflenSEXP);
+    Rcpp::traits::input_parameter< const std::vector<arma::uvec>& >::type ec(ecSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type count(countSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type idx(idxSEXP);
+    rcpp_result_gen = Rcpp::wrap(GradientSMSS(w, efflen, ec, count, idx));
+    return rcpp_result_gen;
+END_RCPP
+}
+// TestGradientSM
+arma::vec TestGradientSM(const Rcpp::CharacterVector& ecraw, const arma::vec& efflenraw, const arma::uvec& spenum, const arma::vec& w, const arma::uvec& count, const arma::uvec& idx);
+RcppExport SEXP _RNASeqQuant_TestGradientSM(SEXP ecrawSEXP, SEXP efflenrawSEXP, SEXP spenumSEXP, SEXP wSEXP, SEXP countSEXP, SEXP idxSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -290,7 +290,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const arma::vec& >::type w(wSEXP);
     Rcpp::traits::input_parameter< const arma::uvec& >::type count(countSEXP);
     Rcpp::traits::input_parameter< const arma::uvec& >::type idx(idxSEXP);
-    rcpp_result_gen = Rcpp::wrap(Test(ecraw, efflenraw, spenum, w, count, idx));
+    rcpp_result_gen = Rcpp::wrap(TestGradientSM(ecraw, efflenraw, spenum, w, count, idx));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -395,8 +395,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RNASeqQuant_Estcount2Prob", (DL_FUNC) &_RNASeqQuant_Estcount2Prob, 2},
     {"_RNASeqQuant_EM", (DL_FUNC) &_RNASeqQuant_EM, 6},
     {"_RNASeqQuant_Adam", (DL_FUNC) &_RNASeqQuant_Adam, 7},
-    {"_RNASeqQuant_GradientSM", (DL_FUNC) &_RNASeqQuant_GradientSM, 5},
-    {"_RNASeqQuant_GradientSM2", (DL_FUNC) &_RNASeqQuant_GradientSM2, 6},
+    {"_RNASeqQuant_GradientSM", (DL_FUNC) &_RNASeqQuant_GradientSM, 6},
     {"_RNASeqQuant_GradientSP", (DL_FUNC) &_RNASeqQuant_GradientSP, 5},
     {"_RNASeqQuant_LLEM", (DL_FUNC) &_RNASeqQuant_LLEM, 4},
     {"_RNASeqQuant_LLGD", (DL_FUNC) &_RNASeqQuant_LLGD, 4},
@@ -413,7 +412,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RNASeqQuant_Softplus", (DL_FUNC) &_RNASeqQuant_Softplus, 2},
     {"_RNASeqQuant_SoftplusGrad1", (DL_FUNC) &_RNASeqQuant_SoftplusGrad1, 1},
     {"_RNASeqQuant_SoftplusGrad", (DL_FUNC) &_RNASeqQuant_SoftplusGrad, 2},
-    {"_RNASeqQuant_Test", (DL_FUNC) &_RNASeqQuant_Test, 6},
+    {"_RNASeqQuant_GradientSMSS", (DL_FUNC) &_RNASeqQuant_GradientSMSS, 5},
+    {"_RNASeqQuant_TestGradientSM", (DL_FUNC) &_RNASeqQuant_TestGradientSM, 6},
     {"_RNASeqQuant_Strsplit", (DL_FUNC) &_RNASeqQuant_Strsplit, 2},
     {"_RNASeqQuant_SplitEC", (DL_FUNC) &_RNASeqQuant_SplitEC, 1},
     {"_RNASeqQuant_MatchEfflen", (DL_FUNC) &_RNASeqQuant_MatchEfflen, 2},

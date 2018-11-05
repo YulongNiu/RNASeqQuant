@@ -6,7 +6,7 @@
 ## sourceCpp('../src/softplus.cpp')
 ## sourceCpp('../src/likelihood.cpp')
 ## sourceCpp('../src/gradient.cpp')
-## sourceCpp('../src/test.cpp')
+## sourceCpp('../src/testgradient.cpp')
 ## sourceCpp('../src/GD.cpp')
 ## sourceCpp('../src/EM.cpp')
 ## source('ec.R')
@@ -69,17 +69,9 @@
 ## LL(Softplus1(w)/sum(Softplus1(w)), MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count)
 ## w <- w - 0.01 * GradientSP(w, MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count, 0:30000)
 
-## ## check gradient
-## idx <- 0:30
-## w <- rep(1, 41392)
-## GradientSM(w, MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count, idx)[idx+1]
-
-## w <- rep(1, 413292)
-## Test(plist$ec, plist$efflen, c(0, 41392), w, plist$count, idx)[idx+1]
-
 ## ## w <- rnorm(41392, 0, sqrt(1/41392))
 ## w <- w - 0.01 * GradientSM(w, MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count, idx)[idx+1]
-## ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 ## RNASeqEM:::start_profiler("profile.out")

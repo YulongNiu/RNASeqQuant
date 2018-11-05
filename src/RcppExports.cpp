@@ -208,13 +208,13 @@ BEGIN_RCPP
 END_RCPP
 }
 // ECGradSM
-arma::vec ECGradSM(const std::vector< arma::vec >& w, const arma::vec wlse, const std::vector< arma::vec >& efflensg, const std::vector< arma::vec >& wsg);
+arma::vec ECGradSM(const std::vector< arma::vec >& w, const arma::vec& wlse, const std::vector< arma::vec >& efflensg, const std::vector< arma::vec >& wsg);
 RcppExport SEXP _RNASeqQuant_ECGradSM(SEXP wSEXP, SEXP wlseSEXP, SEXP efflensgSEXP, SEXP wsgSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const std::vector< arma::vec >& >::type w(wSEXP);
-    Rcpp::traits::input_parameter< const arma::vec >::type wlse(wlseSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type wlse(wlseSEXP);
     Rcpp::traits::input_parameter< const std::vector< arma::vec >& >::type efflensg(efflensgSEXP);
     Rcpp::traits::input_parameter< const std::vector< arma::vec >& >::type wsg(wsgSEXP);
     rcpp_result_gen = Rcpp::wrap(ECGradSM(w, wlse, efflensg, wsg));

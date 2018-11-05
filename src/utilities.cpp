@@ -146,7 +146,9 @@ void EC2Spe(std::vector< std::vector< arma::uvec > >& ec,
             const arma::vec& efflenraw,
             const arma::uvec& spenum) {
 
-  for (uword i = 0; i < ecraw.size(); ++i) {
+  uword ecnum = ecraw.size();
+
+  for (uword i = 0; i < ecnum; ++i) {
     EC2SpeSg(ec.at(i), efflen.at(i), string(ecraw(i)), efflenraw, spenum);
   }
 

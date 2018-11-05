@@ -20,7 +20,7 @@ arma::vec SingleSpeGradSM(const std::vector<arma::vec>& wnew,
                           const arma::uword idx);
 
 arma::vec ECGradSM(const std::vector< arma::vec >& w,
-                   const arma::vec wlse,
+                   const arma::vec& wlse,
                    const std::vector< arma::vec >& efflensg,
                    const std::vector< arma::vec >& ecsg);
 

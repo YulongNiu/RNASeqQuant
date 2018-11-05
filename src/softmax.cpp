@@ -77,11 +77,7 @@ arma::vec Softmax1(const arma::vec& x) {
 }
 
 
-// emp <- matrix(ncol = 1, nrow = 0)
-// SingleSpeGradSM(list(c(1, 1), 1), list(c(1, 1), 1), list(c(1, 1), 1), c(1, 1), 0)
-// SingleSpeGradSM(list(c(1, 1), 1), list(1, 1), list(1, 1), c(0.5, 1), 0)
-// SingleSpeGradSM(list(c(1, 1), 1), list(1, emp), list(1, emp), c(0.5, 0), 0)
-// SingleSpeGradSM(list(c(1, 1), 1), list(c(1, 1), emp), list(c(1, 1), emp), c(1, 0), 0)
+
 // [[Rcpp::export]]
 arma::vec SingleSpeGradSM(const std::vector<arma::vec>& w,
                           const std::vector< arma::vec >& efflensg,
@@ -116,7 +112,7 @@ arma::vec SingleSpeGradSM(const std::vector<arma::vec>& w,
 
 // [[Rcpp::export]]
 arma::vec ECGradSM(const std::vector< arma::vec >& w,
-                   const arma::vec wlse,
+                   const arma::vec& wlse,
                    const std::vector< arma::vec >& efflensg,
                    const std::vector< arma::vec >& wsg) {
 
@@ -136,7 +132,7 @@ arma::vec ECGradSM(const std::vector< arma::vec >& w,
   for (uword i = 0; i < sn; ++i) {
     if (wsg[i].n_elem > 0) {
       res = join_cols(res, SingleSpeGradSM(w, efflensg, wsg, ecratio, i));
-    }
+    } else {}
   }
 
   return res;

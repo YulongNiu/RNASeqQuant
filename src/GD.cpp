@@ -67,7 +67,7 @@ arma::vec Adam(const arma::vec& efflenraw,
 
   for (uword iter = 0; iter < epochs; ++iter) {
 
-    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LLGD(Softmax1(w), efflen, ec, count) << "|" << t << std::endl;
+    std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LLGD(Softmax1(w), efflen, ec, count) << "|" << t << std::endl;
     // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(Softplus1(w) / sum(Softplus1(w)), efflen, ec, count) << "|" << t << std::endl;
 
     idx = shuffle(idx);

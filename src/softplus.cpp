@@ -64,13 +64,8 @@ arma::vec Softplus1(const arma::vec& x) {
 arma::vec Softplus(const arma::vec& x,
                    const arma::vec& weight) {
 
-  vec res(x.n_elem);
+  return Softplus1(x) % weight;
 
-  for (uword i = 0; i < x.n_elem; ++i) {
-    res(i) = log1p(exp(x(i))) * weight(i);
-  }
-
-  return res;
 }
 
 

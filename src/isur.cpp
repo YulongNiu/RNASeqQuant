@@ -11,10 +11,10 @@ using namespace arma;
 
 
 // [[Rcpp::export]]
-arma::vec SquareRoot(const arma::vec& x,
+arma::vec RevSquareRoot(const arma::vec& x,
                      const double alpha) {
 
-  return sqrt(1 + alpha * x * x);
+  return 1/sqrt(1 + alpha * x * x);
 
 }
 
@@ -22,7 +22,7 @@ arma::vec SquareRoot(const arma::vec& x,
 arma::vec ISRU1(const arma::vec& x,
                 const double alpha) {
 
-  return x % SquareRoot(x, alpha) + 1 / sqrt(alpha);
+  return x % RevSquareRoot(x, alpha) + 1 / sqrt(alpha);
 
 }
 
@@ -41,7 +41,7 @@ arma::vec ISRUGrad1(const arma::vec& x,
                     const double alpha) {
 
   // numerator
-  vec sr = SquareRoot(x, alpha);
+  vec sr = RevSquareRoot(x, alpha);
   vec nr = pow(sr, 3);
 
   // denominator
@@ -57,7 +57,7 @@ arma::vec ISRUGrad(const arma::vec& x,
                    const double alpha) {
 
   // numerator
-  vec sr = SquareRoot(x, alpha);
+  vec sr = RevSquareRoot(x, alpha);
   vec nr = pow(sr, 3) % weight;
 
   // denominator

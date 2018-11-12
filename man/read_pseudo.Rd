@@ -25,9 +25,9 @@ Read in output files generated from \code{kallisto pseudo} and \code{kallisto qu
 \examples{
 require('magrittr')
 
-ecpath <- system.file('extdata', 'ecexample.ec', package = 'RNASeqEM')
-countpath <- system.file('extdata', 'count.tsv', package = 'RNASeqEM')
-abpath <- system.file('extdata', 'abundance.tsv', package = 'RNASeqEM')
+ecpath <- system.file('extdata', 'example_ec.ec', package = 'RNASeqQuant')
+countpath <- system.file('extdata', 'example_count.tsv', package = 'RNASeqQuant')
+abpath <- system.file('extdata', 'example_abundance.tsv', package = 'RNASeqQuant')
 
 read_pseudo(ecpath, countpath, abpath)
 }

@@ -113,16 +113,6 @@ arma::uvec IdxSpenum(const arma::uvec& spenumraw) {
   return res;
 }
 
-// [[Rcpp::export]]
-std::vector< std::vector< arma::vec > > InitialSplitSpe(const uword en,
-                                                        const uword sn) {
-  vector< vector< vec > > res(en, vector< vec >(sn));
-
-  return res;
-}
-
-
-
 
 // [[Rcpp::export]]
 void EC2SpeSg(std::vector< arma::uvec >& ecsg,
@@ -156,7 +146,9 @@ void EC2Spe(std::vector< std::vector< arma::uvec > >& ec,
             const arma::vec& efflenraw,
             const arma::uvec& spenum) {
 
-  for (uword i = 0; i < ecraw.size(); ++i) {
+  uword ecnum = ecraw.size();
+
+  for (uword i = 0; i < ecnum; ++i) {
     EC2SpeSg(ec.at(i), efflen.at(i), string(ecraw(i)), efflenraw, spenum);
   }
 

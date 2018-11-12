@@ -1,0 +1,110 @@
+context('gradient')
+
+####################softmax gradient for each ec###############
+emp <- matrix(ncol = 1, nrow = 0)
+
+##~~~~~~~~~~~~~~~~~~~~~~~~~~SingleSpeGradSM~~~~~~~~~~~~~~~~~~~~~~~~
+test_that('"1, 1" | 1', {
+  expect_equal(SingleSpeGradSM(list(c(1, 1), 1), list(c(1, 1), 1), list(c(1, 1), 1), c(1, 1), 0), matrix(c(0.5, 0.5), ncol = 1))
+})
+
+test_that('1, 1 | "1"', {
+  expect_equal(SingleSpeGradSM(list(c(1, 1), 1), list(c(1, 1), 1), list(c(1, 1), 1), c(1, 1), 1), matrix(c(1), ncol = 1))
+})
+
+test_that('"0, 1" | 1', {
+  expect_equal(SingleSpeGradSM(list(c(1, 1), 1), list(1, 1), list(1, 1), c(0.5, 1), 0), matrix(c(2/3), ncol = 1))
+})
+
+test_that('0, 1 | "1"', {
+  expect_equal(SingleSpeGradSM(list(c(1, 1), 1), list(1, 1), list(1, 1), c(0.5, 1), 1), matrix(c(1), ncol = 1))
+})
+
+test_that('"1, 0" | 0', {
+  expect_equal(SingleSpeGradSM(list(c(1, 1), 1), list(1, emp), list(1, emp), c(0.5, 0), 0), matrix(c(1), ncol = 1))
+})
+
+test_that('"1, 1" | 0', {
+  expect_equal(SingleSpeGradSM(list(c(1, 1), 1), list(c(1, 1), emp), list(c(1, 1), emp), c(1, 0), 0), matrix(c(0.5, 0.5), ncol = 1))
+})
+
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+##~~~~~~~~~~~~~~~~~~~~~~~~~ECGradSM func~~~~~~~~~~~~~~~~~~~~~~~~~
+test_that('1, 1 | 1', {
+  expect_equal(ECGradSM(list(c(1, 1), 1), c(log(2)+1, 1), list(c(1, 1), 1), list(c(1, 1), 1)), matrix(c(0.5, 0.5, 1), ncol = 1))
+})
+
+test_that('0, 1 | 1', {
+  expect_equal(ECGradSM(list(c(1, 1), 1), c(log(2)+1, 1), list(1, 1), list(1, 1)), matrix(c(2/3, 1), ncol = 1))
+})
+
+test_that('1, 0 | 1', {
+  expect_equal(ECGradSM(list(c(1, 1), 1), c(log(2)+1, 1), list(1, 1), list(1, 1)), matrix(c(2/3, 1), ncol = 1))
+})
+
+test_that('1, 0 | 0', {
+  expect_equal(ECGradSM(list(c(1, 1), 1), c(log(2)+1, 1), list(1, emp), list(1, emp)), matrix(c(1), ncol = 1))
+})
+
+test_that('1, 1 | 0', {
+  expect_equal(ECGradSM(list(c(1, 1), 1), c(log(2)+1, 1), list(c(1, 1), emp), list(c(1, 1), emp)), matrix(c(0.5, 0.5), ncol = 1))
+})
+
+test_that('0, 0 | 1', {
+  expect_equal(ECGradSM(list(c(1, 1), 1), c(log(2)+1, 1), list(emp, 1), list(emp, 1)), matrix(c(1), ncol = 1))
+})
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+##~~~~~~~~~~~~~~~~~~~~~~~~~ECGradISRU func~~~~~~~~~~~~~~~~~~~~~~~~~
+g1 <- (sqrt(100 / 101) ^ 3) / (4 * sqrt(100 / 101) + 40) * 2
+g2 <- (sqrt(100 / 101) ^ 3) / (2 * sqrt(100 / 101) + 20) * 2
+g3 <- (sqrt(100 / 101) ^ 3) / (3 * sqrt(100 / 101) + 30) * 2
+
+test_that('1, 1 | 1', {
+  expect_equal(ECGradISRU(list(c(1, 1), 1), c(2*sqrt(100/101) + 20, sqrt(100/101) + 10), list(c(1, 1), 1), list(c(1, 1), 1), 1/100), matrix(c(g1, g1, g2), ncol = 1))
+})
+
+test_that('0, 1 | 1', {
+  expect_equal(ECGradISRU(list(c(1, 1), 1), c(2*sqrt(100/101) + 20, sqrt(100/101) + 10), list(1, 1), list(1, 1), 1/100), matrix(c(g3, g2), ncol = 1))
+})
+
+test_that('1, 0 | 0', {
+  expect_equal(ECGradISRU(list(c(1, 1), 1), c(2*sqrt(100/101) + 20, sqrt(100/101) + 10), list(1, emp), list(1, emp), 1/100), matrix(c(g2), ncol = 1))
+})
+
+test_that('1, 1 | 0', {
+  expect_equal(ECGradISRU(list(c(1, 1), 1), c(2*sqrt(100/101) + 20, sqrt(100/101) + 10), list(c(1, 1)), list(c(1, 1)), 1/100), matrix(c(g2/2, g2/2), ncol = 1))
+})
+
+test_that('0, 0 | 1', {
+  expect_equal(ECGradISRU(list(c(1, 1), 1), c(2*sqrt(100/101) + 20, sqrt(100/101) + 10), list(emp, 1), list(emp, 1), 1/100), matrix(c(g2), ncol = 1))
+})
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+###############################################################
+
+
+####################gradient for single species###############
+ecpath <- system.file('extdata', 'ath_ec.ec', package = 'RNASeqQuant')
+countpath <- system.file('extdata', 'ath_count.tsv', package = 'RNASeqQuant')
+abpath <- system.file('extdata', 'ath_abundance.tsv', package = 'RNASeqQuant')
+plist <- read_pseudo(ecpath, countpath, abpath)
+
+## check gradient for all ec
+tn <- length(plist$efflen)
+idx <- 0:(length(plist$ec) - 1)
+w <- rnorm(tn, 0, sqrt(1/tn))
+
+estw1 <- GradientSMSS(w, MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count, idx)
+estw2 <- TestGradientSM(plist$ec, plist$efflen, c(0, tn), w, plist$count, idx)
+
+test_that('softmax gradient for single species', {
+  expect_equal(estw1, estw2)
+})
+
+estw1 <- GradientISRUSS(w, MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count, 1/100, idx)
+estw2 <- TestGradientISRU(plist$ec, plist$efflen, c(0, tn), w, plist$count, 1/100, idx)
+test_that('ISRU gradient for single species', {
+  expect_equal(estw1, estw2)
+})
+######################################################################

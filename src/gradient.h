@@ -4,17 +4,19 @@
 #include <RcppArmadillo.h>
 
 arma::vec GradientSM(const arma::vec& w,
-                     const std::vector<arma::vec>& efflen,
-                     const std::vector<arma::uvec>& ec,
+                     const std::vector< std::vector< arma::vec > >& efflen,
+                     const std::vector< std::vector< arma::uvec > >& ec,
                      const arma::uvec& count,
+                     const arma::uvec& spenum,
                      const arma::uvec& idx);
 
-arma::vec GradientSM2(const arma::vec& w,
-                      const std::vector< std::vector< arma::vec > >& efflen,
-                      const std::vector< std::vector< arma::uvec > >& ec,
-                      const arma::uvec& count,
-                      const arma::uvec& spenum,
-                      const arma::uvec& idx);
+arma::vec GradientISRU(const arma::vec& w,
+                       const std::vector< std::vector< arma::vec > >& efflen,
+                       const std::vector< std::vector< arma::uvec > >& ec,
+                       const arma::uvec& count,
+                       const arma::uvec& spenum,
+                       const double alpha,
+                       const arma::uvec& idx);
 
 arma::vec GradientSP(const arma::vec& w,
                      const std::vector<arma::vec>& efflen,

@@ -77,38 +77,29 @@ arma::vec Softmax1(const arma::vec& x) {
 }
 
 
-// emp <- matrix(ncol = 1, nrow = 0)
-// SingleSpeGradSM(list(c(1, 1), 1), list(c(1, 1), 1), list(c(1, 1), 1), c(1, 1), 0)
-// SingleSpeGradSM(list(c(1, 1), 1), list(1, 1), list(1, 1), c(0.5, 1), 0)
-// SingleSpeGradSM(list(c(1, 1), 1), list(1, emp), list(1, emp), c(0.5, 0), 0)
-// SingleSpeGradSM(list(c(1, 1), 1), list(c(1, 1), emp), list(c(1, 1), emp), c(1, 0), 0)
+
 // [[Rcpp::export]]
 arma::vec SingleSpeGradSM(const std::vector<arma::vec>& w,
                           const std::vector< arma::vec >& efflensg,
                           const std::vector< arma::vec >& wsg,
-                          const arma::vec& wratio,
+                          const arma::vec& ecratio,
                           const arma::uword idx) {
 
+  vec dnw = wsg[idx];
+  vec dnweight = 1 / efflensg[idx];
+
   // numerator
-  vec nr = wsg[idx] + log(1 / efflensg[idx] + sum(wratio) - wratio(idx));
+  // wratio is 0 if one species has no transcripts in the ec
+  // if tratio == 0, then only one species
+  double tratio = sum(ecratio) - ecratio(idx);
+  vec nr = dnw + log(dnweight + tratio);
 
   // denominator
-  vec tw = w[idx];
-  uword tn = tw.n_elem;
-  uword sn = wsg.size();
-  vec resw;
-  vec reswEfflen;
-  for (uword i = 0; i < sn; ++i) {
-    if (i != idx && wsg[i].n_elem > 0) {
-      resw = join_cols(resw, tw);
-      reswEfflen = join_cols(reswEfflen, vec(tn).fill(wratio(i)));
-    } else {}
-  }
+  if (tratio > 0) {
+    dnw = join_cols(dnw, w[idx]);
+    dnweight = join_cols(dnweight, vec(w[idx].n_elem).fill(tratio));
+  } else {}
 
-  vec dnw = join_cols(wsg[idx], resw);
-  vec dnweight = join_cols(1 / efflensg[idx], reswEfflen);
-
-  // std::cout << nr << std::endl;
   // std::cout << dnw << std::endl;
   // std::cout << dnweight << std::endl;
 
@@ -118,26 +109,21 @@ arma::vec SingleSpeGradSM(const std::vector<arma::vec>& w,
 }
 
 
-// emp <- matrix(ncol = 1, nrow = 0)
-// ECGradSM(list(c(1, 1), 1), c(log(2)+1, 1), list(c(1, 1), 1), list(c(1, 1), 1))
-// ECGradSM(list(c(1, 1), 1), c(log(2)+1, 1), list(1, 1), list(1, 1))
-// ECGradSM(list(c(1, 1), 1), c(log(2)+1, 1), list(1, 1), list(1, 1))
-// ECGradSM(list(c(1, 1), 1), c(log(2)+1, 1), list(1, emp), list(1, emp))
-// ECGradSM(list(c(1, 1), 1), c(log(2)+1, 1), list(c(1, 1), emp), list(c(1, 1), emp))
+
 // [[Rcpp::export]]
 arma::vec ECGradSM(const std::vector< arma::vec >& w,
-                   const arma::vec wlse,
+                   const arma::vec& wlse,
                    const std::vector< arma::vec >& efflensg,
                    const std::vector< arma::vec >& wsg) {
 
   // initialization
   uword sn = wsg.size();
-  vec wratio(sn, fill::zeros);
+  vec ecratio(sn, fill::zeros);
 
   // split each ec
   for (uword i = 0; i < sn; ++i) {
     if (wsg[i].n_elem > 0) {
-      wratio(i) = exp(LogSumExp(wsg[i], 1 / efflensg[i]) - wlse(i));
+      ecratio(i) = exp(LogSumExp(wsg[i], 1 / efflensg[i]) - wlse(i));
     } else {}
   }
 
@@ -145,8 +131,8 @@ arma::vec ECGradSM(const std::vector< arma::vec >& w,
   vec res;
   for (uword i = 0; i < sn; ++i) {
     if (wsg[i].n_elem > 0) {
-      res = join_cols(res, SingleSpeGradSM(w, efflensg, wsg, wratio, i));
-    }
+      res = join_cols(res, SingleSpeGradSM(w, efflensg, wsg, ecratio, i));
+    } else {}
   }
 
   return res;

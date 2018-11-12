@@ -59,12 +59,27 @@ test_that('0, 0 | 1', {
 ##~~~~~~~~~~~~~~~~~~~~~~~~~ECGradISRU func~~~~~~~~~~~~~~~~~~~~~~~~~
 g1 <- (sqrt(100 / 101) ^ 3) / (4 * sqrt(100 / 101) + 40) * 2
 g2 <- (sqrt(100 / 101) ^ 3) / (2 * sqrt(100 / 101) + 20) * 2
+g3 <- (sqrt(100 / 101) ^ 3) / (3 * sqrt(100 / 101) + 30) * 2
 
 test_that('1, 1 | 1', {
   expect_equal(ECGradISRU(list(c(1, 1), 1), c(2*sqrt(100/101) + 20, sqrt(100/101) + 10), list(c(1, 1), 1), list(c(1, 1), 1), 1/100), matrix(c(g1, g1, g2), ncol = 1))
 })
 
+test_that('0, 1 | 1', {
+  expect_equal(ECGradISRU(list(c(1, 1), 1), c(2*sqrt(100/101) + 20, sqrt(100/101) + 10), list(1, 1), list(1, 1), 1/100), matrix(c(g3, g2), ncol = 1))
+})
 
+test_that('1, 0 | 0', {
+  expect_equal(ECGradISRU(list(c(1, 1), 1), c(2*sqrt(100/101) + 20, sqrt(100/101) + 10), list(1, emp), list(1, emp), 1/100), matrix(c(g2), ncol = 1))
+})
+
+test_that('1, 1 | 0', {
+  expect_equal(ECGradISRU(list(c(1, 1), 1), c(2*sqrt(100/101) + 20, sqrt(100/101) + 10), list(c(1, 1)), list(c(1, 1)), 1/100), matrix(c(g2/2, g2/2), ncol = 1))
+})
+
+test_that('0, 0 | 1', {
+  expect_equal(ECGradISRU(list(c(1, 1), 1), c(2*sqrt(100/101) + 20, sqrt(100/101) + 10), list(emp, 1), list(emp, 1), 1/100), matrix(c(g2), ncol = 1))
+})
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ###############################################################
 

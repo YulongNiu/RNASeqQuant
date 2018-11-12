@@ -93,7 +93,7 @@ arma::vec SingleSpeGradISRU(const arma::vec& wlse,
 }
 
 
-// ECGradISRU(list(c(1, 1), 1), c(2*sqrt(100/101) + 20, sqrt(100/101) + 10), list(c(1, 1), 1), list(c(1, 1), 1), 1/100)
+// ECGradISRU(list(c(1, 1), 1), c(2*sqrt(100/101) + 20, sqrt(100/101) + 10), list(1, 1), list(1, 1), 1/100)
 // [[Rcpp::export]]
 arma::vec ECGradISRU(const std::vector< arma::vec >& w,
                      const arma::vec& wlse,

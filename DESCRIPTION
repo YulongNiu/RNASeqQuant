@@ -19,7 +19,7 @@ Suggests:
 ByteCompile: true
 License: GPL
 LazyData: true
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
 VignetteBuilder: knitr
 LinkingTo: 
     Rcpp,

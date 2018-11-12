@@ -107,14 +107,4 @@ estw2 <- TestGradientISRU(plist$ec, plist$efflen, c(0, tn), w, plist$count, 1/10
 test_that('ISRU gradient for single species', {
   expect_equal(estw1, estw2)
 })
-
-
-plist <- list(ec = c('0,1,2', '1,2', '0,2', '0', '0,1'), count = rep(1, 5), efflen = rep(1, 3))
-
-tn <- length(plist$efflen)
-idx <- 0:(length(plist$ec) - 1)
-## w <- rnorm(tn, 0, sqrt(1/tn))
-w <- rep(0.01, 3)
-
-TestGradientISRU(plist$ec, plist$efflen, c(0, tn), w, plist$count, 1/100, idx)
 ######################################################################

@@ -2,8 +2,6 @@
 
 #include <vector>
 
-#include "utilities.h"
-
 using namespace std;
 using namespace arma;
 
@@ -12,7 +10,7 @@ using namespace arma;
 
 // [[Rcpp::export]]
 arma::vec InvSqrtRoot(const arma::vec& x,
-                     const double alpha) {
+                      const double alpha) {
 
   return 1/sqrt(1 + alpha * x % x);
 
@@ -40,14 +38,14 @@ double ISRU(const arma::vec& x,
 
 // [[Rcpp::export]]
 arma::vec ISRUGrad1(const arma::vec& x,
+                    const arma::vec& isr,
                     const double alpha) {
 
   // numerator
-  vec sr = InvSqrtRoot(x, alpha);
-  vec nr = pow(sr, 3);
+  vec nr = pow(isr, 3);
 
   // denominator
-  double dn = sum(sr % x) + x.n_elem / sqrt(alpha);
+  double dn = sum(isr % x) + x.n_elem / sqrt(alpha);
 
   return nr / dn;
 }
@@ -55,15 +53,15 @@ arma::vec ISRUGrad1(const arma::vec& x,
 
 // [[Rcpp::export]]
 arma::vec ISRUGrad(const arma::vec& x,
+                   const arma::vec& isr,
                    const arma::vec& weight,
                    const double alpha) {
 
   // numerator
-  vec sr = InvSqrtRoot(x, alpha);
-  vec nr = pow(sr, 3) % weight;
+  vec nr = pow(isr, 3) % weight;
 
   // denominator
-  double dn = sum(sr % x % weight) + sum(weight) / sqrt(alpha);
+  double dn = sum(isr % x % weight) + sum(weight) / sqrt(alpha);
 
   return nr / dn;
 }
@@ -93,7 +91,6 @@ arma::vec SingleSpeGradISRU(const arma::vec& wlse,
 }
 
 
-// ECGradISRU(list(c(1, 1), 1), c(2*sqrt(100/101) + 20, sqrt(100/101) + 10), list(1, 1), list(1, 1), 1/100)
 // [[Rcpp::export]]
 arma::vec ECGradISRU(const std::vector< arma::vec >& w,
                      const arma::vec& wlse,

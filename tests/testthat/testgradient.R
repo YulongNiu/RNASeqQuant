@@ -95,16 +95,26 @@ tn <- length(plist$efflen)
 idx <- 0:(length(plist$ec) - 1)
 w <- rnorm(tn, 0, sqrt(1/tn))
 
-estw1 <- GradientSMSS(w, MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count, idx)[idx+1]
-estw2 <- TestGradientSM(plist$ec, plist$efflen, c(0, 41392), w, plist$count, idx)[idx+1]
+estw1 <- GradientSMSS(w, MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count, idx)
+estw2 <- TestGradientSM(plist$ec, plist$efflen, c(0, tn), w, plist$count, idx)
 
 test_that('softmax gradient for single species', {
   expect_equal(estw1, estw2)
 })
 
-estw1 <- GradientISRUSS(w, MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count, 1/100, idx)[idx+1]
-estw2 <- TestGradientISRU(plist$ec, plist$efflen, c(0, 41392), w, plist$count, 1/100, idx)[idx+1]
+estw1 <- GradientISRUSS(w, MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count, 1/100, idx)
+estw2 <- TestGradientISRU(plist$ec, plist$efflen, c(0, tn), w, plist$count, 1/100, idx)
 test_that('ISRU gradient for single species', {
   expect_equal(estw1, estw2)
 })
+
+
+plist <- list(ec = c('0,1,2', '1,2', '0,2', '0', '0,1'), count = rep(1, 5), efflen = rep(1, 3))
+
+tn <- length(plist$efflen)
+idx <- 0:(length(plist$ec) - 1)
+## w <- rnorm(tn, 0, sqrt(1/tn))
+w <- rep(0.01, 3)
+
+TestGradientISRU(plist$ec, plist$efflen, c(0, tn), w, plist$count, 1/100, idx)
 ######################################################################

@@ -94,5 +94,6 @@ arma::vec TestGradientISRU(const Rcpp::CharacterVector& ecraw,
   EC2Spe(ec, efflen, ecraw, efflenraw, spenum);
 
   vec res = GradientISRU(w, efflen, ec, count, spenum, alpha, idx);
+
   return res;
 }

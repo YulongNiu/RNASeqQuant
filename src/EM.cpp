@@ -68,9 +68,11 @@ arma::vec EMSingle(const arma::vec& prob,
                    const std::vector<arma::uvec>& ec,
                    const arma::uvec& count) {
 
+  // prob.n_elem is the number of transcripts
+  // ec.n_elem == count.n_elem == efflen.n_elem is TRUE, which is the number of equivalent classes/reads
   vec estcount(prob.n_elem, fill::zeros);
 
-  for (uword i = 0; i < count.n_elem; ++i) {
+  for (uword i = 0; i < ec.n_elem; ++i) {
     vec eachcp = prob.elem(ec[i]) / efflen[i];
     estcount.elem(ec[i]) += eachcp * count(i)/ sum(eachcp);
   }
@@ -121,7 +123,7 @@ arma::vec Estcount2Prob(const arma::vec& estcount,
 //' @inheritParams SplitEC
 //' @inheritParams IdxSpenum
 //' @references \href{https://arxiv.org/abs/1104.3889}{Lior Pachter: Models for transcript quantification from RNA-Seq}
-//' @return A \code{numeric vector} indicates probabilities of selecting a read from the different transcripts.
+//' @return A \code{numeric vector} indicates estimated counts of transcripts.
 //' @examples
 //' ## Single species
 //' ##    f1 f2 f3
@@ -169,21 +171,16 @@ arma::vec EM(const arma::vec& efflenraw,
   uvec count = countraw.elem(zeros);
   vector<uvec> ec = SplitEC(ecraw[zerosidx]);
   vector<vec> efflen = MatchEfflen(ec, efflenraw);
-  uvec spenum = IdxSpenum(spenumraw);
 
   // step2: EM iteration
   // start prob and est
   uword tn = sum(spenumraw);
   double cn = sum(count);
   vec prob(tn);
+  prob.fill(1.0/tn);
   vec startest(tn);
+  startest.fill(cn/tn);
   vec est(tn, fill::zeros);
-  for (uword i = 0; i < spenum.n_elem - 1; ++i) {
-    uword start = spenum(i);
-    uword end = spenum(i) + spenum(i+1) - 1;
-    prob.subvec(start, end).fill(1.0/spenum(i+1));
-    startest.subvec(start, end).fill(cn/(spenum(i+1) * spenumraw.size()));
-  }
 
   for (uword iter = 0; iter < maxiter; ++iter) {
 
@@ -207,7 +204,8 @@ arma::vec EM(const arma::vec& efflenraw,
             << "." << std::endl;
       break;
     } else {
-      prob = Estcount2Prob(est, spenum);
+      // prob = Estcount2Prob(est, spenum);
+      prob = est / cn;
       startest = est;
     }
   }

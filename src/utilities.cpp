@@ -71,7 +71,7 @@ std::vector<arma::uvec> SplitEC(const Rcpp::CharacterVector& ecraw) {
 
 //' Match transcript effect length with equivalence classes.
 //'
-//' The length of \code{efflen} is equal to number of transcripts.
+//' The length of \code{efflen} is equal to number of equivalence classes.
 //'
 //' @title Match transcript effect length
 //' @return A \code{std::vector<arma::vec>} with the same length of \code{ecvec}.

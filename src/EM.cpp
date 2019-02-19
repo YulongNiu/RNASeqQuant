@@ -82,34 +82,6 @@ arma::vec EMSingle(const arma::vec& prob,
 
 #endif
 
-//' Transform estimated count to probabilities.
-//'
-//' Use estimated counts as the outputs and EM stop conditions.
-//'
-//' @title Counts to probabilities
-//' @return A \code{arma::vec} indicates probabilities of selecting a read from the different transcripts.
-//' @param estcount A \code{arma::vec} estimated counts of transcripts.
-//' @param spenum A \code{arma::uvec} indicated number of transcripts.
-//' @author Yulong Niu \email{yulong.niu@@hotmail.com}
-//' @keywords internal
-// [[Rcpp::export]]
-arma::vec Estcount2Prob(const arma::vec& estcount,
-                        const arma::uvec& spenum) {
-
-  vec prob(estcount.n_elem, fill::zeros);
-
-  for (uword i = 0; i < spenum.n_elem - 1; ++i) {
-    uword start = spenum(i);
-    uword end = spenum(i) + spenum(i+1) - 1;
-    prob.subvec(start, end) = estcount.subvec(start, end) / sum(estcount.subvec(start, end));
-  }
-
-  // // reduce small number influence
-  // prob *= 1e+8;
-
-  return prob;
-}
-
 
 //' Expectation maximization (EM) model for RNA-seq quantification.
 //'

@@ -21,7 +21,7 @@ EM(efflenraw, ecraw, countraw, spenumraw, maxiter = 10000L,
 \item{miniter}{The minimum iteration number with the default value of 50.}
 }
 \value{
-A \code{numeric vector} indicates probabilities of selecting a read from the different transcripts.
+A \code{numeric vector} indicates estimated counts of transcripts.
 }
 \description{
 Expectation maximization (EM) model for RNA-seq quantification.

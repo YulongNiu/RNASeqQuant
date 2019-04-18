@@ -158,7 +158,7 @@ arma::vec EM(const arma::vec& efflenraw,
 
     est = EMSingle(prob, efflen, ec, count);
 
-    //Rcout << std::setprecision (20) << LLEM(prob, efflen, ec, count) << std::endl;
+    // Rcout << std::setprecision (20) << LLEM(prob, efflen, ec, count) << std::endl;
     // cout << std::setprecision (20) << sum(est) << endl;
     // cout << sum(prob) << endl;
 
@@ -176,7 +176,6 @@ arma::vec EM(const arma::vec& efflenraw,
             << "." << std::endl;
       break;
     } else {
-      // prob = Estcount2Prob(est, spenum);
       prob = est / cn;
       startest = est;
     }

@@ -18,7 +18,7 @@ A \code{std::vector<arma::vec>} with the same length of \code{ecvec}.
 Match transcript effect length with equivalence classes.
 }
 \details{
-The length of \code{efflen} is equal to number of transcripts.
+The length of \code{efflen} is equal to number of equivalence classes.
 }
 \author{
 Yulong Niu \email{yulong.niu@hotmail.com}

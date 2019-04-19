@@ -170,7 +170,7 @@ arma::vec EM(const arma::vec& efflenraw,
       } else {}
     }
 
-    if (nopassn == 0 && iter >= miniter) {
+    if (nopassn == 0 && iter >= miniter - 1) {
       Rcout << "The iteration number is " << iter + 1
             << ". The log likelihood is " << std::setprecision (20) << LLEM(prob, efflen, ec, count)
             << "." << std::endl;

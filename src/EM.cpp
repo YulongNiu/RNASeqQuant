@@ -170,7 +170,6 @@ Rcpp::List EM(const arma::vec& efflenraw,
     if (detail) {
       specounts.row(iter) = SpeCount(est, spenumraw);
       resll(iter) = LLEM(prob, efflen, ec, count);
-      Rcout <<  std::setprecision (20) << resll(iter) << std::endl;
     } else {}
 
     // stop iteration condition

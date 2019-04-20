@@ -115,6 +115,25 @@ arma::uvec IdxSpenum(const arma::uvec& spenumraw) {
 
 
 // [[Rcpp::export]]
+arma::vec SpeCount(const arma::vec& est,
+                   const arma::uvec& spenumraw) {
+
+  uword sn = spenumraw.n_elem;
+  vec res(sn, fill::zeros);
+
+  uword start = 0;
+
+  for (uword i = 0; i < sn; ++i) {
+    uword end = start + spenumraw(i) - 1;
+    res(i) = sum(est.subvec(start, end));
+    start = end + 1;
+  }
+
+  return(res);
+}
+
+
+// [[Rcpp::export]]
 void EC2SpeSg(std::vector< arma::uvec >& ecsg,
               std::vector< arma::vec >& efflensg,
               const std::string& ecsgraw,

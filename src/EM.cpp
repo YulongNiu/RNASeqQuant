@@ -91,11 +91,12 @@ arma::vec EMSingle(const arma::vec& prob,
 //' @param countraw A \code{arma::uvec} indicates the counts of ec.
 //' @param maxiter The maximum iteration number with the default value of 10000.
 //' @param miniter The minimum iteration number with the default value of 50.
+//' @param detail A \code{bool} value.  When it is set as \code{true}, logistic likelihood and counts for each species in every iteration will be returned, otherwise \code{false}.
 //' @inheritParams MatchEfflen
 //' @inheritParams SplitEC
 //' @inheritParams IdxSpenum
 //' @references \href{https://arxiv.org/abs/1104.3889}{Lior Pachter: Models for transcript quantification from RNA-Seq}
-//' @return A \code{numeric vector} indicates estimated counts of transcripts.
+//' @return A \code{List} indicates estimated counts of transcripts.
 //' @examples
 //' ## Single species
 //' ##    f1 f2 f3
@@ -123,12 +124,13 @@ arma::vec EMSingle(const arma::vec& prob,
 //' @author Yulong Niu \email{yulong.niu@@hotmail.com}
 //' @export
 // [[Rcpp::export]]
-arma::vec EM(const arma::vec& efflenraw,
+Rcpp::List EM(const arma::vec& efflenraw,
              const Rcpp::CharacterVector& ecraw,
              const arma::uvec& countraw,
              const arma::uvec& spenumraw,
              const arma::uword maxiter = 10000,
-             const arma::uword miniter = 50) {
+             const arma::uword miniter = 50,
+             const bool detail = false) {
 
   // stop iteration params from kallisto
   double countChangeLimit = 1e-2;
@@ -148,19 +150,28 @@ arma::vec EM(const arma::vec& efflenraw,
   // start prob and est
   uword tn = sum(spenumraw);
   double cn = sum(count);
+  uword sn = spenumraw.n_elem;
+
   vec prob(tn);
   prob.fill(1.0/tn);
   vec startest(tn);
   startest.fill(cn/tn);
   vec est(tn, fill::zeros);
 
-  for (uword iter = 0; iter < maxiter; ++iter) {
+  // details init
+  mat specounts(maxiter, sn, fill::zeros);
+  vec resll(maxiter, fill::zeros);
+
+  uword iter;
+  for (iter = 0; iter < maxiter; ++iter) {
 
     est = EMSingle(prob, efflen, ec, count);
 
-    // Rcout << std::setprecision (20) << LLEM(prob, efflen, ec, count) << std::endl;
-    // cout << std::setprecision (20) << sum(est) << endl;
-    // cout << sum(prob) << endl;
+    if (detail) {
+      specounts.row(iter) = SpeCount(est, spenumraw);
+      resll(iter) = LLEM(prob, efflen, ec, count);
+      Rcout <<  std::setprecision (20) << resll(iter) << std::endl;
+    } else {}
 
     // stop iteration condition
     uword nopassn = 0;
@@ -181,8 +192,13 @@ arma::vec EM(const arma::vec& efflenraw,
     }
   }
 
-  // reset small est
+  // step3: reset small est
   est.elem(find(est < countLimit)).zeros();
 
-  return est;
+  // step4: may add details
+  List res = List::create(_["counts"] = est,
+                          _["specounts"] = specounts.rows(0, iter),
+                          _["ll"] = resll.subvec(0, iter));
+
+  return res;
 }

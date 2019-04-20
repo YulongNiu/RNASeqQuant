@@ -14,6 +14,9 @@ std::vector<arma::vec> MatchEfflen(const std::vector<arma::uvec>& ec,
 
 arma::uvec IdxSpenum(const arma::uvec& spenumraw);
 
+arma::vec SpeCount(const arma::vec& est,
+                   const arma::uvec& spenumraw);
+
 void EC2SpeSg(std::vector< arma::uvec >& ecsg,
               std::vector< arma::vec >& efflensg,
               const std::string& ecsgraw,

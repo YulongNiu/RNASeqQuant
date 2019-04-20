@@ -2,10 +2,10 @@
 library('Rcpp')
 library('magrittr')
 sourceCpp('../src/utilities.cpp')
+sourceCpp('../src/likelihood.cpp')
 sourceCpp('../src/softmax.cpp')
 sourceCpp('../src/softplus.cpp')
 sourceCpp('../src/isru.cpp')
-sourceCpp('../src/likelihood.cpp')
 sourceCpp('../src/gradient.cpp')
 sourceCpp('../src/testgradient.cpp')
 sourceCpp('../src/GD.cpp')
@@ -52,7 +52,7 @@ plist$ec %<>% `[`(zeroidx)
 kallistoest <- read.table('/extDisk1/RESEARCH/RNASeqQuantTest/GD/abundance_ath.tsv', stringsAsFactors = FALSE, header = TRUE)[, 4]
 
 ## RNASeqQuant EM
-emest <- EM(plist$efflen, plist$ec, plist$count, length(plist$efflen))
+emest <- EM(plist$efflen, plist$ec, plist$count, length(plist$efflen), detail = TRUE)
 
 ## RNASeqQuant GD
 gdest <- Adam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1000, 0.01)

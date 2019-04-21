@@ -125,12 +125,12 @@ arma::vec EMSingle(const arma::vec& prob,
 //' @export
 // [[Rcpp::export]]
 Rcpp::List EM(const arma::vec& efflenraw,
-             const Rcpp::CharacterVector& ecraw,
-             const arma::uvec& countraw,
-             const arma::uvec& spenumraw,
-             const arma::uword maxiter = 10000,
-             const arma::uword miniter = 50,
-             const bool detail = false) {
+              const Rcpp::CharacterVector& ecraw,
+              const arma::uvec& countraw,
+              const arma::uvec& spenumraw,
+              const arma::uword maxiter = 10000,
+              const arma::uword miniter = 50,
+              const bool detail = false) {
 
   // stop iteration params from kallisto
   double countChangeLimit = 1e-2;
@@ -169,7 +169,7 @@ Rcpp::List EM(const arma::vec& efflenraw,
 
     if (detail) {
       specounts.row(iter) = SpeCount(est, spenumraw);
-      resll(iter) = LLEM(prob, efflen, ec, count);
+      resll(iter) = LL(prob, efflen, ec, count);
     } else {}
 
     // stop iteration condition
@@ -182,7 +182,7 @@ Rcpp::List EM(const arma::vec& efflenraw,
 
     if (nopassn == 0 && iter >= miniter - 1) {
       Rcout << "The iteration number is " << iter + 1
-            << ". The log likelihood is " << std::setprecision (20) << LLEM(prob, efflen, ec, count)
+            << ". The log likelihood is " << std::setprecision (20) << LL(prob, efflen, ec, count)
             << "." << std::endl;
       break;
     } else {

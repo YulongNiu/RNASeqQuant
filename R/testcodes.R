@@ -7,7 +7,7 @@ sourceCpp('../src/softmax.cpp')
 sourceCpp('../src/softplus.cpp')
 sourceCpp('../src/isru.cpp')
 sourceCpp('../src/gradient.cpp')
-sourceCpp('../src/testgradient.cpp')
+## sourceCpp('../src/testgradient.cpp')
 sourceCpp('../src/GD.cpp')
 sourceCpp('../src/EM.cpp')
 source('ec.R')
@@ -17,7 +17,7 @@ plist <- list(ec = c('0,1,2', '1,2', '0,2', '0', '0,1'), count = rep(1, 5), effl
 
 w <- c(1, 1, 1)
 
-EM(plist$efflen, plist$ec, plist$count, spenum = 3)
+EM(plist$efflen, plist$ec, plist$count, spenum = 3) %>% .$counts
 
 Adam(plist$efflen, plist$ec, plist$count, spenum = 3, 400)
 
@@ -56,6 +56,8 @@ emest <- EM(plist$efflen, plist$ec, plist$count, length(plist$efflen), detail = 
 
 ## RNASeqQuant GD
 gdest <- Adam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1000, 0.01)
+
+gdest <- Adam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 36580, 0.01)
 
 ## merge res
 mergeres <- cbind(kallistoest, emest, gdest)

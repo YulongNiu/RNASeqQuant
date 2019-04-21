@@ -3,6 +3,7 @@
 .Rhistory
 .Rproj.user/
 .directory
+R/.history
 
 # object and shared objects
 *.o

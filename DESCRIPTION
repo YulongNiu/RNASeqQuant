@@ -27,3 +27,4 @@ LinkingTo:
     RcppArmadillo,
     RcppParallel,
     testthat
+SystemRequirements: GNU make

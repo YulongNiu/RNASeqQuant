@@ -93,27 +93,16 @@ std::vector<arma::vec> MatchEfflen(const std::vector<arma::uvec>& ec,
 }
 
 
-//' Index transcripts number of input species.
+//' Estimated counts of input species.
 //'
-//' Add zero at the head of input \code{spenum}.
+//' The indices of \code{est} should be consistent with the \code{spenumraw}. For example, the \code{est} is \code{1.5, 2, 3} and \code{spenumraw} is \code{2, 1}, so \code{2.5, 3} will be returned.
 //'
-//' @title Index species number
-//' @return A \code{arma::uvec}.
+//' @title Species estimated counts
+//' @return A \code{arma::vec} represents the total estimated counts of each species.
+//' @param est A \code{arma::vec} estimated counts of each transcripts.
 //' @param spenumraw A \code{arma::uvec} indicated the transcript number in each species.
 //' @author Yulong Niu \email{yulong.niu@@hotmail.com}
 //' @keywords internal
-// [[Rcpp::export]]
-arma::uvec IdxSpenum(const arma::uvec& spenumraw) {
-
-  uword num = spenumraw.n_elem;
-  uvec res(num + 1, fill::zeros);
-
-  res.subvec(1, num) = spenumraw;
-
-  return res;
-}
-
-
 // [[Rcpp::export]]
 arma::vec SpeCount(const arma::vec& est,
                    const arma::uvec& spenumraw) {
@@ -130,6 +119,27 @@ arma::vec SpeCount(const arma::vec& est,
   }
 
   return(res);
+}
+
+
+//' Index transcripts number of input species.
+//'
+//' Add zero at the head of input \code{spenumraw}.
+//'
+//' @title Index species number
+//' @return A \code{arma::uvec}.
+//' @param spenumraw A \code{arma::uvec} indicated the transcript number in each species.
+//' @author Yulong Niu \email{yulong.niu@@hotmail.com}
+//' @keywords internal
+// [[Rcpp::export]]
+arma::uvec IdxSpenum(const arma::uvec& spenumraw) {
+
+  uword num = spenumraw.n_elem;
+  uvec res(num + 1, fill::zeros);
+
+  res.subvec(1, num) = spenumraw;
+
+  return res;
 }
 
 

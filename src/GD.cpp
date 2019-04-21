@@ -43,18 +43,17 @@ arma::vec Adam(const arma::vec& efflenraw,
   uvec zeros = find(countraw > 0);
   IntegerVector zerosidx(zeros.begin(), zeros.end());
 
-  uvec spenum = IdxSpenum(spenumraw);
   uvec count = countraw.elem(zeros);
-  CharacterVector ecclear = ecraw[zerosidx];
-  uword ecnum = ecclear.size();
-  vector< vector< uvec > > ec(ecnum, vector< uvec >(spenumraw.n_elem));
-  vector< vector< vec > > efflen(ecnum, vector< vec >(spenumraw.n_elem));
-  EC2Spe(ec, efflen, ecclear, efflenraw, spenum);
+  vector<uvec> ec = SplitEC(ecraw[zerosidx]);
+  vector<vec> efflen = MatchEfflen(ec, efflenraw);
 
   // step2: Adam
   // start w and estcount
   uword tn = sum(spenumraw);
   uword cn = sum(count);
+  // uword sn = spenumraw.n_elem;
+  uword ecn = ec.size();
+
  // Glorot normal initializer/Xavier normal initializer
   vec w = randn<vec>(tn) / sqrt(tn);
   // vec w(tn); w.fill(0.01);
@@ -63,14 +62,14 @@ arma::vec Adam(const arma::vec& efflenraw,
   uword t = 0;
   // gradient and shuffled index
   vec grad = vec(tn);
-  uvec idx = linspace<uvec>(0, ecnum - 1, ecnum);
+  uvec idx = linspace<uvec>(0, ecn - 1, ecn);
 
   for (uword iter = 0; iter < epochs; ++iter) {
 
-    vec eachp = w % InvSqrtRoot(w, 1.0/0.01) + 1/sqrt(1.0/0.01);
-    Rcout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LLGD(eachp/sum(eachp), efflen, ec, count) << "|" << t << std::endl;
+    // vec eachp = w % InvSqrtRoot(w, 1.0/0.01) + 1/sqrt(1.0/0.01);
+    // Rcout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(eachp/sum(eachp), efflen, ec, count) << "|" << t << std::endl;
 
-    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LLGD(Softmax1(w), efflen, ec, count) << "|" << t << std::endl;
+    std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(Softmax1(w), efflen, ec, count) << "|" << t << std::endl;
 
     // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(Softplus1(w) / sum(Softplus1(w)), efflen, ec, count) << "|" << t << std::endl;
 
@@ -78,14 +77,14 @@ arma::vec Adam(const arma::vec& efflenraw,
     uword biter = 0;
 
     // mini-batch
-    while (biter < ecnum) {
+    while (biter < ecn) {
       ++t;
       uword endi = biter + batchsize - 1;
-      endi = (endi >= ecnum) ? (ecnum - 1) : endi;
+      endi = (endi >= ecn) ? (ecn - 1) : endi;
       uvec eachidx = idx.subvec(biter, endi);
 
       // adam for each batch
-      grad = GradientISRU(w, efflen, ec, count, spenum, 1.0/0.01, eachidx);
+      grad = GradientSM(w, efflen, ec, count, eachidx);
       m = beta1 * m + (1 - beta1) * grad;
       v = beta2 * v + (1 - beta2) * square(grad);
       double alphat = alpha * sqrt(1 - pow(beta2, t)) / (1 - pow(beta1, t));
@@ -95,15 +94,15 @@ arma::vec Adam(const arma::vec& efflenraw,
     }
   }
 
-  vec eachp = w % InvSqrtRoot(w, 1.0/0.01) + 1/sqrt(1.0/0.01);
-  Rcout << "The log likelihood is " << std::setprecision (20) << LLGD(eachp/sum(eachp), efflen, ec, count) << "." << std::endl;
-  // Rcout << "The log likelihood is " << std::setprecision (20) << LLGD(Softmax1(w), efflen, ec, count) << "." << std::endl;
+  // vec eachp = w % InvSqrtRoot(w, 1.0/0.01) + 1/sqrt(1.0/0.01);
+  // Rcout << "The log likelihood is " << std::setprecision (20) << LLGD(eachp/sum(eachp), efflen, ec, count) << "." << std::endl;
+  Rcout << "The log likelihood is " << std::setprecision (20) << LL(Softmax1(w), efflen, ec, count) << "." << std::endl;
   // Rcout << "The log likelihood is " << std::setprecision (20) << LL(Softplus1(w) / sum(Softplus1(w)), efflen, ec, count) << "." << std::endl;
 
 
   // reset small est
-  vec est = eachp/sum(eachp) * cn;
-  // vec est = Softplus1(w) / sum(Softplus1(w)) * cn;
+  // vec est = eachp/sum(eachp) * cn;
+  vec est = Softmax1(w) / sum(Softmax1(w)) * cn;
   est.elem(find(est < countLimit)).zeros();
 
   return est;

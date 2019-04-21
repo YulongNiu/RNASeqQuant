@@ -79,6 +79,7 @@ arma::vec SoftplusGrad1(const arma::vec& x) {
 
 }
 
+
 //' @inheritParams LogSumExp
 //' @rdname softplus
 //' @keywords internal

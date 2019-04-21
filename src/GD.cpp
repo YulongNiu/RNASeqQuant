@@ -69,7 +69,7 @@ arma::vec Adam(const arma::vec& efflenraw,
     // vec eachp = w % InvSqrtRoot(w, 1.0/0.01) + 1/sqrt(1.0/0.01);
     // Rcout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(eachp/sum(eachp), efflen, ec, count) << "|" << t << std::endl;
 
-    std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(Softmax1(w), efflen, ec, count) << "|" << t << std::endl;
+    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(Softmax1(w), efflen, ec, count) << "|" << t << std::endl;
 
     // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(Softplus1(w) / sum(Softplus1(w)), efflen, ec, count) << "|" << t << std::endl;
 
@@ -84,7 +84,7 @@ arma::vec Adam(const arma::vec& efflenraw,
       uvec eachidx = idx.subvec(biter, endi);
 
       // adam for each batch
-      grad = GradientSM(w, efflen, ec, count, eachidx);
+      grad = GradientSP(w, efflen, ec, count, eachidx);
       m = beta1 * m + (1 - beta1) * grad;
       v = beta2 * v + (1 - beta2) * square(grad);
       double alphat = alpha * sqrt(1 - pow(beta2, t)) / (1 - pow(beta1, t));
@@ -96,13 +96,14 @@ arma::vec Adam(const arma::vec& efflenraw,
 
   // vec eachp = w % InvSqrtRoot(w, 1.0/0.01) + 1/sqrt(1.0/0.01);
   // Rcout << "The log likelihood is " << std::setprecision (20) << LLGD(eachp/sum(eachp), efflen, ec, count) << "." << std::endl;
-  Rcout << "The log likelihood is " << std::setprecision (20) << LL(Softmax1(w), efflen, ec, count) << "." << std::endl;
-  // Rcout << "The log likelihood is " << std::setprecision (20) << LL(Softplus1(w) / sum(Softplus1(w)), efflen, ec, count) << "." << std::endl;
+  // Rcout << "The log likelihood is " << std::setprecision (20) << LL(Softmax1(w), efflen, ec, count) << "." << std::endl;
+  Rcout << "The log likelihood is " << std::setprecision (20) << LL(Softplus1(w) / sum(Softplus1(w)), efflen, ec, count) << "." << std::endl;
 
 
   // reset small est
   // vec est = eachp/sum(eachp) * cn;
-  vec est = Softmax1(w) / sum(Softmax1(w)) * cn;
+  // vec est = Softmax1(w) / sum(Softmax1(w)) * cn;
+  vec est = Softplus1(w) / sum(Softplus1(w)) * cn;
   est.elem(find(est < countLimit)).zeros();
 
   return est;

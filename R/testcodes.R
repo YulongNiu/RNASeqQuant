@@ -19,7 +19,7 @@ w <- c(1, 1, 1)
 
 EM(plist$efflen, plist$ec, plist$count, spenum = 3) %>% .$counts
 
-Adam(plist$efflen, plist$ec, plist$count, spenum = 3, 400)
+Adam(plist$efflen, plist$ec, plist$count, spenum = 3, 100)
 
 ## Test(plist$ec, plist$efflen, c(0, 5))
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -57,7 +57,7 @@ emest <- EM(plist$efflen, plist$ec, plist$count, length(plist$efflen), detail = 
 ## RNASeqQuant GD
 gdest <- Adam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1000, 0.01)
 
-gdest <- Adam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 36580, 0.01)
+gdest <- Adam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 7000, 36580, 0.01)
 
 ## merge res
 mergeres <- cbind(kallistoest, emest, gdest)

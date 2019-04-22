@@ -94,7 +94,7 @@ arma::vec EMSingle(const arma::vec& prob,
 //' @param detail A \code{bool} value.  When it is set as \code{true}, logistic likelihood and counts for each species in every iteration will be returned, otherwise \code{false}.
 //' @inheritParams MatchEfflen
 //' @inheritParams SplitEC
-//' @inheritParams IdxSpenum
+//' @inheritParams SpeCount
 //' @references \href{https://arxiv.org/abs/1104.3889}{Lior Pachter: Models for transcript quantification from RNA-Seq}
 //' @return A \code{List} indicates estimated counts of transcripts.
 //' @examples

@@ -9,11 +9,12 @@
 #' @param countraw A \code{arma::uvec} indicates the counts of ec.
 #' @param maxiter The maximum iteration number with the default value of 10000.
 #' @param miniter The minimum iteration number with the default value of 50.
+#' @param detail A \code{bool} value.  When it is set as \code{true}, logistic likelihood and counts for each species in every iteration will be returned, otherwise \code{false}.
 #' @inheritParams MatchEfflen
 #' @inheritParams SplitEC
-#' @inheritParams IdxSpenum
+#' @inheritParams SpeCount
 #' @references \href{https://arxiv.org/abs/1104.3889}{Lior Pachter: Models for transcript quantification from RNA-Seq}
-#' @return A \code{numeric vector} indicates estimated counts of transcripts.
+#' @return A \code{List} indicates estimated counts of transcripts.
 #' @examples
 #' ## Single species
 #' ##    f1 f2 f3
@@ -40,48 +41,80 @@
 #' EM(plist$efflen, plist$ec, plist$count, 5)
 #' @author Yulong Niu \email{yulong.niu@@hotmail.com}
 #' @export
-EM <- function(efflenraw, ecraw, countraw, spenumraw, maxiter = 10000L, miniter = 50L) {
-    .Call(`_RNASeqQuant_EM`, efflenraw, ecraw, countraw, spenumraw, maxiter, miniter)
+EM <- function(efflenraw, ecraw, countraw, spenumraw, maxiter = 10000L, miniter = 50L, detail = FALSE) {
+    .Call(`_RNASeqQuant_EM`, efflenraw, ecraw, countraw, spenumraw, maxiter, miniter, detail)
 }
 
-GradientSM <- function(w, efflen, ec, count, spenum, idx) {
-    .Call(`_RNASeqQuant_GradientSM`, w, efflen, ec, count, spenum, idx)
+Adam <- function(efflenraw, ecraw, countraw, spenumraw, epochs = 300L, batchsize = 1000L, alpha = 0.1) {
+    .Call(`_RNASeqQuant_Adam`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, alpha)
 }
 
-GradientISRU <- function(w, efflen, ec, count, spenum, alpha, idx) {
-    .Call(`_RNASeqQuant_GradientISRU`, w, efflen, ec, count, spenum, alpha, idx)
+GradientSM <- function(w, efflen, ec, count, idx) {
+    .Call(`_RNASeqQuant_GradientSM`, w, efflen, ec, count, idx)
 }
 
 GradientSP <- function(w, efflen, ec, count, idx) {
     .Call(`_RNASeqQuant_GradientSP`, w, efflen, ec, count, idx)
 }
 
+GradientISRU <- function(w, efflen, ec, count, alpha, idx) {
+    .Call(`_RNASeqQuant_GradientISRU`, w, efflen, ec, count, alpha, idx)
+}
+
+#' Calculate the Inverse square root unit (ISRU)
+#'
+#' \itemize{
+#'   \item \code{InvSqrtRoot()}: Inverse square root.
+#'   \item \code{ISRU()} and \code{ISRU1()}: ISRU with or without weight.
+#'   \item \code{ISRUGrad()} and \code{ISRUGrad1()}: Internal functions of Partial derivation.
+#' }
+#'
+#' @title ISRU
+#' @return
+#' \itemize{
+#'   \item \code{InvSqrtRoot()}: A \code{arma::vec} indicates the inverse square root \eqn{\frac{1}{sqrt(1+\alpha x^2)}}.
+#'   \item \code{ISRU()} and \code{ISRU1()}: A \code{arma::vec} indicates ISRU with (\eqn{(\frac{x_i}{sqrt(1+\alpha x_i^2)} + \frac{1}{\sqrt(\alpha)}) * weight_i} or without weight (\eqn{\frac{x_i}{sqrt(1+\alpha x_i^2)} + \frac{1}{\sqrt(\alpha)}}).
+#'   \item \code{ISRUGrad()} and \code{ISRUGrad1()}: A \code{arma::vec} indicates \eqn{(\frac{1}{sqrt(1+\alpha x_i^2)})^3} or \eqn{(\frac{1}{sqrt(1+\alpha x_i^2)})^3 * weight_i}.
+#' }
+#' @param alpha \code{double}.
+#' @inheritParams LogSumExp
+#' @author Yulong Niu \email{yulong.niu@@hotmail.com}
+#' @rdname ISRU
+#' @keywords internal
 InvSqrtRoot <- function(x, alpha) {
     .Call(`_RNASeqQuant_InvSqrtRoot`, x, alpha)
 }
 
+#' @param isr \code{arma::vec} indicating the inverse square root unit.
+#' @inheritParams InvSqrtRoot
+#' @rdname ISRU
+#' @keywords internal
 ISRU1 <- function(x, isr, alpha) {
     .Call(`_RNASeqQuant_ISRU1`, x, isr, alpha)
 }
 
+#' @inheritParams InvSqrtRoot
+#' @inheritParams ISRU1
+#' @rdname ISRU
+#' @keywords internal
 ISRU <- function(x, isr, weight, alpha) {
     .Call(`_RNASeqQuant_ISRU`, x, isr, weight, alpha)
 }
 
+#' @inheritParams InvSqrtRoot
+#' @inheritParams ISRU1
+#' @rdname ISRU
+#' @keywords internal
 ISRUGrad1 <- function(x, isr, alpha) {
     .Call(`_RNASeqQuant_ISRUGrad1`, x, isr, alpha)
 }
 
+#' @inheritParams InvSqrtRoot
+#' @inheritParams ISRU1
+#' @rdname ISRU
+#' @keywords internal
 ISRUGrad <- function(x, isr, weight, alpha) {
     .Call(`_RNASeqQuant_ISRUGrad`, x, isr, weight, alpha)
-}
-
-SingleSpeGradISRU <- function(wlse, efflensg, ecd, ecsum, ecratio, idx) {
-    .Call(`_RNASeqQuant_SingleSpeGradISRU`, wlse, efflensg, ecd, ecsum, ecratio, idx)
-}
-
-ECGradISRU <- function(w, wlse, efflensg, wsg, alpha) {
-    .Call(`_RNASeqQuant_ECGradISRU`, w, wlse, efflensg, wsg, alpha)
 }
 
 #' Logistic likelihood.
@@ -96,12 +129,8 @@ ECGradISRU <- function(w, wlse, efflensg, wsg, alpha) {
 #' @param count A \code{arma::uvec} indicated counts of ec.
 #' @author Yulong Niu \email{yulong.niu@@hotmail.com}
 #' @keywords internal
-LLEM <- function(prob, efflen, ec, count) {
-    .Call(`_RNASeqQuant_LLEM`, prob, efflen, ec, count)
-}
-
-LLGD <- function(prob, efflen, ec, count) {
-    .Call(`_RNASeqQuant_LLGD`, prob, efflen, ec, count)
+LL <- function(prob, efflen, ec, count) {
+    .Call(`_RNASeqQuant_LL`, prob, efflen, ec, count)
 }
 
 start_profiler <- function(str) {
@@ -158,14 +187,6 @@ Softmax1 <- function(x) {
     .Call(`_RNASeqQuant_Softmax1`, x)
 }
 
-SingleSpeGradSM <- function(w, efflensg, wsg, ecratio, idx) {
-    .Call(`_RNASeqQuant_SingleSpeGradSM`, w, efflensg, wsg, ecratio, idx)
-}
-
-ECGradSM <- function(w, wlse, efflensg, wsg) {
-    .Call(`_RNASeqQuant_ECGradSM`, w, wlse, efflensg, wsg)
-}
-
 #' Calculate the logistic and softplus calculator
 #'
 #' \itemize{
@@ -217,22 +238,6 @@ SoftplusGrad <- function(x, weight) {
     .Call(`_RNASeqQuant_SoftplusGrad`, x, weight)
 }
 
-GradientSMSS <- function(w, efflen, ec, count, idx) {
-    .Call(`_RNASeqQuant_GradientSMSS`, w, efflen, ec, count, idx)
-}
-
-TestGradientSM <- function(ecraw, efflenraw, spenum, w, count, idx) {
-    .Call(`_RNASeqQuant_TestGradientSM`, ecraw, efflenraw, spenum, w, count, idx)
-}
-
-GradientISRUSS <- function(w, efflen, ec, count, alpha, idx) {
-    .Call(`_RNASeqQuant_GradientISRUSS`, w, efflen, ec, count, alpha, idx)
-}
-
-TestGradientISRU <- function(ecraw, efflenraw, spenum, w, count, alpha, idx) {
-    .Call(`_RNASeqQuant_TestGradientISRU`, ecraw, efflenraw, spenum, w, count, alpha, idx)
-}
-
 #' Split strings and equivalence classes.
 #'
 #' \itemize{
@@ -277,32 +282,17 @@ MatchEfflen <- function(ec, efflenraw) {
     .Call(`_RNASeqQuant_MatchEfflen`, ec, efflenraw)
 }
 
-#' Index transcripts number of input species.
+#' Estimated counts of input species.
 #'
-#' Add zero at the head of input \code{spenum}.
+#' The indices of \code{est} should be consistent with the \code{spenumraw}. For example, the \code{est} is \code{1.5, 2, 3} and \code{spenumraw} is \code{2, 1}, so \code{2.5, 3} will be returned.
 #'
-#' @title Index species number
-#' @return A \code{arma::uvec}.
+#' @title Species estimated counts
+#' @return A \code{arma::vec} represents the total estimated counts of each species.
+#' @param est A \code{arma::vec} estimated counts of each transcripts.
 #' @param spenumraw A \code{arma::uvec} indicated the transcript number in each species.
 #' @author Yulong Niu \email{yulong.niu@@hotmail.com}
 #' @keywords internal
-IdxSpenum <- function(spenumraw) {
-    .Call(`_RNASeqQuant_IdxSpenum`, spenumraw)
-}
-
-EC2SpeSg <- function(ecsg, efflensg, ecsgraw, efflenraw, spenum) {
-    invisible(.Call(`_RNASeqQuant_EC2SpeSg`, ecsg, efflensg, ecsgraw, efflenraw, spenum))
-}
-
-EC2Spe <- function(ec, efflen, ecraw, efflenraw, spenum) {
-    invisible(.Call(`_RNASeqQuant_EC2Spe`, ec, efflen, ecraw, efflenraw, spenum))
-}
-
-CmpUvec <- function(x) {
-    .Call(`_RNASeqQuant_CmpUvec`, x)
-}
-
-CmpVec <- function(x) {
-    .Call(`_RNASeqQuant_CmpVec`, x)
+SpeCount <- function(est, spenumraw) {
+    .Call(`_RNASeqQuant_SpeCount`, est, spenumraw)
 }
 

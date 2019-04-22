@@ -18,6 +18,22 @@ using namespace std;
 // [[Rcpp::depends(RcppArmadillo, RcppParallel)]]
 
 
+//' Gradient.
+//'
+//' \itemize{
+//'   \item \code{GradientSM()}: Gradients of Softmax.
+//'   \item \code{GradientSP()}: Gradients of SoftPlus.
+//'   \item \code{GradientISRU()}: Gradients of ISRU.
+//' }
+//'
+//' @title Calculate gradient
+//' @return A \code{arma::vec} indicates gradients.
+//' @param w A \code{arma::vec} indicates estimated parameters.
+//' @param idx A \code{arma::uvec} indicates the index of \code{w} used for gradient descending.
+//' @inheritParams LL
+//' @author Yulong Niu \email{yulong.niu@@hotmail.com}
+//' @rdname gradient
+//' @keywords internal
 // [[Rcpp::export]]
 arma::vec GradientSM(const arma::vec& w,
                      const std::vector<arma::vec>& efflen,
@@ -34,7 +50,9 @@ arma::vec GradientSM(const arma::vec& w,
   return sum(count.elem(idx)) * Softmax1(w) - grad;
 }
 
-
+//' @inheritParams GradientSM
+//' @rdname gradient
+//' @keywords internal
 // [[Rcpp::export]]
 arma::vec GradientSP(const arma::vec& w,
                      const std::vector<arma::vec>& efflen,
@@ -52,6 +70,10 @@ arma::vec GradientSP(const arma::vec& w,
 }
 
 
+//' @inheritParams GradientSM
+//' @inheritParams InvSqrtRoot
+//' @rdname gradient
+//' @keywords internal
 // [[Rcpp::export]]
 arma::vec GradientISRU(const arma::vec& w,
                        const std::vector<arma::vec>& efflen,

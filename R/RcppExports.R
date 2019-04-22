@@ -49,14 +49,37 @@ Adam <- function(efflenraw, ecraw, countraw, spenumraw, epochs = 300L, batchsize
     .Call(`_RNASeqQuant_Adam`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, alpha)
 }
 
+#' Gradient.
+#'
+#' \itemize{
+#'   \item \code{GradientSM()}: Gradients of Softmax.
+#'   \item \code{GradientSP()}: Gradients of SoftPlus.
+#'   \item \code{GradientISRU()}: Gradients of ISRU.
+#' }
+#'
+#' @title Calculate gradient
+#' @return A \code{arma::vec} indicates gradients.
+#' @param w A \code{arma::vec} indicates estimated parameters.
+#' @param idx A \code{arma::uvec} indicates the index of \code{w} used for gradient descending.
+#' @inheritParams LL
+#' @author Yulong Niu \email{yulong.niu@@hotmail.com}
+#' @rdname gradient
+#' @keywords internal
 GradientSM <- function(w, efflen, ec, count, idx) {
     .Call(`_RNASeqQuant_GradientSM`, w, efflen, ec, count, idx)
 }
 
+#' @inheritParams GradientSM
+#' @rdname gradient
+#' @keywords internal
 GradientSP <- function(w, efflen, ec, count, idx) {
     .Call(`_RNASeqQuant_GradientSP`, w, efflen, ec, count, idx)
 }
 
+#' @inheritParams GradientSM
+#' @inheritParams InvSqrtRoot
+#' @rdname gradient
+#' @keywords internal
 GradientISRU <- function(w, efflen, ec, count, alpha, idx) {
     .Call(`_RNASeqQuant_GradientISRU`, w, efflen, ec, count, alpha, idx)
 }
@@ -95,6 +118,7 @@ ISRU1 <- function(x, isr, alpha) {
 
 #' @inheritParams InvSqrtRoot
 #' @inheritParams ISRU1
+#' @inheritParams LogSumExp
 #' @rdname ISRU
 #' @keywords internal
 ISRU <- function(x, isr, weight, alpha) {
@@ -111,6 +135,7 @@ ISRUGrad1 <- function(x, isr, alpha) {
 
 #' @inheritParams InvSqrtRoot
 #' @inheritParams ISRU1
+#' @inheritParams LogSumExp
 #' @rdname ISRU
 #' @keywords internal
 ISRUGrad <- function(x, isr, weight, alpha) {
@@ -144,10 +169,8 @@ stop_profiler <- function() {
 #' Calculate the log-sum-exp and softmax calculator
 #'
 #' \itemize{
-#'   \item \code{LogSumExp()}: Weighted log-sum-exp.
-#'   \item \code{LogSumExp1()}: log-sum-exp without weight.
-#'   \item \code{Softmax()}: Numerator is the exponent of every element of input \code{x}, and denominator is the sum of \code{exp(x)}.
-#'   \item \code{Softmax1()}: \code{weight} is 1.
+#'   \item \code{LogSumExp()} and \code{LogSumExp1()}: log-sum-exp with or without weight.
+#'   \item \code{Softmax()} and \code{Softmax1()}: Softmax with or without weight.
 #' }
 #'
 #' @title Softmax
@@ -191,7 +214,7 @@ Softmax1 <- function(x) {
 #'
 #' \itemize{
 #'   \item \code{Logistic()}: The logistic function.
-#'   \item \item \code{Softplus()} and \code{Softplus1()}: The softplus function.
+#'   \item \item \code{Softplus()} and \code{Softplus1()}: Softplus with or without weight.
 #'   \item \code{SoftplusGrad()} and \code{SoftplusGrad1()}: Internal functions for partial derivation.
 #' }
 #'

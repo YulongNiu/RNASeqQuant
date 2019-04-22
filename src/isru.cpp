@@ -51,6 +51,7 @@ arma::vec ISRU1(const arma::vec& x,
 
 //' @inheritParams InvSqrtRoot
 //' @inheritParams ISRU1
+//' @inheritParams LogSumExp
 //' @rdname ISRU
 //' @keywords internal
 // [[Rcpp::export]]
@@ -85,6 +86,7 @@ arma::vec ISRUGrad1(const arma::vec& x,
 
 //' @inheritParams InvSqrtRoot
 //' @inheritParams ISRU1
+//' @inheritParams LogSumExp
 //' @rdname ISRU
 //' @keywords internal
 // [[Rcpp::export]]

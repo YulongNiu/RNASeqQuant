@@ -2,12 +2,11 @@
 ## library('Rcpp')
 ## library('magrittr')
 ## sourceCpp('../src/utilities.cpp')
+## sourceCpp('../src/likelihood.cpp')
 ## sourceCpp('../src/softmax.cpp')
 ## sourceCpp('../src/softplus.cpp')
 ## sourceCpp('../src/isru.cpp')
-## sourceCpp('../src/likelihood.cpp')
 ## sourceCpp('../src/gradient.cpp')
-## sourceCpp('../src/testgradient.cpp')
 ## sourceCpp('../src/GD.cpp')
 ## sourceCpp('../src/EM.cpp')
 ## source('ec.R')
@@ -17,9 +16,9 @@
 
 ## w <- c(1, 1, 1)
 
-## EM(plist$efflen, plist$ec, plist$count, spenum = 3)
+## EM(plist$efflen, plist$ec, plist$count, spenum = 3) %>% .$counts
 
-## Adam(plist$efflen, plist$ec, plist$count, spenum = 3, 400)
+## Adam(plist$efflen, plist$ec, plist$count, spenum = 3, 100)
 
 ## ## Test(plist$ec, plist$efflen, c(0, 5))
 ## ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -52,10 +51,12 @@
 ## kallistoest <- read.table('/extDisk1/RESEARCH/RNASeqQuantTest/GD/abundance_ath.tsv', stringsAsFactors = FALSE, header = TRUE)[, 4]
 
 ## ## RNASeqQuant EM
-## emest <- EM(plist$efflen, plist$ec, plist$count, length(plist$efflen))
+## emest <- EM(plist$efflen, plist$ec, plist$count, length(plist$efflen), detail = TRUE)
 
 ## ## RNASeqQuant GD
-## gdest <- Adam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1000, 0.01)
+## gdest <- Adam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1000, 1)
+
+## gdest <- Adam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 7000, 36580)
 
 ## ## merge res
 ## mergeres <- cbind(kallistoest, emest, gdest)
@@ -81,6 +82,6 @@
 ## ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-## RNASeqEM:::start_profiler("profile.out")
-## tmp1 <- RNASeqEM:::LogSumExpRatio1(rnorm(1:10000))
-## RNASeqEM:::stop_profiler()
+## ## RNASeqEM:::start_profiler("profile.out")
+## ## tmp1 <- RNASeqEM:::LogSumExpRatio1(rnorm(1:10000))
+## ## RNASeqEM:::stop_profiler()

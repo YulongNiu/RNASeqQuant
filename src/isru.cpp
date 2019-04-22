@@ -8,34 +8,67 @@ using namespace arma;
 // [[Rcpp::depends(RcppArmadillo)]]
 
 
+//' Calculate the Inverse square root unit (ISRU)
+//'
+//' \itemize{
+//'   \item \code{InvSqrtRoot()}: Inverse square root.
+//'   \item \code{ISRU()} and \code{ISRU1()}: ISRU with or without weight.
+//'   \item \code{ISRUGrad()} and \code{ISRUGrad1()}: Internal functions of Partial derivation.
+//' }
+//'
+//' @title ISRU
+//' @return
+//' \itemize{
+//'   \item \code{InvSqrtRoot()}: A \code{arma::vec} indicates the inverse square root \eqn{\frac{1}{sqrt(1+\alpha x^2)}}.
+//'   \item \code{ISRU()} and \code{ISRU1()}: A \code{arma::vec} indicates ISRU with (\eqn{(\frac{x_i}{sqrt(1+\alpha x_i^2)} + \frac{1}{\sqrt(\alpha)}) * weight_i} or without weight (\eqn{\frac{x_i}{sqrt(1+\alpha x_i^2)} + \frac{1}{\sqrt(\alpha)}}).
+//'   \item \code{ISRUGrad()} and \code{ISRUGrad1()}: A \code{arma::vec} indicates \eqn{(\frac{1}{sqrt(1+\alpha x_i^2)})^3} or \eqn{(\frac{1}{sqrt(1+\alpha x_i^2)})^3 * weight_i}.
+//' }
+//' @param alpha \code{double}.
+//' @inheritParams LogSumExp
+//' @author Yulong Niu \email{yulong.niu@@hotmail.com}
+//' @rdname ISRU
+//' @keywords internal
 // [[Rcpp::export]]
 arma::vec InvSqrtRoot(const arma::vec& x,
                       const double alpha) {
 
-  return 1/sqrt(1 + alpha * x % x);
+  return 1 / sqrt(1 + alpha * x % x);
 
 }
 
+//' @param isr \code{arma::vec} indicating the inverse square root unit.
+//' @inheritParams InvSqrtRoot
+//' @rdname ISRU
+//' @keywords internal
 // [[Rcpp::export]]
-double ISRU1(const arma::vec& x,
-             const arma::vec& isr,
-             const double alpha) {
+arma::vec ISRU1(const arma::vec& x,
+                const arma::vec& isr,
+                const double alpha) {
 
-  return sum(isr % x) + x.n_elem / sqrt(alpha);
+  return isr % x + 1 / sqrt(alpha);
 
 }
 
+//' @inheritParams InvSqrtRoot
+//' @inheritParams ISRU1
+//' @inheritParams LogSumExp
+//' @rdname ISRU
+//' @keywords internal
 // [[Rcpp::export]]
-double ISRU(const arma::vec& x,
-            const arma::vec& isr,
-            const arma::vec& weight,
-            const double alpha) {
+arma::vec ISRU(const arma::vec& x,
+               const arma::vec& isr,
+               const arma::vec& weight,
+               const double alpha) {
 
-  return  sum(isr % x % weight) + sum(weight) / sqrt(alpha);
+  return  isr % x % weight + weight / sqrt(alpha);
 
 }
 
 
+//' @inheritParams InvSqrtRoot
+//' @inheritParams ISRU1
+//' @rdname ISRU
+//' @keywords internal
 // [[Rcpp::export]]
 arma::vec ISRUGrad1(const arma::vec& x,
                     const arma::vec& isr,
@@ -51,6 +84,11 @@ arma::vec ISRUGrad1(const arma::vec& x,
 }
 
 
+//' @inheritParams InvSqrtRoot
+//' @inheritParams ISRU1
+//' @inheritParams LogSumExp
+//' @rdname ISRU
+//' @keywords internal
 // [[Rcpp::export]]
 arma::vec ISRUGrad(const arma::vec& x,
                    const arma::vec& isr,
@@ -65,65 +103,3 @@ arma::vec ISRUGrad(const arma::vec& x,
 
   return nr / dn;
 }
-
-
-// [[Rcpp::export]]
-arma::vec SingleSpeGradISRU(const arma::vec& wlse,
-                            const std::vector< arma::vec >& efflensg,
-                            const std::vector< arma::vec >& ecd,
-                            const arma::vec& ecsum,
-                            const arma::vec& ecratio,
-                            const arma::uword idx) {
-
-  // numerator
-  // wratio is 0 if one species has no transcripts in the ec
-  // if tratio == 0, then only one species
-  double tratio = sum(ecratio) - ecratio(idx);
-  vec nr = ecd[idx] % (1 / efflensg[idx] + tratio);
-
-  // denominator
-  double dn = ecsum(idx);
-  if (tratio > 0) {
-    dn += wlse(idx) * tratio;
-  } else {}
-
-  return nr / dn;
-}
-
-
-// [[Rcpp::export]]
-arma::vec ECGradISRU(const std::vector< arma::vec >& w,
-                     const arma::vec& wlse,
-                     const std::vector< arma::vec >& efflensg,
-                     const std::vector< arma::vec >& wsg,
-                     const double alpha) {
-
-  // initialization
-  uword sn = wsg.size();
-  vector<vec> ecd(sn);
-  vec ecsum(sn, fill::zeros);
-  vec ecratio(sn, fill::zeros);
-
-  // split each ec
-  for (uword i = 0; i < sn; ++i) {
-    vec eachw = wsg[i];
-    if (eachw.n_elem > 0) {
-      vec eachisr = InvSqrtRoot(eachw, alpha);
-      ecd[i] = pow(eachisr, 3);
-      ecsum(i) = ISRU(eachw, eachisr, 1 / efflensg[i], alpha);
-      ecratio(i) = ecsum(i) / wlse(i);
-    } else {}
-  }
-
-  // calculate each species
-  vec res;
-  for (uword i = 0; i < sn; ++i) {
-    if (wsg[i].n_elem > 0) {
-      res = join_cols(res, SingleSpeGradISRU(wlse, efflensg, ecd, ecsum, ecratio, i));
-    } else {}
-  }
-
-  return res;
-}
-
-

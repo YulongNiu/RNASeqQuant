@@ -14,10 +14,8 @@ using namespace arma;
 //' Calculate the log-sum-exp and softmax calculator
 //'
 //' \itemize{
-//'   \item \code{LogSumExp()}: Weighted log-sum-exp.
-//'   \item \code{LogSumExp1()}: log-sum-exp without weight.
-//'   \item \code{Softmax()}: Numerator is the exponent of every element of input \code{x}, and denominator is the sum of \code{exp(x)}.
-//'   \item \code{Softmax1()}: \code{weight} is 1.
+//'   \item \code{LogSumExp()} and \code{LogSumExp1()}: log-sum-exp with or without weight.
+//'   \item \code{Softmax()} and \code{Softmax1()}: Softmax with or without weight.
 //' }
 //'
 //' @title Softmax
@@ -74,67 +72,5 @@ arma::vec Softmax1(const arma::vec& x) {
 
   return exp(x - LogSumExp1(x));
 
-}
-
-
-
-// [[Rcpp::export]]
-arma::vec SingleSpeGradSM(const std::vector<arma::vec>& w,
-                          const std::vector< arma::vec >& efflensg,
-                          const std::vector< arma::vec >& wsg,
-                          const arma::vec& ecratio,
-                          const arma::uword idx) {
-
-  vec dnw = wsg[idx];
-  vec dnweight = 1 / efflensg[idx];
-
-  // numerator
-  // wratio is 0 if one species has no transcripts in the ec
-  // if tratio == 0, then only one species
-  double tratio = sum(ecratio) - ecratio(idx);
-  vec nr = dnw + log(dnweight + tratio);
-
-  // denominator
-  if (tratio > 0) {
-    dnw = join_cols(dnw, w[idx]);
-    dnweight = join_cols(dnweight, vec(w[idx].n_elem).fill(tratio));
-  } else {}
-
-  // std::cout << dnw << std::endl;
-  // std::cout << dnweight << std::endl;
-
-  double dn = LogSumExp(dnw, dnweight);
-
-  return exp(nr - dn);
-}
-
-
-
-// [[Rcpp::export]]
-arma::vec ECGradSM(const std::vector< arma::vec >& w,
-                   const arma::vec& wlse,
-                   const std::vector< arma::vec >& efflensg,
-                   const std::vector< arma::vec >& wsg) {
-
-  // initialization
-  uword sn = wsg.size();
-  vec ecratio(sn, fill::zeros);
-
-  // split each ec
-  for (uword i = 0; i < sn; ++i) {
-    if (wsg[i].n_elem > 0) {
-      ecratio(i) = exp(LogSumExp(wsg[i], 1 / efflensg[i]) - wlse(i));
-    } else {}
-  }
-
-  // calculate each species
-  vec res;
-  for (uword i = 0; i < sn; ++i) {
-    if (wsg[i].n_elem > 0) {
-      res = join_cols(res, SingleSpeGradSM(w, efflensg, wsg, ecratio, i));
-    } else {}
-  }
-
-  return res;
 }
 

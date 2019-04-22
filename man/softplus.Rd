@@ -36,7 +36,7 @@ Calculate the logistic and softplus calculator
 \details{
 \itemize{
   \item \code{Logistic()}: The logistic function.
-  \item \item \code{Softplus()} and \code{Softplus1()}: The softplus function.
+  \item \item \code{Softplus()} and \code{Softplus1()}: Softplus with or without weight.
   \item \code{SoftplusGrad()} and \code{SoftplusGrad1()}: Internal functions for partial derivation.
 }
 }

@@ -71,7 +71,7 @@ std::vector<arma::uvec> SplitEC(const Rcpp::CharacterVector& ecraw) {
 
 //' Match transcript effect length with equivalence classes.
 //'
-//' The length of \code{efflen} is equal to number of transcripts.
+//' The length of \code{efflen} is equal to number of equivalence classes.
 //'
 //' @title Match transcript effect length
 //' @return A \code{std::vector<arma::vec>} with the same length of \code{ecvec}.
@@ -93,89 +93,30 @@ std::vector<arma::vec> MatchEfflen(const std::vector<arma::uvec>& ec,
 }
 
 
-//' Index transcripts number of input species.
+//' Estimated counts of input species.
 //'
-//' Add zero at the head of input \code{spenum}.
+//' The indices of \code{est} should be consistent with the \code{spenumraw}. For example, the \code{est} is \code{1.5, 2, 3} and \code{spenumraw} is \code{2, 1}, so \code{2.5, 3} will be returned.
 //'
-//' @title Index species number
-//' @return A \code{arma::uvec}.
+//' @title Species estimated counts
+//' @return A \code{arma::vec} represents the total estimated counts of each species.
+//' @param est A \code{arma::vec} estimated counts of each transcripts.
 //' @param spenumraw A \code{arma::uvec} indicated the transcript number in each species.
 //' @author Yulong Niu \email{yulong.niu@@hotmail.com}
 //' @keywords internal
 // [[Rcpp::export]]
-arma::uvec IdxSpenum(const arma::uvec& spenumraw) {
+arma::vec SpeCount(const arma::vec& est,
+                   const arma::uvec& spenumraw) {
 
-  uword num = spenumraw.n_elem;
-  uvec res(num + 1, fill::zeros);
+  uword sn = spenumraw.n_elem;
+  vec res(sn, fill::zeros);
 
-  res.subvec(1, num) = spenumraw;
+  uword start = 0;
 
-  return res;
-}
-
-
-// [[Rcpp::export]]
-void EC2SpeSg(std::vector< arma::uvec >& ecsg,
-              std::vector< arma::vec >& efflensg,
-              const std::string& ecsgraw,
-              const arma::vec& efflenraw,
-              const arma::uvec& spenum) {
-
-  uvec ecvec = Strsplit(ecsgraw, ',');
-  uword sn = spenum.n_elem - 1;
-
-  for  (uword i = 0; i < sn; ++i) {
-
-    uword start = spenum(i);
-    uword end = spenum(i) + spenum(i+1) - 1;
-    uvec eachidx = find(ecvec >= start && ecvec <= end);
-
-    uvec eachec = ecvec.elem(eachidx);
-    efflensg[i] = efflenraw.elem(eachec);
-    ecsg[i] = eachec;
-
+  for (uword i = 0; i < sn; ++i) {
+    uword end = start + spenumraw(i) - 1;
+    res(i) = sum(est.subvec(start, end));
+    start = end + 1;
   }
 
-}
-
-
-// [[Rcpp::export]]
-void EC2Spe(std::vector< std::vector< arma::uvec > >& ec,
-            std::vector< std::vector< arma::vec > >& efflen,
-            const Rcpp::CharacterVector& ecraw,
-            const arma::vec& efflenraw,
-            const arma::uvec& spenum) {
-
-  uword ecnum = ecraw.size();
-
-  for (uword i = 0; i < ecnum; ++i) {
-    EC2SpeSg(ec.at(i), efflen.at(i), string(ecraw(i)), efflenraw, spenum);
-  }
-
-}
-
-
-// [[Rcpp::export]]
-arma::uvec CmpUvec(const std::vector< arma::uvec >& x) {
-
-  uvec res;
-
-  for (auto i : x) {
-    res = join_cols(res, i);
-  }
-
-  return res;
-}
-
-
-// [[Rcpp::export]]
-arma::vec CmpVec(const std::vector< arma::vec >& x) {
-
-  vec res;
-
-  for (auto i : x) {
-    res = join_cols(res, i);
-  }
-
-  return res;
+  return(res);
 }

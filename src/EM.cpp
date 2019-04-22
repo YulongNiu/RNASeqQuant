@@ -68,9 +68,11 @@ arma::vec EMSingle(const arma::vec& prob,
                    const std::vector<arma::uvec>& ec,
                    const arma::uvec& count) {
 
+  // prob.n_elem is the number of transcripts
+  // ec.n_elem == count.n_elem == efflen.n_elem is TRUE, which is the number of equivalent classes/reads
   vec estcount(prob.n_elem, fill::zeros);
 
-  for (uword i = 0; i < count.n_elem; ++i) {
+  for (uword i = 0; i < ec.n_elem; ++i) {
     vec eachcp = prob.elem(ec[i]) / efflen[i];
     estcount.elem(ec[i]) += eachcp * count(i)/ sum(eachcp);
   }
@@ -79,34 +81,6 @@ arma::vec EMSingle(const arma::vec& prob,
 }
 
 #endif
-
-//' Transform estimated count to probabilities.
-//'
-//' Use estimated counts as the outputs and EM stop conditions.
-//'
-//' @title Counts to probabilities
-//' @return A \code{arma::vec} indicates probabilities of selecting a read from the different transcripts.
-//' @param estcount A \code{arma::vec} estimated counts of transcripts.
-//' @param spenum A \code{arma::uvec} indicated number of transcripts.
-//' @author Yulong Niu \email{yulong.niu@@hotmail.com}
-//' @keywords internal
-// [[Rcpp::export]]
-arma::vec Estcount2Prob(const arma::vec& estcount,
-                        const arma::uvec& spenum) {
-
-  vec prob(estcount.n_elem, fill::zeros);
-
-  for (uword i = 0; i < spenum.n_elem - 1; ++i) {
-    uword start = spenum(i);
-    uword end = spenum(i) + spenum(i+1) - 1;
-    prob.subvec(start, end) = estcount.subvec(start, end) / sum(estcount.subvec(start, end));
-  }
-
-  // // reduce small number influence
-  // prob *= 1e+8;
-
-  return prob;
-}
 
 
 //' Expectation maximization (EM) model for RNA-seq quantification.
@@ -117,11 +91,12 @@ arma::vec Estcount2Prob(const arma::vec& estcount,
 //' @param countraw A \code{arma::uvec} indicates the counts of ec.
 //' @param maxiter The maximum iteration number with the default value of 10000.
 //' @param miniter The minimum iteration number with the default value of 50.
+//' @param detail A \code{bool} value.  When it is set as \code{true}, logistic likelihood and counts for each species in every iteration will be returned, otherwise \code{false}.
 //' @inheritParams MatchEfflen
 //' @inheritParams SplitEC
-//' @inheritParams IdxSpenum
+//' @inheritParams SpeCount
 //' @references \href{https://arxiv.org/abs/1104.3889}{Lior Pachter: Models for transcript quantification from RNA-Seq}
-//' @return A \code{numeric vector} indicates probabilities of selecting a read from the different transcripts.
+//' @return A \code{List} indicates estimated counts of transcripts.
 //' @examples
 //' ## Single species
 //' ##    f1 f2 f3
@@ -149,12 +124,13 @@ arma::vec Estcount2Prob(const arma::vec& estcount,
 //' @author Yulong Niu \email{yulong.niu@@hotmail.com}
 //' @export
 // [[Rcpp::export]]
-arma::vec EM(const arma::vec& efflenraw,
-             const Rcpp::CharacterVector& ecraw,
-             const arma::uvec& countraw,
-             const arma::uvec& spenumraw,
-             const arma::uword maxiter = 10000,
-             const arma::uword miniter = 50) {
+Rcpp::List EM(const arma::vec& efflenraw,
+              const Rcpp::CharacterVector& ecraw,
+              const arma::uvec& countraw,
+              const arma::uvec& spenumraw,
+              const arma::uword maxiter = 10000,
+              const arma::uword miniter = 50,
+              const bool detail = false) {
 
   // stop iteration params from kallisto
   double countChangeLimit = 1e-2;
@@ -169,29 +145,32 @@ arma::vec EM(const arma::vec& efflenraw,
   uvec count = countraw.elem(zeros);
   vector<uvec> ec = SplitEC(ecraw[zerosidx]);
   vector<vec> efflen = MatchEfflen(ec, efflenraw);
-  uvec spenum = IdxSpenum(spenumraw);
 
   // step2: EM iteration
   // start prob and est
   uword tn = sum(spenumraw);
   double cn = sum(count);
-  vec prob(tn);
-  vec startest(tn);
-  vec est(tn, fill::zeros);
-  for (uword i = 0; i < spenum.n_elem - 1; ++i) {
-    uword start = spenum(i);
-    uword end = spenum(i) + spenum(i+1) - 1;
-    prob.subvec(start, end).fill(1.0/spenum(i+1));
-    startest.subvec(start, end).fill(cn/(spenum(i+1) * spenumraw.size()));
-  }
+  uword sn = spenumraw.n_elem;
 
-  for (uword iter = 0; iter < maxiter; ++iter) {
+  vec prob(tn);
+  prob.fill(1.0/tn);
+  vec startest(tn);
+  startest.fill(cn/tn);
+  vec est(tn, fill::zeros);
+
+  // details init
+  mat specounts(maxiter, sn, fill::zeros);
+  vec resll(maxiter, fill::zeros);
+
+  uword iter;
+  for (iter = 0; iter < maxiter; ++iter) {
 
     est = EMSingle(prob, efflen, ec, count);
 
-    //Rcout << std::setprecision (20) << LLEM(prob, efflen, ec, count) << std::endl;
-    // cout << std::setprecision (20) << sum(est) << endl;
-    // cout << sum(prob) << endl;
+    if (detail) {
+      specounts.row(iter) = SpeCount(est, spenumraw);
+      resll(iter) = LL(prob, efflen, ec, count);
+    } else {}
 
     // stop iteration condition
     uword nopassn = 0;
@@ -201,19 +180,24 @@ arma::vec EM(const arma::vec& efflenraw,
       } else {}
     }
 
-    if (nopassn == 0 && iter >= miniter) {
+    if (nopassn == 0 && iter >= miniter - 1) {
       Rcout << "The iteration number is " << iter + 1
-            << ". The log likelihood is " << std::setprecision (20) << LLEM(prob, efflen, ec, count)
+            << ". The log likelihood is " << std::setprecision (20) << LL(prob, efflen, ec, count)
             << "." << std::endl;
       break;
     } else {
-      prob = Estcount2Prob(est, spenum);
+      prob = est / cn;
       startest = est;
     }
   }
 
-  // reset small est
+  // step3: reset small est
   est.elem(find(est < countLimit)).zeros();
 
-  return est;
+  // step4: may add details
+  List res = List::create(_["counts"] = est,
+                          _["specounts"] = specounts.rows(0, iter),
+                          _["ll"] = resll.subvec(0, iter));
+
+  return res;
 }

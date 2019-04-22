@@ -14,10 +14,8 @@ using namespace arma;
 //' Calculate the log-sum-exp and softmax calculator
 //'
 //' \itemize{
-//'   \item \code{LogSumExp()}: Weighted log-sum-exp.
-//'   \item \code{LogSumExp1()}: log-sum-exp without weight.
-//'   \item \code{Softmax()}: Numerator is the exponent of every element of input \code{x}, and denominator is the sum of \code{exp(x)}.
-//'   \item \code{Softmax1()}: \code{weight} is 1.
+//'   \item \code{LogSumExp()} and \code{LogSumExp1()}: log-sum-exp with or without weight.
+//'   \item \code{Softmax()} and \code{Softmax1()}: Softmax with or without weight.
 //' }
 //'
 //' @title Softmax

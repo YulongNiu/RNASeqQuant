@@ -10,7 +10,6 @@
 #include "isru.h"
 #include "gradient.h"
 
-
 using namespace Rcpp;
 using namespace RcppParallel;
 using namespace arma;

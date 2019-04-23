@@ -6,12 +6,9 @@
 
 #include "utilities.h"
 #include "likelihood.h"
-#include "softmax.h"
-#include "softplus.h"
-#include "isru.h"
-#include "gradient.h"
 #include "AFfactory.h"
 #include "AFmeasure.h"
+#include "AFgradient.h"
 
 using namespace Rcpp;
 using namespace RcppParallel;

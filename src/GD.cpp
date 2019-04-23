@@ -71,11 +71,7 @@ arma::vec Adam(const arma::vec& efflenraw,
 
   for (uword iter = 0; iter < epochs; ++iter) {
 
-    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(Softmax1(w), efflen, ec, count) << "|" << t << std::endl;
-
-    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(Softplus1(w) / sum(Softplus1(w)), efflen, ec, count) << "|" << t << std::endl;
-
-    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(ISRU1(w, InvSqrtRoot(w, arguments["alpha"]), arguments["alpha"]) / sum(ISRU1(w, InvSqrtRoot(w, arguments["alpha"]), arguments["alpha"])), efflen, ec, count) << "|" << t << std::endl;
+    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w), efflen, ec, count) << "|" << t << std::endl;
 
     idx = shuffle(idx);
     uword biter = 0;
@@ -98,11 +94,7 @@ arma::vec Adam(const arma::vec& efflenraw,
     }
   }
 
-
-  // Rcout << "The log likelihood is " << std::setprecision (20) << LL(Softmax1(w), efflen, ec, count) << "." << std::endl;
-  // Rcout << "The log likelihood is " << std::setprecision (20) << LL(Softplus1(w) / sum(Softplus1(w)), efflen, ec, count) << "." << std::endl;
-  // Rcout << "The log likelihood is " << std::setprecision (20) << LL(ISRU1(w, InvSqrtRoot(w, alpha), alpha) / sum(ISRU1(w, InvSqrtRoot(w, alpha), alpha)), efflen, ec, count) << "." << std::endl;
-
+  Rcout << "The log likelihood is " << std::setprecision (20) << LL(afc->AFCounts(w), efflen, ec, count) << "." << std::endl;
 
   // reset small est
   vec est = afc->AFCounts(w) * cn;

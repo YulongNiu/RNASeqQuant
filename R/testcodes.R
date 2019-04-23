@@ -6,7 +6,6 @@ sourceCpp('../src/softmax.cpp')
 sourceCpp('../src/softplus.cpp')
 sourceCpp('../src/isru.cpp')
 sourceCpp('../src/gradient.cpp')
-sourceCpp('../src/AFfactory.cpp')
 sourceCpp('../src/likelihood.cpp')
 sourceCpp('../src/GD.cpp')
 sourceCpp('../src/EM.cpp')
@@ -21,7 +20,7 @@ Adam(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1000, 0.1, list(metho
 
 Adam(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1000, 0.1, list(method = 'Softplus'), list())
 
-Adam(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1000, 0.1, list(method = 'ISRU'), list())
+Adam(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1000, 0.1, list(method = 'ISRU'), list(alpha = 0.1))
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 

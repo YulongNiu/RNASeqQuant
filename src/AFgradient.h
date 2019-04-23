@@ -33,7 +33,7 @@ public:
 //' @rdname gradient
 //' @keywords internal
 //=========//
-// Softplus //
+// Softplus//
 //=========//
 class AFSP : public AFmeasure {
 public:

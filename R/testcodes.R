@@ -19,8 +19,7 @@ w <- c(1, 1, 1)
 
 EM(plist$efflen, plist$ec, plist$count, spenum = 3) %>% .$counts
 
-Adam(plist$efflen, plist$ec, plist$count, spenum = 3, 100)
-Adagrad(plist$efflen, plist$ec, plist$count, spenum = 3, 100)
+Adam(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1000, 0.1, list(method = 'Softmax'), list())
 
 ## Test(plist$ec, plist$efflen, c(0, 5))
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

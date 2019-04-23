@@ -10,6 +10,8 @@
 #include "softplus.h"
 #include "isru.h"
 #include "gradient.h"
+#include "AFfactory.h"
+#include "AFmeasure.h"
 
 using namespace Rcpp;
 using namespace RcppParallel;
@@ -24,9 +26,11 @@ arma::vec Adam(const arma::vec& efflenraw,
                const Rcpp::CharacterVector& ecraw,
                const arma::uvec& countraw,
                const arma::uvec& spenumraw,
-               const arma::uword epochs = 300,
-               const arma::uword batchsize = 1000,
-               const double eta = 0.1) {
+               const arma::uword epochs,
+               const arma::uword batchsize,
+               const double eta,
+               const Rcpp::List attrs,
+               const Rcpp::List arguments) {
 
   // stop iteration settings from kallisto
   // double countChangeLimit = 1e-2
@@ -38,8 +42,7 @@ arma::vec Adam(const arma::vec& efflenraw,
   double beta2 = 0.999;
   double epsilon = 1e-8;
 
-  // step1: pseudo information
-  // remove zero counts
+  // step1: pseudo information remove zero counts
   uvec zeros = find(countraw > 0);
   IntegerVector zerosidx(zeros.begin(), zeros.end());
 
@@ -48,7 +51,6 @@ arma::vec Adam(const arma::vec& efflenraw,
   vector<vec> efflen = MatchEfflen(ec, efflenraw);
 
   // step2: Adam
-  // start w and estcount
   uword tn = sum(spenumraw);
   uword cn = sum(count);
   // uword sn = spenumraw.n_elem;
@@ -60,9 +62,11 @@ arma::vec Adam(const arma::vec& efflenraw,
   vec m = vec(tn, fill::zeros);
   vec v = vec(tn, fill::zeros);
   uword t = 0;
-  // gradient and shuffled index
   vec grad = vec(tn);
   uvec idx = linspace<uvec>(0, ecn - 1, ecn);
+
+  // active function
+  std::shared_ptr<AFmeasure> afgrad = AFfactory().createAFGradient(attrs, arguments);
 
   for (uword iter = 0; iter < epochs; ++iter) {
 
@@ -83,7 +87,7 @@ arma::vec Adam(const arma::vec& efflenraw,
       uvec eachidx = idx.subvec(biter, endi);
 
       // adam for each batch
-      grad = GradientSM_(w, efflen, ec, count, eachidx);
+      grad = afgrad->AFGradient(w, efflen, ec, count, eachidx);
       // grad = GradientSP(w, efflen, ec, count, eachidx);
       // grad = GradientISRU(w, efflen, ec, count, alpha, eachidx);
       m = beta1 * m + (1 - beta1) * grad;
@@ -165,7 +169,7 @@ arma::vec Adagrad(const arma::vec& efflenraw,
       uvec eachidx = idx.subvec(biter, endi);
 
       // adam for each batch
-        grad = GradientSM(w, efflen, ec, count, eachidx);
+        grad = GradientSM_(w, efflen, ec, count, eachidx);
       // grad = GradientSP(w, efflen, ec, count, eachidx);
       // grad = GradientISRU(w, efflen, ec, count, alpha, eachidx);
         G += grad % grad;

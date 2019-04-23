@@ -67,6 +67,7 @@ arma::vec Adam(const arma::vec& efflenraw,
 
   // active function
   std::shared_ptr<AFmeasure> afgrad = AFfactory().createAFGradient(attrs, arguments);
+  std::shared_ptr<AFmeasure> afc = AFfactory().createAFCounts(attrs, arguments);
 
   for (uword iter = 0; iter < epochs; ++iter) {
 
@@ -74,7 +75,9 @@ arma::vec Adam(const arma::vec& efflenraw,
 
     // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(Softplus1(w) / sum(Softplus1(w)), efflen, ec, count) << "|" << t << std::endl;
 
-    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(ISRU1(w, InvSqrtRoot(w, alpha), alpha) / sum(ISRU1(w, InvSqrtRoot(w, alpha), alpha)), efflen, ec, count) << "|" << t << std::endl;
+    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(ISRU1(w, InvSqrtRoot(w, arguments["alpha"]), arguments["alpha"]) / sum(ISRU1(w, InvSqrtRoot(w, arguments["alpha"]), arguments["alpha"])), efflen, ec, count) << "|" << t << std::endl;
+
+    // Rcout << afc->AFCounts(w) << std::endl;
 
     idx = shuffle(idx);
     uword biter = 0;
@@ -88,8 +91,6 @@ arma::vec Adam(const arma::vec& efflenraw,
 
       // adam for each batch
       grad = afgrad->AFGradient(w, efflen, ec, count, eachidx);
-      // grad = GradientSP(w, efflen, ec, count, eachidx);
-      // grad = GradientISRU(w, efflen, ec, count, alpha, eachidx);
       m = beta1 * m + (1 - beta1) * grad;
       v = beta2 * v + (1 - beta2) * square(grad);
       double etat = eta * sqrt(1 - pow(beta2, t)) / (1 - pow(beta1, t));
@@ -100,15 +101,13 @@ arma::vec Adam(const arma::vec& efflenraw,
   }
 
 
-  Rcout << "The log likelihood is " << std::setprecision (20) << LL(Softmax1(w), efflen, ec, count) << "." << std::endl;
+  // Rcout << "The log likelihood is " << std::setprecision (20) << LL(Softmax1(w), efflen, ec, count) << "." << std::endl;
   // Rcout << "The log likelihood is " << std::setprecision (20) << LL(Softplus1(w) / sum(Softplus1(w)), efflen, ec, count) << "." << std::endl;
   // Rcout << "The log likelihood is " << std::setprecision (20) << LL(ISRU1(w, InvSqrtRoot(w, alpha), alpha) / sum(ISRU1(w, InvSqrtRoot(w, alpha), alpha)), efflen, ec, count) << "." << std::endl;
 
 
   // reset small est
-  vec est = Softmax1(w) / sum(Softmax1(w)) * cn;
-  // vec est = Softplus1(w) / sum(Softplus1(w)) * cn;
-  // vec est = ISRU1(w, InvSqrtRoot(w, alpha), alpha) / sum(ISRU1(w, InvSqrtRoot(w, alpha), alpha)) * cn;
+  vec est = afc->AFCounts(w) * cn;
   est.elem(find(est < countLimit)).zeros();
 
   return est;

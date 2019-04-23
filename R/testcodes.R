@@ -15,13 +15,13 @@ source('ec.R')
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~small example~~~~~~~~~~~~~~~~~~~~~~~
 plist <- list(ec = c('0,1,2', '1,2', '0,2', '0', '0,1'), count = rep(1, 5), efflen = rep(1, 3))
 
-w <- c(1, 1, 1)
-
 EM(plist$efflen, plist$ec, plist$count, spenum = 3) %>% .$counts
 
 Adam(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1000, 0.1, list(method = 'Softmax'), list())
 
-## Test(plist$ec, plist$efflen, c(0, 5))
+Adam(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1000, 0.1, list(method = 'Softplus'), list())
+
+Adam(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1000, 0.1, list(method = 'ISRU'), list())
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 

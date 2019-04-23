@@ -25,7 +25,7 @@ public:
   }
 
   arma::vec AFCounts(const arma::vec& w) {
-    return Softmax1(w) / sum(Softmax1(w));
+    return Softmax1(w);
   }
 };
 

@@ -77,8 +77,6 @@ arma::vec Adam(const arma::vec& efflenraw,
 
     // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(ISRU1(w, InvSqrtRoot(w, arguments["alpha"]), arguments["alpha"]) / sum(ISRU1(w, InvSqrtRoot(w, arguments["alpha"]), arguments["alpha"])), efflen, ec, count) << "|" << t << std::endl;
 
-    // Rcout << afc->AFCounts(w) << std::endl;
-
     idx = shuffle(idx);
     uword biter = 0;
 
@@ -169,8 +167,6 @@ arma::vec Adagrad(const arma::vec& efflenraw,
 
       // adam for each batch
         grad = GradientSM_(w, efflen, ec, count, eachidx);
-      // grad = GradientSP(w, efflen, ec, count, eachidx);
-      // grad = GradientISRU(w, efflen, ec, count, alpha, eachidx);
         G += grad % grad;
         w -= alpha / sqrt(G + epsilon) % grad;
 

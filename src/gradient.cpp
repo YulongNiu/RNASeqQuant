@@ -1,5 +1,4 @@
 #include <RcppArmadillo.h>
-#include <RcppParallel.h>
 
 #include <algorithm>
 #include <vector>
@@ -11,19 +10,18 @@
 #include "gradient.h"
 
 using namespace Rcpp;
-using namespace RcppParallel;
 using namespace arma;
 using namespace std;
 
-// [[Rcpp::depends(RcppArmadillo, RcppParallel)]]
+// [[Rcpp::depends(RcppArmadillo)]]
 
 
 //' Gradient.
 //'
 //' \itemize{
-//'   \item \code{GradientSM()}: Gradients of Softmax.
-//'   \item \code{GradientSP()}: Gradients of SoftPlus.
-//'   \item \code{GradientISRU()}: Gradients of ISRU.
+//'   \item \code{GradientSM_()}: Gradients of Softmax.
+//'   \item \code{GradientSP_()}: Gradients of SoftPlus.
+//'   \item \code{GradientISRU_()}: Gradients of ISRU.
 //' }
 //'
 //' @title Calculate gradient
@@ -35,11 +33,11 @@ using namespace std;
 //' @rdname gradient
 //' @keywords internal
 // [[Rcpp::export]]
-arma::vec GradientSM(const arma::vec& w,
-                     const std::vector<arma::vec>& efflen,
-                     const std::vector<arma::uvec>& ec,
-                     const arma::uvec& count,
-                     const arma::uvec& idx) {
+arma::vec GradientSM_(const arma::vec& w,
+                      const std::vector<arma::vec>& efflen,
+                      const std::vector<arma::uvec>& ec,
+                      const arma::uvec& count,
+                      const arma::uvec& idx) {
 
   vec grad(w.n_elem, fill::zeros);
 
@@ -50,15 +48,15 @@ arma::vec GradientSM(const arma::vec& w,
   return sum(count.elem(idx)) * Softmax1(w) - grad;
 }
 
-//' @inheritParams GradientSM
+//' @inheritParams GradientSM_
 //' @rdname gradient
 //' @keywords internal
 // [[Rcpp::export]]
-arma::vec GradientSP(const arma::vec& w,
-                     const std::vector<arma::vec>& efflen,
-                     const std::vector<arma::uvec>& ec,
-                     const arma::uvec& count,
-                     const arma::uvec& idx) {
+arma::vec GradientSP_(const arma::vec& w,
+                      const std::vector<arma::vec>& efflen,
+                      const std::vector<arma::uvec>& ec,
+                      const arma::uvec& count,
+                      const arma::uvec& idx) {
 
   vec grad(w.n_elem, fill::zeros);
 
@@ -70,17 +68,17 @@ arma::vec GradientSP(const arma::vec& w,
 }
 
 
-//' @inheritParams GradientSM
+//' @inheritParams GradientSM_
 //' @inheritParams InvSqrtRoot
 //' @rdname gradient
 //' @keywords internal
 // [[Rcpp::export]]
-arma::vec GradientISRU(const arma::vec& w,
-                       const std::vector<arma::vec>& efflen,
-                       const std::vector<arma::uvec>& ec,
-                       const arma::uvec& count,
-                       const double alpha,
-                       const arma::uvec& idx) {
+arma::vec GradientISRU_(const arma::vec& w,
+                        const std::vector<arma::vec>& efflen,
+                        const std::vector<arma::uvec>& ec,
+                        const arma::uvec& count,
+                        const arma::uvec& idx,
+                        const double alpha) {
 
   vec grad(w.n_elem, fill::zeros);
 

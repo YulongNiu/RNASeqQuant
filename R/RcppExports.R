@@ -49,6 +49,10 @@ Adam <- function(efflenraw, ecraw, countraw, spenumraw, epochs = 300L, batchsize
     .Call(`_RNASeqQuant_Adam`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, alpha)
 }
 
+Adagrad <- function(efflenraw, ecraw, countraw, spenumraw, epochs = 300L, batchsize = 1000L, alpha = 0.1) {
+    .Call(`_RNASeqQuant_Adagrad`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, alpha)
+}
+
 #' Gradient.
 #'
 #' \itemize{

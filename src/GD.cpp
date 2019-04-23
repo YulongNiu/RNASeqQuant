@@ -26,7 +26,7 @@ arma::vec Adam(const arma::vec& efflenraw,
                const arma::uvec& spenumraw,
                const arma::uword epochs = 300,
                const arma::uword batchsize = 1000,
-               const double alpha = 0.1) {
+               const double eta = 0.1) {
 
   // stop iteration settings from kallisto
   // double countChangeLimit = 1e-2
@@ -83,13 +83,13 @@ arma::vec Adam(const arma::vec& efflenraw,
       uvec eachidx = idx.subvec(biter, endi);
 
       // adam for each batch
-      grad = GradientSM(w, efflen, ec, count, eachidx);
+      grad = GradientSM_(w, efflen, ec, count, eachidx);
       // grad = GradientSP(w, efflen, ec, count, eachidx);
       // grad = GradientISRU(w, efflen, ec, count, alpha, eachidx);
       m = beta1 * m + (1 - beta1) * grad;
       v = beta2 * v + (1 - beta2) * square(grad);
-      double alphat = alpha * sqrt(1 - pow(beta2, t)) / (1 - pow(beta1, t));
-      w -= alphat * m / (sqrt(v) + epsilon);
+      double etat = eta * sqrt(1 - pow(beta2, t)) / (1 - pow(beta1, t));
+      w -= etat * m / (sqrt(v) + epsilon);
 
       biter += batchsize;
     }

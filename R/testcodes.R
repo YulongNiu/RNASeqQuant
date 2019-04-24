@@ -23,6 +23,10 @@ Adam(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1000, 0.1, list(metho
 Adagrad(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1000, 0.1, list(method = 'Softmax'), list())
 Adagrad(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1000, 0.1, list(method = 'Softplus'), list())
 Adagrad(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1000, 0.1, list(method = 'ISRU'), list(alpha = 0.1))
+
+RMSProp(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1000, 0.1, list(method = 'Softmax'), list())
+RMSProp(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1000, 0.1, list(method = 'Softplus'), list())
+RMSProp(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1000, 0.1, list(method = 'ISRU'), list(alpha = 0.1))
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -58,10 +62,16 @@ emest <- EM(plist$efflen, plist$ec, plist$count, length(plist$efflen), detail = 
 ## RNASeqQuant GD
 gdest <- Adam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1000, 0.1, list(method = 'Softmax'), list())
 gdest <- Adam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1000, 0.1, list(method = 'Softplus'), list())
-gdest <- Adam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1000, 0.1, list(method = 'ISRU'), list(alpha = 0.01))
+gdest <- Adam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1000, 0.1, list(method = 'ISRU'), list(alpha = 0.1))
 
 
 gdest <- Adagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1000, 0.1, list(method = 'Softmax'), list())
+gdest <- Adagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1000, 0.1, list(method = 'Softplus'), list())
+gdest <- Adagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1000, 0.1, list(method = 'ISRU'), list(alpha = 0.1))
+
+gdest <- RMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1000, 0.1, list(method = 'Softmax'), list())
+gdest <- RMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1000, 0.1, list(method = 'Softplus'), list())
+gdest <- RMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1000, 0.1, list(method = 'ISRU'), list(alpha = 0.1))
 
 ## merge res
 mergeres <- cbind(kallistoest, emest, gdest)

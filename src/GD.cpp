@@ -27,7 +27,8 @@ arma::vec Adam(const arma::vec& efflenraw,
                const arma::uword batchsize,
                const double eta,
                const Rcpp::List attrs,
-               const Rcpp::List arguments) {
+               const Rcpp::List arguments,
+               const bool details = false) {
 
   // stop iteration settings from kallisto
   // double countChangeLimit = 1e-2
@@ -53,7 +54,7 @@ arma::vec Adam(const arma::vec& efflenraw,
   // uword sn = spenumraw.n_elem;
   uword ecn = ec.size();
 
- // Glorot normal initializer/Xavier normal initializer
+  // Glorot normal initializer/Xavier normal initializer
   vec w = randn<vec>(tn) / sqrt(tn);
   // vec w(tn); w.fill(0.01);
   vec m = vec(tn, fill::zeros);
@@ -69,7 +70,6 @@ arma::vec Adam(const arma::vec& efflenraw,
   for (uword iter = 0; iter < epochs; ++iter) {
 
     // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w), efflen, ec, count) << "|" << t << std::endl;
-
     idx = shuffle(idx);
     uword biter = 0;
 
@@ -91,9 +91,10 @@ arma::vec Adam(const arma::vec& efflenraw,
     }
   }
 
-  Rcout << "The log likelihood is " << std::setprecision (20) << LL(afc->AFCounts(w), efflen, ec, count) << "." << std::endl;
+  Rcout << "The log likelihood is " << std::setprecision (20) << LL(afc->AFCounts(w), efflen, ec, count) <<
+    "." << std::endl;
 
-  // reset small est
+  // step3: reset small est
   vec est = afc->AFCounts(w) * cn;
   est.elem(find(est < countLimit)).zeros();
 
@@ -107,9 +108,11 @@ arma::vec Adagrad(const arma::vec& efflenraw,
                   const Rcpp::CharacterVector& ecraw,
                   const arma::uvec& countraw,
                   const arma::uvec& spenumraw,
-                  const arma::uword epochs = 300,
-                  const arma::uword batchsize = 1000,
-                  const double alpha = 0.1) {
+                  const arma::uword epochs,
+                  const arma::uword batchsize,
+                  const double eta,
+                  const Rcpp::List attrs,
+                  const Rcpp::List arguments) {
 
   // stop iteration settings from kallisto
   // double countChangeLimit = 1e-2
@@ -143,8 +146,13 @@ arma::vec Adagrad(const arma::vec& efflenraw,
   vec grad = vec(tn);
   uvec idx = linspace<uvec>(0, ecn - 1, ecn);
 
+  // active function
+  std::shared_ptr<AFmeasure> afgrad = AFfactory().createAFGradient(attrs, arguments);
+  std::shared_ptr<AFmeasure> afc = AFfactory().createAFCounts(attrs, arguments);
+
   for (uword iter = 0; iter < epochs; ++iter) {
 
+    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w), efflen, ec, count) << "|" << t << std::endl;
     idx = shuffle(idx);
     uword biter = 0;
 
@@ -155,23 +163,19 @@ arma::vec Adagrad(const arma::vec& efflenraw,
       uvec eachidx = idx.subvec(biter, endi);
 
       // adam for each batch
-        grad = GradientSM_(w, efflen, ec, count, eachidx);
+        grad = afgrad->AFGradient(w, efflen, ec, count, eachidx);
         G += grad % grad;
-        w -= alpha / sqrt(G + epsilon) % grad;
+        w -= eta / sqrt(G + epsilon) % grad;
 
       biter += batchsize;
     }
   }
 
-  Rcout << "The log likelihood is " << std::setprecision (20) << LL(Softmax1(w), efflen, ec, count) << "." << std::endl;
-  // Rcout << "The log likelihood is " << std::setprecision (20) << LL(Softplus1(w) / sum(Softplus1(w)), efflen, ec, count) << "." << std::endl;
-  // Rcout << "The log likelihood is " << std::setprecision (20) << LL(ISRU1(w, InvSqrtRoot(w, alpha), alpha) / sum(ISRU1(w, InvSqrtRoot(w, alpha), alpha)), efflen, ec, count) << "." << std::endl;
-
+  Rcout << "The log likelihood is " << std::setprecision (20) << LL(afc->AFCounts(w), efflen, ec, count) <<
+    "." << std::endl;
 
   // reset small est
-  vec est = Softmax1(w) / sum(Softmax1(w)) * cn;
-  // vec est = Softplus1(w) / sum(Softplus1(w)) * cn;
-  // vec est = ISRU1(w, InvSqrtRoot(w, alpha), alpha) / sum(ISRU1(w, InvSqrtRoot(w, alpha), alpha)) * cn;
+  vec est = afc->AFCounts(w) * cn;
   est.elem(find(est < countLimit)).zeros();
 
   return est;

@@ -1,14 +1,31 @@
-#ifndef AFGRADIENT_H_
-#define AFGRADIENT_H_
+#ifndef ACTIVATION_H_
+#define ACTIVATION_H_
 
 #include "AFmeasure.h"
-#include "gradient.h"
 #include "softmax.h"
 #include "softplus.h"
 #include "isru.h"
 
+using namespace Rcpp;
+using namespace arma;
+using namespace std;
 
-//' @inheritParams GradientSM_
+// [[Rcpp::depends(RcppArmadillo)]]
+
+//' Gradient.
+//'
+//' \itemize{
+//'   \item \code{AFSM}: Softmax.
+//'   \item \code{AFSP}: Softplus.
+//'   \item \code{AFISRU}: ISRU.
+//' }
+//'
+//' @title Calculate gradient
+//' @return A \code{arma::vec} indicates gradients.
+//' @param w A \code{arma::vec} indicates estimated parameters.
+//' @param idx A \code{arma::uvec} indicates the index of \code{w} used for gradient descending.
+//' @inheritParams LL
+//' @author Yulong Niu \email{yulong.niu@@hotmail.com}
 //' @rdname gradient
 //' @keywords internal
 //=========//
@@ -21,7 +38,13 @@ public:
                        const std::vector<arma::uvec>& ec,
                        const arma::uvec& count,
                        const arma::uvec& idx) {
-    return GradientSM_(w, efflen, ec, count, idx);
+    vec grad(w.n_elem, fill::zeros);
+
+    for (auto i : idx) {
+      grad.elem(ec[i]) += count(i) * Softmax(w.elem(ec[i]), 1/efflen[i]);
+    }
+
+    return sum(count.elem(idx)) * Softmax1(w) - grad;
   }
 
   arma::vec AFCounts(const arma::vec& w) {
@@ -29,7 +52,7 @@ public:
   }
 };
 
-//' @inheritParams GradientSM_
+//' @inheritParams AFSM
 //' @rdname gradient
 //' @keywords internal
 //=========//
@@ -42,7 +65,13 @@ public:
                        const std::vector<arma::uvec>& ec,
                        const arma::uvec& count,
                        const arma::uvec& idx) {
-    return GradientSP_(w, efflen, ec, count, idx);
+    vec grad(w.n_elem, fill::zeros);
+
+    for (auto i : idx) {
+      grad.elem(ec[i]) += count(i) * SoftplusGrad(w.elem(ec[i]), 1/efflen[i]);
+    }
+
+    return sum(count.elem(idx)) * SoftplusGrad1(w) - grad;
   }
 
   arma::vec AFCounts(const arma::vec& w) {
@@ -50,7 +79,7 @@ public:
   }
 };
 
-//' @inheritParams GradientSM_
+//' @inheritParams AFSM
 //' @inheritParams InvSqrtRoot
 //' @rdname gradient
 //' @keywords internal
@@ -71,7 +100,13 @@ public:
                        const std::vector<arma::uvec>& ec,
                        const arma::uvec& count,
                        const arma::uvec& idx) {
-    return GradientISRU_(w, efflen, ec, count, idx, this->alpha);
+    vec grad(w.n_elem, fill::zeros);
+
+    for (auto i : idx) {
+      grad.elem(ec[i]) += count(i) * ISRUGrad(w.elem(ec[i]), InvSqrtRoot(w.elem(ec[i]), alpha), 1/efflen[i], alpha);
+    }
+
+    return sum(count.elem(idx)) * ISRUGrad1(w, InvSqrtRoot(w, alpha), alpha) - grad;
   }
 
   arma::vec AFCounts(const arma::vec& w) {

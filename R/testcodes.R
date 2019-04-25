@@ -5,7 +5,6 @@ sourceCpp('../src/utilities.cpp')
 sourceCpp('../src/softmax.cpp')
 sourceCpp('../src/softplus.cpp')
 sourceCpp('../src/isru.cpp')
-sourceCpp('../src/gradient.cpp')
 sourceCpp('../src/likelihood.cpp')
 sourceCpp('../src/GD.cpp')
 sourceCpp('../src/EM.cpp')
@@ -46,13 +45,6 @@ NRMSProp(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(m
 ## plist <- read_pseudo(ecpath, countpath, abpath)
 
 plist <- list()
-plist$efflen <- read.table('/extDisk1/RESEARCH/RNASeqQuantTest/GD/abundance_ath.tsv', stringsAsFactors = FALSE, header = TRUE)[, 3]
-plist$ec <- read.table('/extDisk1/RESEARCH/RNASeqQuantTest/GD/pseudoalignments_ath.tsv', stringsAsFactors = FALSE, header = TRUE)[, 3]
-plist$count <- read.table('/extDisk1/RESEARCH/RNASeqQuantTest/GD/pseudoalignments_ath.tsv', stringsAsFactors = FALSE, header = TRUE)[, 2]
-
-zeroidx <- plist$count > 0
-plist$count %<>% `[`(zeroidx)
-plist$ec %<>% `[`(zeroidx)xoplist <- list()
 plist$efflen <- read.table('/extDisk1/RESEARCH/RNASeqQuantTest/GD/abundance_ath.tsv', stringsAsFactors = FALSE, header = TRUE)[, 3]
 plist$ec <- read.table('/extDisk1/RESEARCH/RNASeqQuantTest/GD/pseudoalignments_ath.tsv', stringsAsFactors = FALSE, header = TRUE)[, 3]
 plist$count <- read.table('/extDisk1/RESEARCH/RNASeqQuantTest/GD/pseudoalignments_ath.tsv', stringsAsFactors = FALSE, header = TRUE)[, 2]

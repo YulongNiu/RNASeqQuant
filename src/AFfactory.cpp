@@ -1,5 +1,5 @@
 #include "AFfactory.h"
-#include "AFgradient.h"
+#include "activation.h"
 #include "utilities.h"
 
 std::shared_ptr<AFmeasure> AFfactory::createAFGradient(const Rcpp::List &attrs,

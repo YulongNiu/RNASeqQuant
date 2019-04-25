@@ -8,7 +8,7 @@
 #include "likelihood.h"
 #include "AFfactory.h"
 #include "AFmeasure.h"
-#include "AFgradient.h"
+#include "activation.h"
 
 using namespace Rcpp;
 using namespace RcppParallel;
@@ -20,14 +20,14 @@ using namespace std;
 
 // [[Rcpp::export]]
 arma::vec Momentum(const arma::vec& efflenraw,
-                  const Rcpp::CharacterVector& ecraw,
-                  const arma::uvec& countraw,
-                  const arma::uvec& spenumraw,
-                  const arma::uword epochs,
-                  const arma::uword batchsize,
-                  const double eta,
-                  const Rcpp::List attrs,
-                  const Rcpp::List arguments) {
+                   const Rcpp::CharacterVector& ecraw,
+                   const arma::uvec& countraw,
+                   const arma::uvec& spenumraw,
+                   const arma::uword epochs,
+                   const arma::uword batchsize,
+                   const double eta,
+                   const Rcpp::List attrs,
+                   const Rcpp::List arguments) {
 
   // stop iteration settings from kallisto
   // double countChangeLimit = 1e-2

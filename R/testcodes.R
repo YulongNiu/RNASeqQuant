@@ -52,16 +52,21 @@ plist$count <- read.table('/extDisk1/RESEARCH/RNASeqQuantTest/GD/pseudoalignment
 
 zeroidx <- plist$count > 0
 plist$count %<>% `[`(zeroidx)
-plist$ec %<>% `[`(zeroidx)
+plist$ec %<>% `[`(zeroidx)xoplist <- list()
+plist$efflen <- read.table('/extDisk1/RESEARCH/RNASeqQuantTest/GD/abundance_ath.tsv', stringsAsFactors = FALSE, header = TRUE)[, 3]
+plist$ec <- read.table('/extDisk1/RESEARCH/RNASeqQuantTest/GD/pseudoalignments_ath.tsv', stringsAsFactors = FALSE, header = TRUE)[, 3]
+plist$count <- read.table('/extDisk1/RESEARCH/RNASeqQuantTest/GD/pseudoalignments_ath.tsv', stringsAsFactors = FALSE, header = TRUE)[, 2]
 
-## Test(plist$ec, plist$efflen, c(0, 41392))
+zeroidx <- plist$count > 0
+plist$count %<>% `[`(zeroidx)
+plist$ec %<>% `[`(zeroidx)
 
 ## kallisto EM
 ## kallistoest <- read.table('/extDisk1/RESEARCH/RNASeqQuantTest/simulate/human/humanquant/abundance.tsv', stringsAsFactors = FALSE, header = TRUE)[, 4]
 kallistoest <- read.table('/extDisk1/RESEARCH/RNASeqQuantTest/GD/abundance_ath.tsv', stringsAsFactors = FALSE, header = TRUE)[, 4]
 
 ## RNASeqQuant EM
-emest <- EM(plist$efflen, plist$ec, plist$count, length(plist$efflen), detail = TRUE)
+emest <- EM(plist$efflen, plist$ec, plist$count, length(plist$efflen), detail = FALSE)
 
 ## RNASeqQuant GD
 gdest <- Adam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(method = 'Softmax'), list())
@@ -83,9 +88,16 @@ gdest <- NRMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200
 
 
 ## nice test
+## Adam mini-batch
+gdest <- Adam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 1024, 0.1, list(method = 'Softmax'), list())
+gdest <- NAdam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 1024, 0.1, list(method = 'Softmax'), list())
+gdest <- NAdagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 1024, 0.1, list(method = 'Softmax'), list())
+
+
+## NRMSProp full batch
 emest <- EM(plist$efflen, plist$ec, plist$count, length(plist$efflen), detail = TRUE)
 gdest <- NRMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 36580, 0.005, list(method = 'Softmax'), list())
-
+gdest <- NAdagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 36580, 0.1, list(method = 'Softmax'), list())
 
 ## merge res
 mergeres <- cbind(kallistoest, emest, gdest)
@@ -94,7 +106,6 @@ colnames(mergeres) <- c('kallistoest', 'emest', 'gdest')
 ## correlation coefficient
 cor(mergeres, method = 'pearson')
 cor(mergeres, method = 'spearman')
-
 
 ## test full batch
 set.seed(12345)

@@ -7,8 +7,8 @@
 using namespace Rcpp;
 
 // EM
-Rcpp::List EM(const arma::vec& efflenraw, const Rcpp::CharacterVector& ecraw, const arma::uvec& countraw, const arma::uvec& spenumraw, const arma::uword maxiter, const arma::uword miniter, const bool detail);
-RcppExport SEXP _RNASeqQuant_EM(SEXP efflenrawSEXP, SEXP ecrawSEXP, SEXP countrawSEXP, SEXP spenumrawSEXP, SEXP maxiterSEXP, SEXP miniterSEXP, SEXP detailSEXP) {
+Rcpp::List EM(const arma::vec& efflenraw, const Rcpp::CharacterVector& ecraw, const arma::uvec& countraw, const arma::uvec& spenumraw, const arma::uword maxiter, const arma::uword miniter, const bool details);
+RcppExport SEXP _RNASeqQuant_EM(SEXP efflenrawSEXP, SEXP ecrawSEXP, SEXP countrawSEXP, SEXP spenumrawSEXP, SEXP maxiterSEXP, SEXP miniterSEXP, SEXP detailsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -18,14 +18,14 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const arma::uvec& >::type spenumraw(spenumrawSEXP);
     Rcpp::traits::input_parameter< const arma::uword >::type maxiter(maxiterSEXP);
     Rcpp::traits::input_parameter< const arma::uword >::type miniter(miniterSEXP);
-    Rcpp::traits::input_parameter< const bool >::type detail(detailSEXP);
-    rcpp_result_gen = Rcpp::wrap(EM(efflenraw, ecraw, countraw, spenumraw, maxiter, miniter, detail));
+    Rcpp::traits::input_parameter< const bool >::type details(detailsSEXP);
+    rcpp_result_gen = Rcpp::wrap(EM(efflenraw, ecraw, countraw, spenumraw, maxiter, miniter, details));
     return rcpp_result_gen;
 END_RCPP
 }
-// Adam
-arma::vec Adam(const arma::vec& efflenraw, const Rcpp::CharacterVector& ecraw, const arma::uvec& countraw, const arma::uvec& spenumraw, const arma::uword epochs, const arma::uword batchsize, const double alpha);
-RcppExport SEXP _RNASeqQuant_Adam(SEXP efflenrawSEXP, SEXP ecrawSEXP, SEXP countrawSEXP, SEXP spenumrawSEXP, SEXP epochsSEXP, SEXP batchsizeSEXP, SEXP alphaSEXP) {
+// Momentum
+arma::vec Momentum(const arma::vec& efflenraw, const Rcpp::CharacterVector& ecraw, const arma::uvec& countraw, const arma::uvec& spenumraw, const arma::uword epochs, const arma::uword batchsize, const double eta, const Rcpp::List attrs, const Rcpp::List arguments);
+RcppExport SEXP _RNASeqQuant_Momentum(SEXP efflenrawSEXP, SEXP ecrawSEXP, SEXP countrawSEXP, SEXP spenumrawSEXP, SEXP epochsSEXP, SEXP batchsizeSEXP, SEXP etaSEXP, SEXP attrsSEXP, SEXP argumentsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -35,54 +35,162 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const arma::uvec& >::type spenumraw(spenumrawSEXP);
     Rcpp::traits::input_parameter< const arma::uword >::type epochs(epochsSEXP);
     Rcpp::traits::input_parameter< const arma::uword >::type batchsize(batchsizeSEXP);
-    Rcpp::traits::input_parameter< const double >::type alpha(alphaSEXP);
-    rcpp_result_gen = Rcpp::wrap(Adam(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, alpha));
+    Rcpp::traits::input_parameter< const double >::type eta(etaSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List >::type attrs(attrsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List >::type arguments(argumentsSEXP);
+    rcpp_result_gen = Rcpp::wrap(Momentum(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments));
     return rcpp_result_gen;
 END_RCPP
 }
-// GradientSM
-arma::vec GradientSM(const arma::vec& w, const std::vector<arma::vec>& efflen, const std::vector<arma::uvec>& ec, const arma::uvec& count, const arma::uvec& idx);
-RcppExport SEXP _RNASeqQuant_GradientSM(SEXP wSEXP, SEXP efflenSEXP, SEXP ecSEXP, SEXP countSEXP, SEXP idxSEXP) {
+// NAG
+arma::vec NAG(const arma::vec& efflenraw, const Rcpp::CharacterVector& ecraw, const arma::uvec& countraw, const arma::uvec& spenumraw, const arma::uword epochs, const arma::uword batchsize, const double eta, const Rcpp::List attrs, const Rcpp::List arguments);
+RcppExport SEXP _RNASeqQuant_NAG(SEXP efflenrawSEXP, SEXP ecrawSEXP, SEXP countrawSEXP, SEXP spenumrawSEXP, SEXP epochsSEXP, SEXP batchsizeSEXP, SEXP etaSEXP, SEXP attrsSEXP, SEXP argumentsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::vec& >::type w(wSEXP);
-    Rcpp::traits::input_parameter< const std::vector<arma::vec>& >::type efflen(efflenSEXP);
-    Rcpp::traits::input_parameter< const std::vector<arma::uvec>& >::type ec(ecSEXP);
-    Rcpp::traits::input_parameter< const arma::uvec& >::type count(countSEXP);
-    Rcpp::traits::input_parameter< const arma::uvec& >::type idx(idxSEXP);
-    rcpp_result_gen = Rcpp::wrap(GradientSM(w, efflen, ec, count, idx));
+    Rcpp::traits::input_parameter< const arma::vec& >::type efflenraw(efflenrawSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::CharacterVector& >::type ecraw(ecrawSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type countraw(countrawSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type spenumraw(spenumrawSEXP);
+    Rcpp::traits::input_parameter< const arma::uword >::type epochs(epochsSEXP);
+    Rcpp::traits::input_parameter< const arma::uword >::type batchsize(batchsizeSEXP);
+    Rcpp::traits::input_parameter< const double >::type eta(etaSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List >::type attrs(attrsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List >::type arguments(argumentsSEXP);
+    rcpp_result_gen = Rcpp::wrap(NAG(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments));
     return rcpp_result_gen;
 END_RCPP
 }
-// GradientSP
-arma::vec GradientSP(const arma::vec& w, const std::vector<arma::vec>& efflen, const std::vector<arma::uvec>& ec, const arma::uvec& count, const arma::uvec& idx);
-RcppExport SEXP _RNASeqQuant_GradientSP(SEXP wSEXP, SEXP efflenSEXP, SEXP ecSEXP, SEXP countSEXP, SEXP idxSEXP) {
+// Adam
+arma::vec Adam(const arma::vec& efflenraw, const Rcpp::CharacterVector& ecraw, const arma::uvec& countraw, const arma::uvec& spenumraw, const arma::uword epochs, const arma::uword batchsize, const double eta, const Rcpp::List attrs, const Rcpp::List arguments);
+RcppExport SEXP _RNASeqQuant_Adam(SEXP efflenrawSEXP, SEXP ecrawSEXP, SEXP countrawSEXP, SEXP spenumrawSEXP, SEXP epochsSEXP, SEXP batchsizeSEXP, SEXP etaSEXP, SEXP attrsSEXP, SEXP argumentsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::vec& >::type w(wSEXP);
-    Rcpp::traits::input_parameter< const std::vector<arma::vec>& >::type efflen(efflenSEXP);
-    Rcpp::traits::input_parameter< const std::vector<arma::uvec>& >::type ec(ecSEXP);
-    Rcpp::traits::input_parameter< const arma::uvec& >::type count(countSEXP);
-    Rcpp::traits::input_parameter< const arma::uvec& >::type idx(idxSEXP);
-    rcpp_result_gen = Rcpp::wrap(GradientSP(w, efflen, ec, count, idx));
+    Rcpp::traits::input_parameter< const arma::vec& >::type efflenraw(efflenrawSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::CharacterVector& >::type ecraw(ecrawSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type countraw(countrawSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type spenumraw(spenumrawSEXP);
+    Rcpp::traits::input_parameter< const arma::uword >::type epochs(epochsSEXP);
+    Rcpp::traits::input_parameter< const arma::uword >::type batchsize(batchsizeSEXP);
+    Rcpp::traits::input_parameter< const double >::type eta(etaSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List >::type attrs(attrsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List >::type arguments(argumentsSEXP);
+    rcpp_result_gen = Rcpp::wrap(Adam(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments));
     return rcpp_result_gen;
 END_RCPP
 }
-// GradientISRU
-arma::vec GradientISRU(const arma::vec& w, const std::vector<arma::vec>& efflen, const std::vector<arma::uvec>& ec, const arma::uvec& count, const double alpha, const arma::uvec& idx);
-RcppExport SEXP _RNASeqQuant_GradientISRU(SEXP wSEXP, SEXP efflenSEXP, SEXP ecSEXP, SEXP countSEXP, SEXP alphaSEXP, SEXP idxSEXP) {
+// NAdam
+arma::vec NAdam(const arma::vec& efflenraw, const Rcpp::CharacterVector& ecraw, const arma::uvec& countraw, const arma::uvec& spenumraw, const arma::uword epochs, const arma::uword batchsize, const double eta, const Rcpp::List attrs, const Rcpp::List arguments);
+RcppExport SEXP _RNASeqQuant_NAdam(SEXP efflenrawSEXP, SEXP ecrawSEXP, SEXP countrawSEXP, SEXP spenumrawSEXP, SEXP epochsSEXP, SEXP batchsizeSEXP, SEXP etaSEXP, SEXP attrsSEXP, SEXP argumentsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::vec& >::type w(wSEXP);
-    Rcpp::traits::input_parameter< const std::vector<arma::vec>& >::type efflen(efflenSEXP);
-    Rcpp::traits::input_parameter< const std::vector<arma::uvec>& >::type ec(ecSEXP);
-    Rcpp::traits::input_parameter< const arma::uvec& >::type count(countSEXP);
-    Rcpp::traits::input_parameter< const double >::type alpha(alphaSEXP);
-    Rcpp::traits::input_parameter< const arma::uvec& >::type idx(idxSEXP);
-    rcpp_result_gen = Rcpp::wrap(GradientISRU(w, efflen, ec, count, alpha, idx));
+    Rcpp::traits::input_parameter< const arma::vec& >::type efflenraw(efflenrawSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::CharacterVector& >::type ecraw(ecrawSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type countraw(countrawSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type spenumraw(spenumrawSEXP);
+    Rcpp::traits::input_parameter< const arma::uword >::type epochs(epochsSEXP);
+    Rcpp::traits::input_parameter< const arma::uword >::type batchsize(batchsizeSEXP);
+    Rcpp::traits::input_parameter< const double >::type eta(etaSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List >::type attrs(attrsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List >::type arguments(argumentsSEXP);
+    rcpp_result_gen = Rcpp::wrap(NAdam(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments));
+    return rcpp_result_gen;
+END_RCPP
+}
+// Adagrad
+arma::vec Adagrad(const arma::vec& efflenraw, const Rcpp::CharacterVector& ecraw, const arma::uvec& countraw, const arma::uvec& spenumraw, const arma::uword epochs, const arma::uword batchsize, const double eta, const Rcpp::List attrs, const Rcpp::List arguments);
+RcppExport SEXP _RNASeqQuant_Adagrad(SEXP efflenrawSEXP, SEXP ecrawSEXP, SEXP countrawSEXP, SEXP spenumrawSEXP, SEXP epochsSEXP, SEXP batchsizeSEXP, SEXP etaSEXP, SEXP attrsSEXP, SEXP argumentsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type efflenraw(efflenrawSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::CharacterVector& >::type ecraw(ecrawSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type countraw(countrawSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type spenumraw(spenumrawSEXP);
+    Rcpp::traits::input_parameter< const arma::uword >::type epochs(epochsSEXP);
+    Rcpp::traits::input_parameter< const arma::uword >::type batchsize(batchsizeSEXP);
+    Rcpp::traits::input_parameter< const double >::type eta(etaSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List >::type attrs(attrsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List >::type arguments(argumentsSEXP);
+    rcpp_result_gen = Rcpp::wrap(Adagrad(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments));
+    return rcpp_result_gen;
+END_RCPP
+}
+// NAdagrad
+arma::vec NAdagrad(const arma::vec& efflenraw, const Rcpp::CharacterVector& ecraw, const arma::uvec& countraw, const arma::uvec& spenumraw, const arma::uword epochs, const arma::uword batchsize, const double eta, const Rcpp::List attrs, const Rcpp::List arguments);
+RcppExport SEXP _RNASeqQuant_NAdagrad(SEXP efflenrawSEXP, SEXP ecrawSEXP, SEXP countrawSEXP, SEXP spenumrawSEXP, SEXP epochsSEXP, SEXP batchsizeSEXP, SEXP etaSEXP, SEXP attrsSEXP, SEXP argumentsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type efflenraw(efflenrawSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::CharacterVector& >::type ecraw(ecrawSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type countraw(countrawSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type spenumraw(spenumrawSEXP);
+    Rcpp::traits::input_parameter< const arma::uword >::type epochs(epochsSEXP);
+    Rcpp::traits::input_parameter< const arma::uword >::type batchsize(batchsizeSEXP);
+    Rcpp::traits::input_parameter< const double >::type eta(etaSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List >::type attrs(attrsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List >::type arguments(argumentsSEXP);
+    rcpp_result_gen = Rcpp::wrap(NAdagrad(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments));
+    return rcpp_result_gen;
+END_RCPP
+}
+// Adadelta
+arma::vec Adadelta(const arma::vec& efflenraw, const Rcpp::CharacterVector& ecraw, const arma::uvec& countraw, const arma::uvec& spenumraw, const arma::uword epochs, const arma::uword batchsize, const double eta, const Rcpp::List attrs, const Rcpp::List arguments);
+RcppExport SEXP _RNASeqQuant_Adadelta(SEXP efflenrawSEXP, SEXP ecrawSEXP, SEXP countrawSEXP, SEXP spenumrawSEXP, SEXP epochsSEXP, SEXP batchsizeSEXP, SEXP etaSEXP, SEXP attrsSEXP, SEXP argumentsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type efflenraw(efflenrawSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::CharacterVector& >::type ecraw(ecrawSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type countraw(countrawSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type spenumraw(spenumrawSEXP);
+    Rcpp::traits::input_parameter< const arma::uword >::type epochs(epochsSEXP);
+    Rcpp::traits::input_parameter< const arma::uword >::type batchsize(batchsizeSEXP);
+    Rcpp::traits::input_parameter< const double >::type eta(etaSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List >::type attrs(attrsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List >::type arguments(argumentsSEXP);
+    rcpp_result_gen = Rcpp::wrap(Adadelta(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments));
+    return rcpp_result_gen;
+END_RCPP
+}
+// RMSProp
+arma::vec RMSProp(const arma::vec& efflenraw, const Rcpp::CharacterVector& ecraw, const arma::uvec& countraw, const arma::uvec& spenumraw, const arma::uword epochs, const arma::uword batchsize, const double eta, const Rcpp::List attrs, const Rcpp::List arguments);
+RcppExport SEXP _RNASeqQuant_RMSProp(SEXP efflenrawSEXP, SEXP ecrawSEXP, SEXP countrawSEXP, SEXP spenumrawSEXP, SEXP epochsSEXP, SEXP batchsizeSEXP, SEXP etaSEXP, SEXP attrsSEXP, SEXP argumentsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type efflenraw(efflenrawSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::CharacterVector& >::type ecraw(ecrawSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type countraw(countrawSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type spenumraw(spenumrawSEXP);
+    Rcpp::traits::input_parameter< const arma::uword >::type epochs(epochsSEXP);
+    Rcpp::traits::input_parameter< const arma::uword >::type batchsize(batchsizeSEXP);
+    Rcpp::traits::input_parameter< const double >::type eta(etaSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List >::type attrs(attrsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List >::type arguments(argumentsSEXP);
+    rcpp_result_gen = Rcpp::wrap(RMSProp(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments));
+    return rcpp_result_gen;
+END_RCPP
+}
+// NRMSProp
+arma::vec NRMSProp(const arma::vec& efflenraw, const Rcpp::CharacterVector& ecraw, const arma::uvec& countraw, const arma::uvec& spenumraw, const arma::uword epochs, const arma::uword batchsize, const double eta, const Rcpp::List attrs, const Rcpp::List arguments);
+RcppExport SEXP _RNASeqQuant_NRMSProp(SEXP efflenrawSEXP, SEXP ecrawSEXP, SEXP countrawSEXP, SEXP spenumrawSEXP, SEXP epochsSEXP, SEXP batchsizeSEXP, SEXP etaSEXP, SEXP attrsSEXP, SEXP argumentsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type efflenraw(efflenrawSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::CharacterVector& >::type ecraw(ecrawSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type countraw(countrawSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type spenumraw(spenumrawSEXP);
+    Rcpp::traits::input_parameter< const arma::uword >::type epochs(epochsSEXP);
+    Rcpp::traits::input_parameter< const arma::uword >::type batchsize(batchsizeSEXP);
+    Rcpp::traits::input_parameter< const double >::type eta(etaSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List >::type attrs(attrsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List >::type arguments(argumentsSEXP);
+    rcpp_result_gen = Rcpp::wrap(NRMSProp(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -337,13 +445,30 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// isEqualStr
+bool isEqualStr(std::string& str1, std::string str2);
+RcppExport SEXP _RNASeqQuant_isEqualStr(SEXP str1SEXP, SEXP str2SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string& >::type str1(str1SEXP);
+    Rcpp::traits::input_parameter< std::string >::type str2(str2SEXP);
+    rcpp_result_gen = Rcpp::wrap(isEqualStr(str1, str2));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_RNASeqQuant_EM", (DL_FUNC) &_RNASeqQuant_EM, 7},
-    {"_RNASeqQuant_Adam", (DL_FUNC) &_RNASeqQuant_Adam, 7},
-    {"_RNASeqQuant_GradientSM", (DL_FUNC) &_RNASeqQuant_GradientSM, 5},
-    {"_RNASeqQuant_GradientSP", (DL_FUNC) &_RNASeqQuant_GradientSP, 5},
-    {"_RNASeqQuant_GradientISRU", (DL_FUNC) &_RNASeqQuant_GradientISRU, 6},
+    {"_RNASeqQuant_Momentum", (DL_FUNC) &_RNASeqQuant_Momentum, 9},
+    {"_RNASeqQuant_NAG", (DL_FUNC) &_RNASeqQuant_NAG, 9},
+    {"_RNASeqQuant_Adam", (DL_FUNC) &_RNASeqQuant_Adam, 9},
+    {"_RNASeqQuant_NAdam", (DL_FUNC) &_RNASeqQuant_NAdam, 9},
+    {"_RNASeqQuant_Adagrad", (DL_FUNC) &_RNASeqQuant_Adagrad, 9},
+    {"_RNASeqQuant_NAdagrad", (DL_FUNC) &_RNASeqQuant_NAdagrad, 9},
+    {"_RNASeqQuant_Adadelta", (DL_FUNC) &_RNASeqQuant_Adadelta, 9},
+    {"_RNASeqQuant_RMSProp", (DL_FUNC) &_RNASeqQuant_RMSProp, 9},
+    {"_RNASeqQuant_NRMSProp", (DL_FUNC) &_RNASeqQuant_NRMSProp, 9},
     {"_RNASeqQuant_InvSqrtRoot", (DL_FUNC) &_RNASeqQuant_InvSqrtRoot, 2},
     {"_RNASeqQuant_ISRU1", (DL_FUNC) &_RNASeqQuant_ISRU1, 3},
     {"_RNASeqQuant_ISRU", (DL_FUNC) &_RNASeqQuant_ISRU, 4},
@@ -365,6 +490,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RNASeqQuant_SplitEC", (DL_FUNC) &_RNASeqQuant_SplitEC, 1},
     {"_RNASeqQuant_MatchEfflen", (DL_FUNC) &_RNASeqQuant_MatchEfflen, 2},
     {"_RNASeqQuant_SpeCount", (DL_FUNC) &_RNASeqQuant_SpeCount, 2},
+    {"_RNASeqQuant_isEqualStr", (DL_FUNC) &_RNASeqQuant_isEqualStr, 2},
     {NULL, NULL, 0}
 };
 

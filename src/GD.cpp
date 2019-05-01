@@ -6,10 +6,9 @@
 
 #include "utilities.h"
 #include "likelihood.h"
-#include "softmax.h"
-#include "softplus.h"
-#include "isru.h"
-#include "gradient.h"
+#include "AFfactory.h"
+#include "AFmeasure.h"
+#include "activation.h"
 
 using namespace Rcpp;
 using namespace RcppParallel;
@@ -20,13 +19,177 @@ using namespace std;
 
 
 // [[Rcpp::export]]
+arma::vec Momentum(const arma::vec& efflenraw,
+                   const Rcpp::CharacterVector& ecraw,
+                   const arma::uvec& countraw,
+                   const arma::uvec& spenumraw,
+                   const arma::uword epochs,
+                   const arma::uword batchsize,
+                   const double eta,
+                   const Rcpp::List attrs,
+                   const Rcpp::List arguments) {
+
+  // stop iteration settings from kallisto
+  // double countChangeLimit = 1e-2
+  // double countChange = 1e-2
+  double countLimit = 1e-8;
+
+  // adagrad settings
+  double gamma = 0.9;
+
+  // step1: pseudo information
+  // remove zero counts
+  uvec zeros = find(countraw > 0);
+  IntegerVector zerosidx(zeros.begin(), zeros.end());
+
+  uvec count = countraw.elem(zeros);
+  vector<uvec> ec = SplitEC(ecraw[zerosidx]);
+  vector<vec> efflen = MatchEfflen(ec, efflenraw);
+
+  // step2: Adagrad
+  // start w and estcount
+  uword tn = sum(spenumraw);
+  uword cn = sum(count);
+  // uword sn = spenumraw.n_elem;
+  uword ecn = ec.size();
+
+  // Glorot normal initializer/Xavier normal initializer
+  vec w = randn<vec>(tn) / sqrt(tn);
+  // vec w(tn); w.fill(0.01);
+  vec v = vec(tn, fill::zeros);
+
+  // gradient and shuffled index
+  vec grad = vec(tn);
+  uvec idx = linspace<uvec>(0, ecn - 1, ecn);
+
+  // active function
+  std::shared_ptr<AFmeasure> afgrad = AFfactory().createAFGradient(attrs, arguments);
+  std::shared_ptr<AFmeasure> afc = AFfactory().createAFCounts(attrs, arguments);
+
+  for (uword iter = 0; iter < epochs; ++iter) {
+
+    // Rcout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w), efflen, ec, count) << std::endl;
+
+    idx = shuffle(idx);
+    uword biter = 0;
+
+    // mini-batch
+    while (biter < ecn) {
+      uword endi = biter + batchsize - 1;
+      endi = (endi >= ecn) ? (ecn - 1) : endi;
+      uvec eachidx = idx.subvec(biter, endi);
+
+      // adam for each batch
+      grad = afgrad->AFGradient(w, efflen, ec, count, eachidx);
+      v = gamma * v + eta * grad;
+      w -= v;
+
+      biter += batchsize;
+    }
+  }
+
+  Rcout << "The log likelihood is " << std::setprecision (20) << LL(afc->AFCounts(w), efflen, ec, count) <<
+    "." << std::endl;
+
+  // reset small est
+  vec est = afc->AFCounts(w) * cn;
+  est.elem(find(est < countLimit)).zeros();
+
+  return est;
+}
+
+// [[Rcpp::export]]
+arma::vec NAG(const arma::vec& efflenraw,
+                  const Rcpp::CharacterVector& ecraw,
+                  const arma::uvec& countraw,
+                  const arma::uvec& spenumraw,
+                  const arma::uword epochs,
+                  const arma::uword batchsize,
+                  const double eta,
+                  const Rcpp::List attrs,
+                  const Rcpp::List arguments) {
+
+  // stop iteration settings from kallisto
+  // double countChangeLimit = 1e-2
+  // double countChange = 1e-2
+  double countLimit = 1e-8;
+
+  // adagrad settings
+  double gamma = 0.9;
+
+  // step1: pseudo information
+  // remove zero counts
+  uvec zeros = find(countraw > 0);
+  IntegerVector zerosidx(zeros.begin(), zeros.end());
+
+  uvec count = countraw.elem(zeros);
+  vector<uvec> ec = SplitEC(ecraw[zerosidx]);
+  vector<vec> efflen = MatchEfflen(ec, efflenraw);
+
+  // step2: Adagrad
+  // start w and estcount
+  uword tn = sum(spenumraw);
+  uword cn = sum(count);
+  // uword sn = spenumraw.n_elem;
+  uword ecn = ec.size();
+
+  // Glorot normal initializer/Xavier normal initializer
+  vec w = randn<vec>(tn) / sqrt(tn);
+  // vec w(tn); w.fill(0.01);
+  vec v = vec(tn, fill::zeros);
+
+  // gradient and shuffled index
+  vec grad = vec(tn);
+  uvec idx = linspace<uvec>(0, ecn - 1, ecn);
+
+  // active function
+  std::shared_ptr<AFmeasure> afgrad = AFfactory().createAFGradient(attrs, arguments);
+  std::shared_ptr<AFmeasure> afc = AFfactory().createAFCounts(attrs, arguments);
+
+  for (uword iter = 0; iter < epochs; ++iter) {
+
+    // Rcout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w), efflen, ec, count) << std::endl;
+
+    idx = shuffle(idx);
+    uword biter = 0;
+
+    // mini-batch
+    while (biter < ecn) {
+      uword endi = biter + batchsize - 1;
+      endi = (endi >= ecn) ? (ecn - 1) : endi;
+      uvec eachidx = idx.subvec(biter, endi);
+
+      // adam for each batch
+      w -= gamma * v;
+      grad = afgrad->AFGradient(w, efflen, ec, count, eachidx);
+      v = gamma * v + eta * grad;
+      w -= v;
+
+      biter += batchsize;
+    }
+  }
+
+  Rcout << "The log likelihood is " << std::setprecision (20) << LL(afc->AFCounts(w), efflen, ec, count) <<
+    "." << std::endl;
+
+  // reset small est
+  vec est = afc->AFCounts(w) * cn;
+  est.elem(find(est < countLimit)).zeros();
+
+  return est;
+}
+
+
+// [[Rcpp::export]]
 arma::vec Adam(const arma::vec& efflenraw,
                const Rcpp::CharacterVector& ecraw,
                const arma::uvec& countraw,
                const arma::uvec& spenumraw,
-               const arma::uword epochs = 300,
-               const arma::uword batchsize = 1000,
-               const double alpha = 0.1) {
+               const arma::uword epochs,
+               const arma::uword batchsize,
+               const double eta,
+               const Rcpp::List attrs,
+               const Rcpp::List arguments) {
 
   // stop iteration settings from kallisto
   // double countChangeLimit = 1e-2
@@ -38,8 +201,7 @@ arma::vec Adam(const arma::vec& efflenraw,
   double beta2 = 0.999;
   double epsilon = 1e-8;
 
-  // step1: pseudo information
-  // remove zero counts
+  // step1: pseudo information remove zero counts
   uvec zeros = find(countraw > 0);
   IntegerVector zerosidx(zeros.begin(), zeros.end());
 
@@ -48,29 +210,27 @@ arma::vec Adam(const arma::vec& efflenraw,
   vector<vec> efflen = MatchEfflen(ec, efflenraw);
 
   // step2: Adam
-  // start w and estcount
   uword tn = sum(spenumraw);
   uword cn = sum(count);
   // uword sn = spenumraw.n_elem;
   uword ecn = ec.size();
 
- // Glorot normal initializer/Xavier normal initializer
+  // Glorot normal initializer/Xavier normal initializer
   vec w = randn<vec>(tn) / sqrt(tn);
   // vec w(tn); w.fill(0.01);
   vec m = vec(tn, fill::zeros);
   vec v = vec(tn, fill::zeros);
   uword t = 0;
-  // gradient and shuffled index
   vec grad = vec(tn);
   uvec idx = linspace<uvec>(0, ecn - 1, ecn);
 
+  // active function
+  std::shared_ptr<AFmeasure> afgrad = AFfactory().createAFGradient(attrs, arguments);
+  std::shared_ptr<AFmeasure> afc = AFfactory().createAFCounts(attrs, arguments);
+
   for (uword iter = 0; iter < epochs; ++iter) {
 
-    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(Softmax1(w), efflen, ec, count) << "|" << t << std::endl;
-
-    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(Softplus1(w) / sum(Softplus1(w)), efflen, ec, count) << "|" << t << std::endl;
-
-    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(ISRU1(w, InvSqrtRoot(w, alpha), alpha) / sum(ISRU1(w, InvSqrtRoot(w, alpha), alpha)), efflen, ec, count) << "|" << t << std::endl;
+    // Rcout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w), efflen, ec, count) << std::endl;
 
     idx = shuffle(idx);
     uword biter = 0;
@@ -83,30 +243,523 @@ arma::vec Adam(const arma::vec& efflenraw,
       uvec eachidx = idx.subvec(biter, endi);
 
       // adam for each batch
-      // grad = GradientSM(w, efflen, ec, count, eachidx);
-      // grad = GradientSP(w, efflen, ec, count, eachidx);
-      grad = GradientISRU(w, efflen, ec, count, alpha, eachidx);
+      grad = afgrad->AFGradient(w, efflen, ec, count, eachidx);
       m = beta1 * m + (1 - beta1) * grad;
       v = beta2 * v + (1 - beta2) * square(grad);
-      double alphat = alpha * sqrt(1 - pow(beta2, t)) / (1 - pow(beta1, t));
-      w -= alphat * m / (sqrt(v) + epsilon);
+      double etat = eta * sqrt(1 - pow(beta2, t)) / (1 - pow(beta1, t));
+      w -= etat * m / (sqrt(v) + epsilon);
 
       biter += batchsize;
     }
   }
 
+  Rcout << "The log likelihood is " << std::setprecision (20) << LL(afc->AFCounts(w), efflen, ec, count) <<
+    "." << std::endl;
 
-  // Rcout << "The log likelihood is " << std::setprecision (20) << LL(Softmax1(w), efflen, ec, count) << "." << std::endl;
-  // Rcout << "The log likelihood is " << std::setprecision (20) << LL(Softplus1(w) / sum(Softplus1(w)), efflen, ec, count) << "." << std::endl;
-  Rcout << "The log likelihood is " << std::setprecision (20) << LL(ISRU1(w, InvSqrtRoot(w, alpha), alpha) / sum(ISRU1(w, InvSqrtRoot(w, alpha), alpha)), efflen, ec, count) << "." << std::endl;
-
-
-  // reset small est
-  // vec est = Softmax1(w) / sum(Softmax1(w)) * cn;
-  // vec est = Softplus1(w) / sum(Softplus1(w)) * cn;
-  vec est = ISRU1(w, InvSqrtRoot(w, alpha), alpha) / sum(ISRU1(w, InvSqrtRoot(w, alpha), alpha)) * cn;
+  // step3: reset small est
+  vec est = afc->AFCounts(w) * cn;
   est.elem(find(est < countLimit)).zeros();
 
   return est;
 }
 
+
+// [[Rcpp::export]]
+arma::vec NAdam(const arma::vec& efflenraw,
+               const Rcpp::CharacterVector& ecraw,
+               const arma::uvec& countraw,
+               const arma::uvec& spenumraw,
+               const arma::uword epochs,
+               const arma::uword batchsize,
+               const double eta,
+               const Rcpp::List attrs,
+               const Rcpp::List arguments) {
+
+  // stop iteration settings from kallisto
+  // double countChangeLimit = 1e-2
+  // double countChange = 1e-2
+  double countLimit = 1e-8;
+
+  // adam settings
+  double beta1 = 0.9;
+  double beta2 = 0.999;
+  double epsilon = 1e-8;
+
+  // step1: pseudo information remove zero counts
+  uvec zeros = find(countraw > 0);
+  IntegerVector zerosidx(zeros.begin(), zeros.end());
+
+  uvec count = countraw.elem(zeros);
+  vector<uvec> ec = SplitEC(ecraw[zerosidx]);
+  vector<vec> efflen = MatchEfflen(ec, efflenraw);
+
+  // step2: Adam
+  uword tn = sum(spenumraw);
+  uword cn = sum(count);
+  // uword sn = spenumraw.n_elem;
+  uword ecn = ec.size();
+
+  // Glorot normal initializer/Xavier normal initializer
+  vec w = randn<vec>(tn) / sqrt(tn);
+  // vec w(tn); w.fill(0.01);
+  vec m = vec(tn, fill::zeros);
+  vec v = vec(tn, fill::zeros);
+  uword t = 0;
+  vec grad = vec(tn);
+  uvec idx = linspace<uvec>(0, ecn - 1, ecn);
+
+  // active function
+  std::shared_ptr<AFmeasure> afgrad = AFfactory().createAFGradient(attrs, arguments);
+  std::shared_ptr<AFmeasure> afc = AFfactory().createAFCounts(attrs, arguments);
+
+  for (uword iter = 0; iter < epochs; ++iter) {
+
+    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w), efflen, ec, count) << "|" << t << std::endl;
+    idx = shuffle(idx);
+    uword biter = 0;
+
+    // mini-batch
+    while (biter < ecn) {
+      ++t;
+      uword endi = biter + batchsize - 1;
+      endi = (endi >= ecn) ? (ecn - 1) : endi;
+      uvec eachidx = idx.subvec(biter, endi);
+
+      // adam for each batch
+      grad = afgrad->AFGradient(w, efflen, ec, count, eachidx);
+      m = beta1 * m + (1 - beta1) * grad;
+      v = beta2 * v + (1 - beta2) * square(grad);
+      vec etat = beta1 * m + (1 - beta1) * grad / (1 - pow(beta1, t));
+      w -= eta * etat / (sqrt(v) + epsilon);
+
+      biter += batchsize;
+    }
+  }
+
+  Rcout << "The log likelihood is " << std::setprecision (20) << LL(afc->AFCounts(w), efflen, ec, count) <<
+    "." << std::endl;
+
+  // step3: reset small est
+  vec est = afc->AFCounts(w) * cn;
+  est.elem(find(est < countLimit)).zeros();
+
+  return est;
+}
+
+
+
+// [[Rcpp::export]]
+arma::vec Adagrad(const arma::vec& efflenraw,
+                  const Rcpp::CharacterVector& ecraw,
+                  const arma::uvec& countraw,
+                  const arma::uvec& spenumraw,
+                  const arma::uword epochs,
+                  const arma::uword batchsize,
+                  const double eta,
+                  const Rcpp::List attrs,
+                  const Rcpp::List arguments) {
+
+  // stop iteration settings from kallisto
+  // double countChangeLimit = 1e-2
+  // double countChange = 1e-2
+  double countLimit = 1e-8;
+
+  // adagrad settings
+  double epsilon = 1e-8;
+
+  // step1: pseudo information
+  // remove zero counts
+  uvec zeros = find(countraw > 0);
+  IntegerVector zerosidx(zeros.begin(), zeros.end());
+
+  uvec count = countraw.elem(zeros);
+  vector<uvec> ec = SplitEC(ecraw[zerosidx]);
+  vector<vec> efflen = MatchEfflen(ec, efflenraw);
+
+  // step2: Adagrad
+  // start w and estcount
+  uword tn = sum(spenumraw);
+  uword cn = sum(count);
+  // uword sn = spenumraw.n_elem;
+  uword ecn = ec.size();
+
+  // Glorot normal initializer/Xavier normal initializer
+  vec w = randn<vec>(tn) / sqrt(tn);
+  // vec w(tn); w.fill(0.01);
+  vec G = vec(tn, fill::zeros);
+  // gradient and shuffled index
+  vec grad = vec(tn);
+  uvec idx = linspace<uvec>(0, ecn - 1, ecn);
+
+  // active function
+  std::shared_ptr<AFmeasure> afgrad = AFfactory().createAFGradient(attrs, arguments);
+  std::shared_ptr<AFmeasure> afc = AFfactory().createAFCounts(attrs, arguments);
+
+  for (uword iter = 0; iter < epochs; ++iter) {
+
+    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w), efflen, ec, count) << "|" << t << std::endl;
+    idx = shuffle(idx);
+    uword biter = 0;
+
+    // mini-batch
+    while (biter < ecn) {
+      uword endi = biter + batchsize - 1;
+      endi = (endi >= ecn) ? (ecn - 1) : endi;
+      uvec eachidx = idx.subvec(biter, endi);
+
+      // adam for each batch
+        grad = afgrad->AFGradient(w, efflen, ec, count, eachidx);
+        G += grad % grad;
+        w -= eta / sqrt(G + epsilon) % grad;
+
+      biter += batchsize;
+    }
+  }
+
+  Rcout << "The log likelihood is " << std::setprecision (20) << LL(afc->AFCounts(w), efflen, ec, count) <<
+    "." << std::endl;
+
+  // reset small est
+  vec est = afc->AFCounts(w) * cn;
+  est.elem(find(est < countLimit)).zeros();
+
+  return est;
+}
+
+
+// [[Rcpp::export]]
+arma::vec NAdagrad(const arma::vec& efflenraw,
+                  const Rcpp::CharacterVector& ecraw,
+                  const arma::uvec& countraw,
+                  const arma::uvec& spenumraw,
+                  const arma::uword epochs,
+                  const arma::uword batchsize,
+                  const double eta,
+                  const Rcpp::List attrs,
+                  const Rcpp::List arguments) {
+
+  // stop iteration settings from kallisto
+  // double countChangeLimit = 1e-2
+  // double countChange = 1e-2
+  double countLimit = 1e-8;
+
+  // adagrad settings
+  double epsilon = 1e-8;
+  double velocity = 0.9;
+
+  // step1: pseudo information
+  // remove zero counts
+  uvec zeros = find(countraw > 0);
+  IntegerVector zerosidx(zeros.begin(), zeros.end());
+
+  uvec count = countraw.elem(zeros);
+  vector<uvec> ec = SplitEC(ecraw[zerosidx]);
+  vector<vec> efflen = MatchEfflen(ec, efflenraw);
+
+  // step2: Adagrad
+  // start w and estcount
+  uword tn = sum(spenumraw);
+  uword cn = sum(count);
+  // uword sn = spenumraw.n_elem;
+  uword ecn = ec.size();
+
+  // Glorot normal initializer/Xavier normal initializer
+  vec w = randn<vec>(tn) / sqrt(tn);
+  // vec w(tn); w.fill(0.01);
+  vec G = vec(tn, fill::zeros);
+  vec V = vec(tn, fill::zeros);
+
+  // gradient and shuffled index
+  vec grad = vec(tn);
+  uvec idx = linspace<uvec>(0, ecn - 1, ecn);
+
+  // active function
+  std::shared_ptr<AFmeasure> afgrad = AFfactory().createAFGradient(attrs, arguments);
+  std::shared_ptr<AFmeasure> afc = AFfactory().createAFCounts(attrs, arguments);
+
+  for (uword iter = 0; iter < epochs; ++iter) {
+
+    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w), efflen, ec, count) << "|" << t << std::endl;
+    idx = shuffle(idx);
+    uword biter = 0;
+
+    // mini-batch
+    while (biter < ecn) {
+      uword endi = biter + batchsize - 1;
+      endi = (endi >= ecn) ? (ecn - 1) : endi;
+      uvec eachidx = idx.subvec(biter, endi);
+
+      // NAG
+      w -= velocity * V;
+      grad = afgrad->AFGradient(w, efflen, ec, count, eachidx);
+      G += grad % grad;
+
+      // update V
+      V = velocity * V + eta / sqrt(G + epsilon) % grad;
+      w -= V;
+
+      biter += batchsize;
+    }
+  }
+
+  Rcout << "The log likelihood is " << std::setprecision (20) << LL(afc->AFCounts(w), efflen, ec, count) <<
+    "." << std::endl;
+
+  // reset small est
+  vec est = afc->AFCounts(w) * cn;
+  est.elem(find(est < countLimit)).zeros();
+
+  return est;
+}
+
+
+// [[Rcpp::export]]
+arma::vec Adadelta(const arma::vec& efflenraw,
+                  const Rcpp::CharacterVector& ecraw,
+                  const arma::uvec& countraw,
+                  const arma::uvec& spenumraw,
+                  const arma::uword epochs,
+                  const arma::uword batchsize,
+                  const double eta,
+                  const Rcpp::List attrs,
+                  const Rcpp::List arguments) {
+
+  // stop iteration settings from kallisto
+  // double countChangeLimit = 1e-2
+  // double countChange = 1e-2
+  double countLimit = 1e-8;
+
+  // adagrad settings
+  double gamma = 0.9;
+  double epsilon = 1e-8;
+
+  // step1: pseudo information
+  // remove zero counts
+  uvec zeros = find(countraw > 0);
+  IntegerVector zerosidx(zeros.begin(), zeros.end());
+
+  uvec count = countraw.elem(zeros);
+  vector<uvec> ec = SplitEC(ecraw[zerosidx]);
+  vector<vec> efflen = MatchEfflen(ec, efflenraw);
+
+  // step2: Adagrad
+  // start w and estcount
+  uword tn = sum(spenumraw);
+  uword cn = sum(count);
+  // uword sn = spenumraw.n_elem;
+  uword ecn = ec.size();
+
+  // Glorot normal initializer/Xavier normal initializer
+  vec w = randn<vec>(tn) / sqrt(tn);
+  // vec w(tn); w.fill(0.01);
+  vec eg2 = vec(tn, fill::zeros);
+  vec edx2 = vec(tn, fill::zeros);
+
+  // gradient and shuffled index
+  vec grad = vec(tn);
+  uvec idx = linspace<uvec>(0, ecn - 1, ecn);
+
+  // active function
+  std::shared_ptr<AFmeasure> afgrad = AFfactory().createAFGradient(attrs, arguments);
+  std::shared_ptr<AFmeasure> afc = AFfactory().createAFCounts(attrs, arguments);
+
+  for (uword iter = 0; iter < epochs; ++iter) {
+
+    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w), efflen, ec, count) << "|" << t << std::endl;
+    idx = shuffle(idx);
+    uword biter = 0;
+
+    // mini-batch
+    while (biter < ecn) {
+      uword endi = biter + batchsize - 1;
+      endi = (endi >= ecn) ? (ecn - 1) : endi;
+      uvec eachidx = idx.subvec(biter, endi);
+
+      // adam for each batch
+      grad = afgrad->AFGradient(w, efflen, ec, count, eachidx);
+      eg2 = gamma * eg2 + (1 - gamma) * grad % grad;
+      vec dx = sqrt(edx2 + epsilon) / sqrt(eg2 + epsilon) % grad;
+      edx2 = gamma * edx2 + (1 - gamma) * dx % dx;
+      w -= dx;
+
+      biter += batchsize;
+    }
+  }
+
+  Rcout << "The log likelihood is " << std::setprecision (20) << LL(afc->AFCounts(w), efflen, ec, count) <<
+    "." << std::endl;
+
+  // reset small est
+  vec est = afc->AFCounts(w) * cn;
+  est.elem(find(est < countLimit)).zeros();
+
+  return est;
+}
+
+
+// [[Rcpp::export]]
+arma::vec RMSProp(const arma::vec& efflenraw,
+                  const Rcpp::CharacterVector& ecraw,
+                  const arma::uvec& countraw,
+                  const arma::uvec& spenumraw,
+                  const arma::uword epochs,
+                  const arma::uword batchsize,
+                  const double eta,
+                  const Rcpp::List attrs,
+                  const Rcpp::List arguments) {
+
+  // stop iteration settings from kallisto
+  // double countChangeLimit = 1e-2
+  // double countChange = 1e-2
+  double countLimit = 1e-8;
+
+  // adagrad settings
+  double gamma = 0.9;
+  double epsilon = 1e-8;
+
+  // step1: pseudo information
+  // remove zero counts
+  uvec zeros = find(countraw > 0);
+  IntegerVector zerosidx(zeros.begin(), zeros.end());
+
+  uvec count = countraw.elem(zeros);
+  vector<uvec> ec = SplitEC(ecraw[zerosidx]);
+  vector<vec> efflen = MatchEfflen(ec, efflenraw);
+
+  // step2: Adagrad
+  // start w and estcount
+  uword tn = sum(spenumraw);
+  uword cn = sum(count);
+  // uword sn = spenumraw.n_elem;
+  uword ecn = ec.size();
+
+  // Glorot normal initializer/Xavier normal initializer
+  vec w = randn<vec>(tn) / sqrt(tn);
+  // vec w(tn); w.fill(0.01);
+  vec eg2 = vec(tn, fill::zeros);
+  // gradient and shuffled index
+  vec grad = vec(tn);
+  uvec idx = linspace<uvec>(0, ecn - 1, ecn);
+
+  // active function
+  std::shared_ptr<AFmeasure> afgrad = AFfactory().createAFGradient(attrs, arguments);
+  std::shared_ptr<AFmeasure> afc = AFfactory().createAFCounts(attrs, arguments);
+
+  for (uword iter = 0; iter < epochs; ++iter) {
+
+    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w), efflen, ec, count) << "|" << t << std::endl;
+    idx = shuffle(idx);
+    uword biter = 0;
+
+    // mini-batch
+    while (biter < ecn) {
+      uword endi = biter + batchsize - 1;
+      endi = (endi >= ecn) ? (ecn - 1) : endi;
+      uvec eachidx = idx.subvec(biter, endi);
+
+      // adam for each batch
+      grad = afgrad->AFGradient(w, efflen, ec, count, eachidx);
+      eg2 = gamma * eg2 + (1 - gamma) * grad % grad;
+      w -= eta / sqrt(eg2 + epsilon) % grad;
+
+      biter += batchsize;
+    }
+  }
+
+  Rcout << "The log likelihood is " << std::setprecision (20) << LL(afc->AFCounts(w), efflen, ec, count) <<
+    "." << std::endl;
+
+  // reset small est
+  vec est = afc->AFCounts(w) * cn;
+  est.elem(find(est < countLimit)).zeros();
+
+  return est;
+}
+
+
+
+// [[Rcpp::export]]
+arma::vec NRMSProp(const arma::vec& efflenraw,
+                   const Rcpp::CharacterVector& ecraw,
+                   const arma::uvec& countraw,
+                   const arma::uvec& spenumraw,
+                   const arma::uword epochs,
+                   const arma::uword batchsize,
+                   const double eta,
+                   const Rcpp::List attrs,
+                   const Rcpp::List arguments) {
+
+  // stop iteration settings from kallisto
+  // double countChangeLimit = 1e-2
+  // double countChange = 1e-2
+  double countLimit = 1e-8;
+
+  // adagrad settings
+  double gamma = 0.9;
+  double epsilon = 1e-8;
+  double velocity = 0.9;
+
+  // step1: pseudo information
+  // remove zero counts
+  uvec zeros = find(countraw > 0);
+  IntegerVector zerosidx(zeros.begin(), zeros.end());
+
+  uvec count = countraw.elem(zeros);
+  vector<uvec> ec = SplitEC(ecraw[zerosidx]);
+  vector<vec> efflen = MatchEfflen(ec, efflenraw);
+
+  // step2: Adagrad
+  // start w and estcount
+  uword tn = sum(spenumraw);
+  uword cn = sum(count);
+  // uword sn = spenumraw.n_elem;
+  uword ecn = ec.size();
+
+  // Glorot normal initializer/Xavier normal initializer
+  vec w = randn<vec>(tn) / sqrt(tn);
+  // vec w(tn); w.fill(0.01);
+  vec eg2 = vec(tn, fill::zeros);
+  vec V = vec(tn, fill::zeros);
+
+  // gradient and shuffled index
+  vec grad = vec(tn);
+  uvec idx = linspace<uvec>(0, ecn - 1, ecn);
+
+  // active function
+  std::shared_ptr<AFmeasure> afgrad = AFfactory().createAFGradient(attrs, arguments);
+  std::shared_ptr<AFmeasure> afc = AFfactory().createAFCounts(attrs, arguments);
+
+  for (uword iter = 0; iter < epochs; ++iter) {
+
+    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w), efflen, ec, count) << "|" << t << std::endl;
+    idx = shuffle(idx);
+    uword biter = 0;
+
+    // mini-batch
+    while (biter < ecn) {
+      uword endi = biter + batchsize - 1;
+      endi = (endi >= ecn) ? (ecn - 1) : endi;
+      uvec eachidx = idx.subvec(biter, endi);
+
+      // NAG
+      w -= velocity * V;
+      grad = afgrad->AFGradient(w, efflen, ec, count, eachidx);
+      eg2 = gamma * eg2 + (1 - gamma) * grad % grad;
+
+      // update V
+      V = velocity * V + eta / sqrt(eg2 + epsilon) % grad;
+      w -= V;
+
+      biter += batchsize;
+    }
+  }
+
+  Rcout << "The log likelihood is " << std::setprecision (20) << LL(afc->AFCounts(w), efflen, ec, count) <<
+    "." << std::endl;
+
+  // reset small est
+  vec est = afc->AFCounts(w) * cn;
+  est.elem(find(est < countLimit)).zeros();
+
+  return est;
+}

@@ -91,7 +91,7 @@ arma::vec EMSingle(const arma::vec& prob,
 //' @param countraw A \code{arma::uvec} indicates the counts of ec.
 //' @param maxiter The maximum iteration number with the default value of 10000.
 //' @param miniter The minimum iteration number with the default value of 50.
-//' @param detail A \code{bool} value.  When it is set as \code{true}, logistic likelihood and counts for each species in every iteration will be returned, otherwise \code{false}.
+//' @param details A \code{bool} value.  When it is set as \code{true}, logistic likelihood and counts for each species in every iteration will be returned, otherwise \code{false}.
 //' @inheritParams MatchEfflen
 //' @inheritParams SplitEC
 //' @inheritParams SpeCount
@@ -130,7 +130,7 @@ Rcpp::List EM(const arma::vec& efflenraw,
               const arma::uvec& spenumraw,
               const arma::uword maxiter = 10000,
               const arma::uword miniter = 50,
-              const bool detail = false) {
+              const bool details = false) {
 
   // stop iteration params from kallisto
   double countChangeLimit = 1e-2;
@@ -167,7 +167,8 @@ Rcpp::List EM(const arma::vec& efflenraw,
 
     est = EMSingle(prob, efflen, ec, count);
 
-    if (detail) {
+    // record running details
+    if (details) {
       specounts.row(iter) = SpeCount(est, spenumraw);
       resll(iter) = LL(prob, efflen, ec, count);
     } else {}

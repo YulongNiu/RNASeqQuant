@@ -9,7 +9,7 @@
 #' @param countraw A \code{arma::uvec} indicates the counts of ec.
 #' @param maxiter The maximum iteration number with the default value of 10000.
 #' @param miniter The minimum iteration number with the default value of 50.
-#' @param detail A \code{bool} value.  When it is set as \code{true}, logistic likelihood and counts for each species in every iteration will be returned, otherwise \code{false}.
+#' @param details A \code{bool} value.  When it is set as \code{true}, logistic likelihood and counts for each species in every iteration will be returned, otherwise \code{false}.
 #' @inheritParams MatchEfflen
 #' @inheritParams SplitEC
 #' @inheritParams SpeCount
@@ -41,20 +41,52 @@
 #' EM(plist$efflen, plist$ec, plist$count, 5)
 #' @author Yulong Niu \email{yulong.niu@@hotmail.com}
 #' @export
-EM <- function(efflenraw, ecraw, countraw, spenumraw, maxiter = 10000L, miniter = 50L, detail = FALSE) {
-    .Call(`_RNASeqQuant_EM`, efflenraw, ecraw, countraw, spenumraw, maxiter, miniter, detail)
+EM <- function(efflenraw, ecraw, countraw, spenumraw, maxiter = 10000L, miniter = 50L, details = FALSE) {
+    .Call(`_RNASeqQuant_EM`, efflenraw, ecraw, countraw, spenumraw, maxiter, miniter, details)
 }
 
-Adam <- function(efflenraw, ecraw, countraw, spenumraw, epochs = 300L, batchsize = 1000L, alpha = 0.1) {
-    .Call(`_RNASeqQuant_Adam`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, alpha)
+Momentum <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments) {
+    .Call(`_RNASeqQuant_Momentum`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments)
+}
+
+NAG <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments) {
+    .Call(`_RNASeqQuant_NAG`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments)
+}
+
+Adam <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments) {
+    .Call(`_RNASeqQuant_Adam`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments)
+}
+
+NAdam <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments) {
+    .Call(`_RNASeqQuant_NAdam`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments)
+}
+
+Adagrad <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments) {
+    .Call(`_RNASeqQuant_Adagrad`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments)
+}
+
+NAdagrad <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments) {
+    .Call(`_RNASeqQuant_NAdagrad`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments)
+}
+
+Adadelta <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments) {
+    .Call(`_RNASeqQuant_Adadelta`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments)
+}
+
+RMSProp <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments) {
+    .Call(`_RNASeqQuant_RMSProp`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments)
+}
+
+NRMSProp <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments) {
+    .Call(`_RNASeqQuant_NRMSProp`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments)
 }
 
 #' Gradient.
 #'
 #' \itemize{
-#'   \item \code{GradientSM()}: Gradients of Softmax.
-#'   \item \code{GradientSP()}: Gradients of SoftPlus.
-#'   \item \code{GradientISRU()}: Gradients of ISRU.
+#'   \item \code{AFSM}: Softmax.
+#'   \item \code{AFSP}: Softplus.
+#'   \item \code{AFISRU}: ISRU.
 #' }
 #'
 #' @title Calculate gradient
@@ -65,24 +97,18 @@ Adam <- function(efflenraw, ecraw, countraw, spenumraw, epochs = 300L, batchsize
 #' @author Yulong Niu \email{yulong.niu@@hotmail.com}
 #' @rdname gradient
 #' @keywords internal
-GradientSM <- function(w, efflen, ec, count, idx) {
-    .Call(`_RNASeqQuant_GradientSM`, w, efflen, ec, count, idx)
-}
+NULL
 
-#' @inheritParams GradientSM
+#' @inheritParams AFSM
 #' @rdname gradient
 #' @keywords internal
-GradientSP <- function(w, efflen, ec, count, idx) {
-    .Call(`_RNASeqQuant_GradientSP`, w, efflen, ec, count, idx)
-}
+NULL
 
-#' @inheritParams GradientSM
+#' @inheritParams AFSM
 #' @inheritParams InvSqrtRoot
 #' @rdname gradient
 #' @keywords internal
-GradientISRU <- function(w, efflen, ec, count, alpha, idx) {
-    .Call(`_RNASeqQuant_GradientISRU`, w, efflen, ec, count, alpha, idx)
-}
+NULL
 
 #' Calculate the Inverse square root unit (ISRU)
 #'
@@ -317,5 +343,16 @@ MatchEfflen <- function(ec, efflenraw) {
 #' @keywords internal
 SpeCount <- function(est, spenumraw) {
     .Call(`_RNASeqQuant_SpeCount`, est, spenumraw)
+}
+
+#' Compare two strings
+#'
+#' @title Two strings comparison
+#' @return A \code{bool} indicating whether two strings are equal.
+#' @param str1 str2 \code{std::string} strings.
+#' @author Yulong Niu \email{yulong.niu@@hotmail.com}
+#' @keywords internal
+isEqualStr <- function(str1, str2) {
+    .Call(`_RNASeqQuant_isEqualStr`, str1, str2)
 }
 

@@ -5,7 +5,7 @@
 \title{EM model}
 \usage{
 EM(efflenraw, ecraw, countraw, spenumraw, maxiter = 10000L,
-  miniter = 50L, detail = FALSE)
+  miniter = 50L, details = FALSE)
 }
 \arguments{
 \item{efflenraw}{A code{arma::vec} indicating the effect length of transcript.}
@@ -20,7 +20,7 @@ EM(efflenraw, ecraw, countraw, spenumraw, maxiter = 10000L,
 
 \item{miniter}{The minimum iteration number with the default value of 50.}
 
-\item{detail}{A \code{bool} value.  When it is set as \code{true}, logistic likelihood and counts for each species in every iteration will be returned, otherwise \code{false}.}
+\item{details}{A \code{bool} value.  When it is set as \code{true}, logistic likelihood and counts for each species in every iteration will be returned, otherwise \code{false}.}
 }
 \value{
 A \code{List} indicates estimated counts of transcripts.

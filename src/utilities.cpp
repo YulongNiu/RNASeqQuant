@@ -120,3 +120,17 @@ arma::vec SpeCount(const arma::vec& est,
 
   return(res);
 }
+
+
+//' Compare two strings
+//'
+//' @title Two strings comparison
+//' @return A \code{bool} indicating whether two strings are equal.
+//' @param str1 str2 \code{std::string} strings.
+//' @author Yulong Niu \email{yulong.niu@@hotmail.com}
+//' @keywords internal
+// [[Rcpp::export]]
+bool isEqualStr(std::string& str1,
+                std::string str2) {
+  return str1.compare(str2) == 0;
+}

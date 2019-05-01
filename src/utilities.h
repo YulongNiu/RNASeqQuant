@@ -14,4 +14,8 @@ std::vector<arma::vec> MatchEfflen(const std::vector<arma::uvec>& ec,
 
 arma::vec SpeCount(const arma::vec& est,
                    const arma::uvec& spenumraw);
+
+bool isEqualStr(std::string& str1,
+                std::string str2);
+
 #endif

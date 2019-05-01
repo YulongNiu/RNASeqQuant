@@ -17,7 +17,7 @@ emest <- EM(plist$efflen, plist$ec, plist$count, length(plist$efflen))
 
 ## adam
 ## softmax
-adamISRU <- Adam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1000, 1)
+gdest <- Adam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 1024, 0.1, list(method = 'Softmax'), list())
 
 ## test1: count number
 test_that('Total number of reads in EM results', {
@@ -25,6 +25,6 @@ test_that('Total number of reads in EM results', {
 })
 
 test_that('Total number of reads in GD results', {
-  expect_equal(sum(plist$count), sum(adamISRU))
+  expect_equal(sum(plist$count), sum(gdest))
 })
 ######################################################################

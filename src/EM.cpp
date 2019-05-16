@@ -152,10 +152,13 @@ Rcpp::List EM(const arma::vec& efflenraw,
   double cn = sum(count);
   uword sn = spenumraw.n_elem;
 
-  vec prob(tn);
-  prob.fill(1.0/tn);
-  vec startest(tn);
-  startest.fill(cn/tn);
+  // // cn / tn
+  // vec prob(tn);
+  // prob.fill(1.0/tn);
+  // average for each species
+  vec prob = InitAve(spenumraw);
+
+  vec startest = cn * prob;
   vec est(tn, fill::zeros);
 
   // details init
@@ -165,14 +168,14 @@ Rcpp::List EM(const arma::vec& efflenraw,
   uword iter;
   for (iter = 0; iter < maxiter; ++iter) {
 
-    est = EMSingle(prob, efflen, ec, count);
-
     // record running details
     if (details) {
-      vec eachc = SpeCount(est, spenumraw);
+      vec eachc = SpeCount(startest, spenumraw);
       specounts.row(iter) = rowvec(eachc.begin(), sn, false);
       resll(iter) = LL(prob, efflen, ec, count);
     } else {}
+
+    est = EMSingle(prob, efflen, ec, count);
 
     // stop iteration condition
     uword nopassn = 0;

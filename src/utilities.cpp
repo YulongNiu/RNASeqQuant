@@ -122,6 +122,24 @@ arma::vec SpeCount(const arma::vec& est,
 }
 
 
+// [[Rcpp::export]]
+arma::vec InitAve(const arma::uvec& spenumraw) {
+
+  uword sn = spenumraw.n_elem;
+  vec initest(sum(spenumraw), fill::zeros);
+
+  uword start = 0;
+
+  for (uword i = 0; i < sn; ++i) {
+    uword end = start + spenumraw(i) - 1;
+    initest.subvec(start, end).fill(1.0 / (spenumraw(i) * sn));
+    start = end + 1;
+  }
+
+  return(initest);
+}
+
+
 //' Compare two strings
 //'
 //' @title Two strings comparison

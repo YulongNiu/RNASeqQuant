@@ -169,7 +169,8 @@ Rcpp::List EM(const arma::vec& efflenraw,
 
     // record running details
     if (details) {
-      specounts.row(iter) = SpeCount(est, spenumraw);
+      vec eachc = SpeCount(est, spenumraw);
+      specounts.row(iter) = rowvec(eachc.begin(), sn, false);
       resll(iter) = LL(prob, efflen, ec, count);
     } else {}
 

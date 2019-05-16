@@ -34,31 +34,32 @@
 
 
 ## ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~real example~~~~~~~~~~~~~~~~~~~~~
-## ## ecpath <- '/extDisk1/RESEARCH/RNASeqQuantTest/athtest/testpseudo/pseudoalignments.ec'
-## ## countpath <- '/extDisk1/RESEARCH/RNASeqQuantTest/athtest/testpseudo/pseudoalignments.tsv'
-## ## abpath <- '/extDisk1/RESEARCH/RNASeqQuantTest/athtest/testquant/abundance.tsv'
+## ## ecpath <- '/extDisk1/RESEARCH/RNASeqQuantTestPython/athtest/testpseudo/pseudoalignments.ec'
+## ## countpath <- '/extDisk1/RESEARCH/RNASeqQuantTestPython/athtest/testpseudo/pseudoalignments.tsv'
+## ## abpath <- '/extDisk1/RESEARCH/RNASeqQuantTestPython/athtest/testquant/abundance.tsv'
 ## ## plist <- read_pseudo(ecpath, countpath, abpath)
 
-## ## ecpath <- '/extDisk1/RESEARCH/RNASeqQuantTest/simulate/human/humanpseudo/pseudoalignments.ec'
-## ## countpath <- '/extDisk1/RESEARCH/RNASeqQuantTest/simulate/human/humanpseudo/pseudoalignments.tsv'
-## ## abpath <- '/extDisk1/RESEARCH/RNASeqQuantTest/simulate/human/humanquant/abundance.tsv'
+## ## ecpath <- '/extDisk1/RESEARCH/RNASeqQuantTestPython/simulate/human/humanpseudo/pseudoalignments.ec'
+## ## countpath <- '/extDisk1/RESEARCH/RNASeqQuantTestPython/simulate/human/humanpseudo/pseudoalignments.tsv'
+## ## abpath <- '/extDisk1/RESEARCH/RNASeqQuantTestPython/simulate/human/humanquant/abundance.tsv'
 ## ## plist <- read_pseudo(ecpath, countpath, abpath)
 
 ## plist <- list()
-## plist$efflen <- read.table('/extDisk1/RESEARCH/RNASeqQuantTest/GD/abundance_ath.tsv', stringsAsFactors = FALSE, header = TRUE)[, 3]
-## plist$ec <- read.table('/extDisk1/RESEARCH/RNASeqQuantTest/GD/pseudoalignments_ath.tsv', stringsAsFactors = FALSE, header = TRUE)[, 3]
-## plist$count <- read.table('/extDisk1/RESEARCH/RNASeqQuantTest/GD/pseudoalignments_ath.tsv', stringsAsFactors = FALSE, header = TRUE)[, 2]
+## plist$efflen <- read.table('/extDisk1/RESEARCH/RNASeqQuantTestPython/GD/abundance_ath.tsv', stringsAsFactors = FALSE, header = TRUE)[, 3]
+## plist$ec <- read.table('/extDisk1/RESEARCH/RNASeqQuantTestPython/GD/pseudoalignments_ath.tsv', stringsAsFactors = FALSE, header = TRUE)[, 3]
+## plist$count <- read.table('/extDisk1/RESEARCH/RNASeqQuantTestPython/GD/pseudoalignments_ath.tsv', stringsAsFactors = FALSE, header = TRUE)[, 2]
 
 ## zeroidx <- plist$count > 0
 ## plist$count %<>% `[`(zeroidx)
 ## plist$ec %<>% `[`(zeroidx)
 
 ## ## kallisto EM
-## ## kallistoest <- read.table('/extDisk1/RESEARCH/RNASeqQuantTest/simulate/human/humanquant/abundance.tsv', stringsAsFactors = FALSE, header = TRUE)[, 4]
-## kallistoest <- read.table('/extDisk1/RESEARCH/RNASeqQuantTest/GD/abundance_ath.tsv', stringsAsFactors = FALSE, header = TRUE)[, 4]
+## ## kallistoest <- read.table('/extDisk1/RESEARCH/RNASeqQuantTestPython/simulate/human/humanquant/abundance.tsv', stringsAsFactors = FALSE, header = TRUE)[, 4]
+## kallistoest <- read.table('/extDisk1/RESEARCH/RNASeqQuantTestPython/GD/abundance_ath.tsv', stringsAsFactors = FALSE, header = TRUE)[, 4]
 
 ## ## RNASeqQuant EM
-## emest <- EM(plist$efflen, plist$ec, plist$count, length(plist$efflen), detail = FALSE)
+## emest <- EM(plist$efflen, plist$ec, plist$count, c(20000, 21392), detail = TRUE)
+## emest <- EM(plist$efflen, plist$ec, plist$count, 41392, detail = FALSE)
 
 ## ## RNASeqQuant GD
 ## gdest <- Adam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(method = 'Softmax'), list())

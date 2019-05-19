@@ -28,21 +28,156 @@ Robject <- function(x){sub('%obj%', x, '<span style="background-color:#F0F0F0;co
 Rclass <- function(x){sub('%obj%', x, '<span style="font-family:\'Times New Roman\', Times, serif;font-style: italic">%obj%</span>')}
 ```
 
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+TeX: { equationNumbers: { autoNumber: "AMS" } }
+});
+</script>
+
+$$
+\newcommand{\P}{\mathrm{P}}
+$$
+
+$$
+\newcommand{\tildel}{\widetilde{l_t}}
+$$
+
+$$
+\newcommand{\tildelu}{\widetilde{l_u}}
+$$
+
+$$
+\newcommand{\tildesv}{\widetilde{l_v}}
+$$
+
+$$
+\DeclareMathOperator*{\argmax}{arg\,max} 
+$$
+
 # Overview
 
 `r RNASeqQuant()` implements both expectation maximization and gradient descent for RNA-Seq quantification.
 
 # Models
 
-## Single species RNA-Seq
+## EM model for single species
 
-For single species RNA-Seq, if $T=\{t_1, t_2, \dots, t_K\}$ is the set of transcripts (with length $l_i$ for $t_i$) and the copy number of $t_i$ is $c_i$, we define $\rho_k=\frac{c_k}{\sum\limits_{t \in T}c_t} = \frac{c_k}{M}$ is the relative abundances of $t_i$, where $M$ is the total copy number, so that $\sum\limits_{k=1}^K \rho_k=1$.
+In single species, if $T=\{t_1, t_2, \dots, t_K\}$ is the set of transcripts (with length $l_i$ for $t_i$) and the copy number of $t_i$ is $c_i$, we define $\rho_k=\frac{c_k}{\sum\limits_{t \in T}c_t} = \frac{c_k}{M}$ is the relative abundances of $t_i$, where $M$ is the total copy number, so that $\sum\limits_{k=1}^K \rho_k=1$.
 
-[@bray2016near; @pachter2011models]
+For a single species RNA-Seq data-set, let $F=\{f_1, f_2, \dots, f_N\}$ be the set of transcription fragments (reads) in a total number of $N=\|F\|$. Fragments mapped to the transcript $t_i$ composes the set $F_t \in F$ in a number of $X_t=\|F_t\|$. We assume that all fragments in $F$ have the same length $m$. In $t_i$, the number of position in which the fragment can start is $\tildel = l_i - m + 1$. $\tildel$ is also called *effective length* [@bray2016near; @pachter2011models].
 
-## Multiple Species RNA-Seq
+After mapping, we can observe the alignment positions of $f_i$, which can be mapped to several transcripts, but we do not know the exact transcript. The estimated parameters is $\alpha=\{\alpha_1, \alpha_2, \dots, \alpha_K\}$. The probability that the fragment $f$ comes from the transcripts $t$ is:
 
+$$
+\begin{align}
+\begin{split}
+\P(f \in t) &= \frac{\rho_t M \tildel}{\sum\limits_{k=1}^{K} \rho_k M \widetilde{l_k}} \\
+&= \frac{\rho_t \tildel}{\sum\limits_{k=1}^{K} \rho_k \widetilde{l_k}} \\
+&= \alpha_t
+\end{split}
+\label{eq:1}
+\end{align}
+$$
 
+If $f$ comes from $t$, the probability that $f$ mapped to a certain position of $t$ is:
 
+$$
+\begin{align}
+\begin{split}
+\P(\mathrm{pos}|f \in t) = \frac{1}{\tildel}
+\end{split}
+\label{eq:2}
+\end{align}
+$$
+
+Combining $\eqref{eq:1}$ and $\eqref{eq:2}$, the probability that $f$ mapped to a certain position of $t$ is:
+
+$$
+\begin{align}
+\begin{split}
+\P(\mathrm{pos}, f \in t) = \frac{\alpha_t}{\tildel}
+\end{split}
+\label{eq:3}
+\end{align}
+$$
+
+The logarithm of likelihood (LL) function is:
+
+$$
+\begin{align}
+\begin{split}
+LL &= \sum\limits_{f \in F} \log \left(\P(\mathrm{pos}|\alpha)\ \right) \\
+&= \sum\limits_{f \in F} \log \left( \sum_{k=1}^{K} \P(\mathrm{pos}, f \in t_k|\alpha) \right) \\
+&= \sum\limits_{f \in F} \log \left( \sum_{k = 1}^{K} y_k \frac{\alpha_k}{\widetilde{l_k}} \right) \\
+\end{split}
+\label{eq:4}
+\end{align}
+$$
+
+where $y_k$ is the $\{0, 1\}$ indicator.
+
+We use expectation–maximization (EM) algorithm to estimate $alpha$. In the $n$ iteration, $\P(f \in t_1\|\mathrm{pos}, \alpha^{(n)})$ equals to:
+
+$$
+\begin{align}
+\begin{split}
+\P(f \in t_1|\mathrm{pos}, \alpha^{(n)}) &= \frac{\P(f \in t_1, \mathrm{pos}|\alpha^{(n)})}{\sum\limits_{k=1}^{K} \P(f \in t_k, \mathrm{pos}|\alpha^{(n)})} \\
+&= \frac{\alpha_1^{(n)} \frac{y_1}{\widetilde{l_1}}}{\sum\limits_{k=1}^{K} \alpha_k^{(n)} \frac{y_k}{\widetilde{l_k}}} \\
+&= \lambda_1
+\end{split}
+\label{eq:5}
+\end{align}
+$$
+
+where $\sum\limits_{k=1}^{K} \lambda_k = 1$.
+
+$$
+\begin{align}
+\begin{split}
+\alpha^{(n+1)} &= \argmax_\alpha \left( 
+\sum_{f \in F} \sum_{k=1}^{K} \P(f \in t_k|\mathrm{pos}, \alpha^{(n)})  \log \left( \P(f \in t_1, \mathrm{pos}|\alpha^{(n)}) \right) 
+\right) \\
+&= \argmax_\alpha \left( 
+\sum_{f \in F} \sum_{k=1}^{K} \lambda_k \log\left(
+\alpha_k \frac{y_k}{\widetilde{l_k}}
+\right)
+\right) \\
+&= \argmax_\alpha \left(
+\sum_{f \in F} \sum_{k=1}^{K}  \lambda_k \log\left(
+\alpha_k
+\right)
+\right)
+\end{split}
+\label{eq:6}
+\end{align}
+$$
+
+The $n+1$ estimation of $\alpha$ is:
+
+$$
+\begin{align*}
+\begin{split}
+\alpha_k^{(n+1)} &= \frac{\sum_\limits{f \in F} \lambda_k}{\sum\limits_{i=1}^{K} \sum\limits_{f \in F} \lambda_i} \\
+&= \frac{\sum\limits_{f \in F} \lambda_k}{N}
+,\ k=1, 2, \dots, K
+\end{split}
+\end{align*}
+$$
+
+## EM model for multiple species
+
+For a mix species RNA-Seq data-set, species $A$ and $B$ for example, $R=\{r_1, r_2, \dots, r_U\}$ is the set of transcripts (with length $l_u$ for $r_u$) in species $A$ and $S=\{s_1, s_2, \dots, s_V\}$ is the set of transcripts (with length $l_v$ for $s_v$) in species $B$. Total transcripts in species $A$ and $B$ composes the set $T=\{t_1, t_2, \dots, t_{U+V}\}$. 
+
+The relative abundances in $A$ and $B$ are $\rho_u$，$\sum\limits_{u=1}^U \rho_u= 1$ and $\theta_v$, $\sum\limits_{v=1}^V \theta_v= 1$, respectively. Similarly, we define:
+
+$$
+\begin{align}
+\begin{split}
+\P(f \in r_u) = \frac{\rho_u \tildelu}{\sum\limits_{r \in R} \rho_r \widetilde{l_r}} = \alpha_u \\
+\P(\mathrm{pos}, f \in r_u) = \frac{\alpha_u}{\tildelu}
+\end{split}
+\label{eq:7}
+\end{align}
+$$
 
 # References

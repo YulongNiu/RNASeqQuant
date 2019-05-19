@@ -1,0 +1,48 @@
+---
+title: "RNASeqQuant: an R package for RNA-Seq quantification"
+author: "Yulong Niu, Ruben Garrido-Oter"
+date: "`r Sys.Date()`"
+bibliography: RSQref.bib
+csl: nature.csl
+output:
+  BiocStyle::html_document:
+    toc: true
+  BiocStyle::pdf_document:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{RNASeqQuant: an R package for RNA-Seq quantification}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\usepackage[utf8]{inputenc}
+---
+
+```{r style, echo=FALSE, results='asis', message=FALSE}
+BiocStyle::markdown()
+knitr::opts_chunk$set(tidy = FALSE,
+                      warning = FALSE,
+                      message = FALSE)
+```
+
+``` {r macro, echo=FALSE, results='hide', message=FALSE}
+RNASeqQuant <- function() {"*[RNASeqQuant](https://github.com/YulongNiu/RNASeqQuant)*"}
+Robject <- function(x){sub('%obj%', x, '<span style="background-color:#F0F0F0;color:#404040;font-family:\'Lucida Console\', monospace">%obj%</span>')}
+Rclass <- function(x){sub('%obj%', x, '<span style="font-family:\'Times New Roman\', Times, serif;font-style: italic">%obj%</span>')}
+```
+
+# Overview
+
+`r RNASeqQuant()` implements both expectation maximization and gradient descent for RNA-Seq quantification.
+
+# Models
+
+## Single species RNA-Seq
+
+For single species RNA-Seq, if $T=\{t_1, t_2, \dots, t_K\}$ is the set of transcripts (with length $l_i$ for $t_i$) and the copy number of $t_i$ is $c_i$, we define $\rho_k=\frac{c_k}{\sum\limits_{t \in T}c_t} = \frac{c_k}{M}$ is the relative abundances of $t_i$, where $M$ is the total copy number, so that $\sum\limits_{k=1}^K \rho_k=1$.
+
+[@bray2016near; @pachter2011models]
+
+## Multiple Species RNA-Seq
+
+
+
+
+# References

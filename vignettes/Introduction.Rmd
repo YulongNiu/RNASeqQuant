@@ -180,4 +180,54 @@ $$
 \end{align}
 $$
 
+$$
+\begin{align}
+\begin{split}
+\P(f \in s_v) = \frac{\theta_v \tildesv}{\sum\limits_{s \in S} \theta_s \widetilde{l_s}} = \beta_v \\
+\P(\mathrm{pos}, f \in s_v) = \frac{\beta_v}{\tildesv}
+\end{split}
+\label{eq:8}
+\end{align}
+$$
+
+The probability of single mapped fragment is:
+
+$$
+\begin{align}
+\begin{split}
+\P(\mathrm{pos}|\eta)  &= \P(\mathrm{pos}, f \in A|\eta) + \P(\mathrm{pos}, f \in B|\eta)\\
+&= \P(\mathrm{pos} | f \in A, \eta) \P(f \in A) + \P(\mathrm{pos} | f \in B, \eta) \P(f \in B) \\
+&= \sum_{i=1}^{U}m_i \frac{\alpha_i}{\widetilde{l_i}} \P(f \in A) + \sum_{j=U+1}^{U+V}m_j \frac{\beta_j}{\widetilde{l_j}} \P(f \in B) 
+\end{split}
+\label{eq:9}
+\end{align}
+$$
+
+Thus, the parameters will be estimated are:
+
+$$
+\begin{align*}
+\begin{split}
+\eta=\{\alpha_1, \dots, \alpha_u, \beta_1, \dots, \beta_v,  \P(f \in A),  \P(f \in B)\}
+\end{split}
+\end{align*}
+$$
+
+In $n+1$ iteration, the parameters in the expanded EM algorithm:
+
+$$
+\begin{align}
+\begin{split}
+\lambda_i^{(n+1)} &= \frac{\alpha_j^{(n)} \frac{m_i}{\widetilde{l_j}} \P(f \in A)}{\sum\limits_{i=1}^{U}\alpha_i^{(n)} \frac{m_i}{\widetilde{l_i}} \P(f \in A) + \sum\limits_{j=U+1}^{U+V}\beta_j^{(n)} \frac{m_j}{\widetilde{l_j}} \P(f \in B)}\\
+\lambda_j^{(n+1)} &= \frac{\beta_j^{(n)} \frac{m_i}{\widetilde{l_j}} \P(f \in A)}{\sum\limits_{i=1}^{U}\alpha_i^{(n)} \frac{m_i}{\widetilde{l_i}} \P(f \in A) + \sum\limits_{j=U+1}^{U+V}\beta_j^{(n)} \frac{m_j}{\widetilde{l_j}} \P(f \in B)}\\
+\alpha_i^{(n+1)} &= \frac{\sum\limits_{f \in F} \lambda_i^{(n+1)}}{\sum\limits_{f \in F} \sum\limits_{i=1}^{U} \lambda_i^{(n+1)}} \\
+\beta_j^{(n+1)} &= \frac{\sum\limits_{f \in F} \lambda_j^{(n+1)}}{\sum\limits_{f \in F} \sum\limits_{j=U+1}^{U+V} \lambda_j^{(n+1)}} \\
+\P(f \in A)^{(n+1)} &= \frac{\sum\limits_{f \in F} \sum\limits_{i=1}^{U} \lambda_i^{(n+1)}}{\sum\limits_{f \in F} \sum\limits_{i=1}^{U} \lambda_i^{(n+1)} + \sum\limits_{f \in F} \sum\limits_{j=U+1}^{U+V} \lambda_j^{(n+1)}} = \frac{\sum\limits_{f \in F} \sum\limits_{i=1}^{U} \lambda_i^{(n+1)}}{N}\\
+\P(f \in B)^{(n+1)} &= \frac{\sum\limits_{f \in F} \sum\limits_{j=U+1}^{U+V} \lambda_j^{(n+1)}}{\sum\limits_{f \in F} \sum\limits_{i=1}^{U} \lambda_i^{(n+1)} + \sum\limits_{f \in F} \sum\limits_{j=U+1}^{U+V} \lambda_j^{(n+1)}} = \frac{\sum\limits_{f \in F} \sum\limits_{j=U+1}^{U+V} \lambda_j^{(n+1)}}{N} 
+\end{split}
+\label{eq:10}
+\end{align}
+$$
+
+
 # References

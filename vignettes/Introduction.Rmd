@@ -34,21 +34,10 @@ TeX: { equationNumbers: { autoNumber: "AMS" } }
 });
 </script>
 
-$$
 \newcommand{\P}{\mathrm{P}}
-$$
-
-$$
 \newcommand{\tildel}{\widetilde{l_t}}
-$$
-
-$$
 \newcommand{\tildelu}{\widetilde{l_u}}
-$$
-
-$$
 \newcommand{\tildesv}{\widetilde{l_v}}
-$$
 
 $$
 \DeclareMathOperator*{\argmax}{arg\,max} 

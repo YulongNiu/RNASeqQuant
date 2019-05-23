@@ -1,5 +1,5 @@
 Package: RNASeqQuant
-Title: RNASeqQuant: an R package for RNA-Seq quantification.
+Title: RNASeqQuant: an R package for RNA-Seq quantification
 Description: Both expectation maximization and gradient descent are implementated for RNA-Seq quantification.
 Version: 0.0.10
 Authors@R: person("Yulong", "Niu", email = "yulong.niu@hotmail.com", role = c("aut", "cre"))

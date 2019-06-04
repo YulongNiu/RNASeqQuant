@@ -17,6 +17,9 @@ arma::vec SpeCount(const arma::vec& est,
 
 arma::vec InitAve(const arma::uvec& spenumraw);
 
+arma::vec LambdaSpe(const arma::uvec& spenumraw,
+                    const arma::vec& lambda);
+
 bool isEqualStr(std::string& str1,
                 std::string str2);
 

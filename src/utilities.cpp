@@ -6,6 +6,8 @@
 #include <iterator>
 #include <vector>
 
+#include "utilities.h"
+
 using namespace std;
 using namespace Rcpp;
 using namespace arma;
@@ -95,25 +97,25 @@ std::vector<arma::vec> MatchEfflen(const std::vector<arma::uvec>& ec,
 
 //' Estimated counts of input species.
 //'
-//' The indices of \code{est} should be consistent with the \code{spenumraw}. For example, the \code{est} is \code{1.5, 2, 3} and \code{spenumraw} is \code{2, 1}, so \code{2.5, 3} will be returned.
+//' The indices of \code{est} should be consistent with the \code{spenum}. For example, the \code{est} is \code{1.5, 2, 3} and \code{spenum} is \code{2, 1}, so \code{2.5, 3} will be returned.
 //'
 //' @title Species estimated counts
 //' @return A \code{arma::vec} represents the total estimated counts of each species.
 //' @param est A \code{arma::vec} estimated counts of each transcripts.
-//' @param spenumraw A \code{arma::uvec} indicated the transcript number in each species.
+//' @param spenum A \code{arma::uvec} indicated the transcript number in each species.
 //' @author Yulong Niu \email{yulong.niu@@hotmail.com}
 //' @keywords internal
 // [[Rcpp::export]]
 arma::vec SpeCount(const arma::vec& est,
-                   const arma::uvec& spenumraw) {
+                   const arma::uvec& spenum) {
 
-  uword sn = spenumraw.n_elem;
+  uword sn = spenum.n_elem;
   vec res(sn, fill::zeros);
 
   uword start = 0;
 
   for (uword i = 0; i < sn; ++i) {
-    uword end = start + spenumraw(i) - 1;
+    uword end = start + spenum(i) - 1;
     res(i) = sum(est.subvec(start, end));
     start = end + 1;
   }
@@ -123,21 +125,45 @@ arma::vec SpeCount(const arma::vec& est,
 
 
 // [[Rcpp::export]]
-arma::vec InitAve(const arma::uvec& spenumraw) {
+arma::vec InitAve(const arma::uvec& spenum) {
 
-  uword sn = spenumraw.n_elem;
-  vec initest(sum(spenumraw), fill::zeros);
+  uword sn = spenum.n_elem;
+  uword tn = sum(spenum);
+  vec initest(tn);
 
   uword start = 0;
 
   for (uword i = 0; i < sn; ++i) {
-    uword end = start + spenumraw(i) - 1;
-    initest.subvec(start, end).fill(1.0 / (spenumraw(i) * sn));
+    uword end = start + spenum(i) - 1;
+    initest.subvec(start, end).fill(1.0 / (spenum(i) * sn));
     start = end + 1;
   }
 
   return(initest);
 }
+
+
+// [[Rcpp::export]]
+arma::vec LambdaSpe(const arma::uvec& spenum,
+                    const arma::vec& lambda) {
+
+  uword sn = spenum.n_elem;
+  uword tn = sum(spenum);
+
+  vec lsum = SpeCount(lambda, spenum);
+  vec lspe(tn);
+
+  uword start = 0;
+
+  for (uword i = 0; i < sn; ++i) {
+    uword end = start + spenum(i) - 1;
+    lspe.subvec(start, end).fill(lsum(i));
+    start = end + 1;
+  }
+
+  return(lspe);
+}
+
 
 
 //' Compare two strings

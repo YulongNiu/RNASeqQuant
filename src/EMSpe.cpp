@@ -16,57 +16,11 @@ using namespace std;
 
 // [[Rcpp::depends(RcppArmadillo, RcppParallel)]]
 
-#if RCPP_PARALLEL_USE_TBB
 
-tbb::mutex countMutex;
-
-struct ExpectEC : public Worker
-{
-  const arma::vec& prob;
-  const std::vector<arma::vec>& efflen;
-  const std::vector<arma::uvec>& ec;
-  const arma::uvec& count;
-  arma::vec& estcount;
-
-  ExpectEC(const arma::vec& prob,
-           const std::vector<arma::vec>& efflen,
-           const std::vector<arma::uvec>& ec,
-           const arma::uvec& count,
-           arma::vec& estcount)
-    : prob(prob), efflen(efflen), ec(ec), count(count), estcount(estcount) {}
-
-  void operator()(std::size_t begin, std::size_t end) {
-    countMutex.lock();
-    for (std::size_t i = begin; i < end; ++i) {
-      vec eachcp = prob.elem(ec[i]) / efflen[i];
-      estcount.elem(ec[i]) += eachcp * count(i)/ sum(eachcp);
-    }
-    countMutex.unlock();
-  }
-};
-
-arma::vec EMSingle(const arma::vec& prob,
-                   const std::vector<arma::vec>& efflen,
-                   const std::vector<arma::uvec>& ec,
-                   const arma::uvec& count) {
-
-  vec estcount(prob.n_elem, fill::zeros);
-
-  // create parallel worker and call
-  ExpectEC expectEC(prob, efflen, ec, count, estcount);
-
-  // grain size is 1k
-  parallelFor(0, efflen.size(), expectEC, 1000);
-
-  return estcount;
-}
-
-#else
-
-arma::vec EMSingle(const arma::vec& prob,
-                   const std::vector<arma::vec>& efflen,
-                   const std::vector<arma::uvec>& ec,
-                   const arma::uvec& count) {
+arma::vec EMSingleSpe(const arma::vec& prob,
+                      const std::vector<arma::vec>& efflen,
+                      const std::vector<arma::uvec>& ec,
+                      const arma::uvec& count) {
 
   // prob.n_elem is the number of transcripts
   // ec.n_elem == count.n_elem == efflen.n_elem is TRUE, which is the number of equivalent classes/reads
@@ -79,8 +33,6 @@ arma::vec EMSingle(const arma::vec& prob,
 
   return estcount;
 }
-
-#endif
 
 
 //' Expectation maximization (EM) model for RNA-seq quantification.
@@ -124,13 +76,14 @@ arma::vec EMSingle(const arma::vec& prob,
 //' @author Yulong Niu \email{yulong.niu@@hotmail.com}
 //' @export
 // [[Rcpp::export]]
-Rcpp::List EM(const arma::vec& efflenraw,
-              const Rcpp::CharacterVector& ecraw,
-              const arma::uvec& countraw,
-              const arma::uvec& spenumraw,
-              const arma::uword maxiter = 10000,
-              const arma::uword miniter = 50,
-              const bool details = false) {
+Rcpp::List EMSpe(const arma::vec& efflenraw,
+                 const Rcpp::CharacterVector& ecraw,
+                 const arma::uvec& countraw,
+                 const arma::uvec& spenumraw,
+                 const arma::uvec& specountsraw,
+                 const arma::uword maxiter = 10000,
+                 const arma::uword miniter = 50,
+                 const bool details = false) {
 
   // stop iteration params from kallisto
   double countChangeLimit = 1e-2;
@@ -155,6 +108,7 @@ Rcpp::List EM(const arma::vec& efflenraw,
   // // cn / tn
   // vec prob(tn);
   // prob.fill(1.0/tn);
+
   // average for each species
   vec prob = InitAve(spenumraw);
 

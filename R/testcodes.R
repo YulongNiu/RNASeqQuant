@@ -90,8 +90,8 @@ gdest <- NAdagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300
 
 ## NRMSProp full batch
 emest <- EM(plist$efflen, plist$ec, plist$count, length(plist$efflen), detail = TRUE)
-gdest <- NRMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 36580, 0.002, list(method = 'Softmax'), list())
-gdest <- NAdagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 36580, 0.1, list(method = 'Softmax'), list())
+gdest <- NRMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 36580, 0.005, list(method = 'Softmax'), list())
+gdest <- NAdagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 36580, 0.3, list(method = 'Softmax'), list())
 
 ## merge res
 mergeres <- cbind(kallistoest, emest, gdest)

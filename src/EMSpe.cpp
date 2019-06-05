@@ -80,7 +80,7 @@ Rcpp::List EMSpe(const arma::vec& efflenraw,
                  const Rcpp::CharacterVector& ecraw,
                  const arma::uvec& countraw,
                  const arma::uvec& spenumraw,
-                 const arma::uvec& specountsraw,
+                 const arma::uvec& specounts,
                  const arma::uword maxiter = 10000,
                  const arma::uword miniter = 50,
                  const bool details = false) {

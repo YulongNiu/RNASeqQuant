@@ -107,7 +107,7 @@ $$
 
 where $y_k$ is the $\{0, 1\}$ indicator.
 
-We use expectation–maximization (EM) algorithm to estimate $alpha$. In the $n$ iteration, $\Pro(f \in t_1\|\mathrm{pos}, \alpha^{(n)})$ equals to:
+We use expectation–maximization (EM) algorithm to estimate $\alpha$. In the $n$ iteration, $\Pro(f \in t_1\|\mathrm{pos}, \alpha^{(n)})$ equals to:
 
 $$
 \begin{equation}

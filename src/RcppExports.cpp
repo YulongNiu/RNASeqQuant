@@ -212,42 +212,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// AccuSum
-arma::uvec AccuSum(const arma::uvec& spenum);
-RcppExport SEXP _RNASeqQuant_AccuSum(SEXP spenumSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::uvec& >::type spenum(spenumSEXP);
-    rcpp_result_gen = Rcpp::wrap(AccuSum(spenum));
-    return rcpp_result_gen;
-END_RCPP
-}
-// EC2SpeEach
-arma::uvec EC2SpeEach(const arma::uvec& accuIdx, const arma::uvec& ec);
-RcppExport SEXP _RNASeqQuant_EC2SpeEach(SEXP accuIdxSEXP, SEXP ecSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::uvec& >::type accuIdx(accuIdxSEXP);
-    Rcpp::traits::input_parameter< const arma::uvec& >::type ec(ecSEXP);
-    rcpp_result_gen = Rcpp::wrap(EC2SpeEach(accuIdx, ec));
-    return rcpp_result_gen;
-END_RCPP
-}
-// EC2Spe
-std::vector<arma::vec> EC2Spe(const arma::uvec& accuIdx, const std::vector<arma::uvec>& ec, const arma::vec& spefixcounts);
-RcppExport SEXP _RNASeqQuant_EC2Spe(SEXP accuIdxSEXP, SEXP ecSEXP, SEXP spefixcountsSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::uvec& >::type accuIdx(accuIdxSEXP);
-    Rcpp::traits::input_parameter< const std::vector<arma::uvec>& >::type ec(ecSEXP);
-    Rcpp::traits::input_parameter< const arma::vec& >::type spefixcounts(spefixcountsSEXP);
-    rcpp_result_gen = Rcpp::wrap(EC2Spe(accuIdx, ec, spefixcounts));
-    return rcpp_result_gen;
-END_RCPP
-}
 // InvSqrtRoot
 arma::vec InvSqrtRoot(const arma::vec& x, const double alpha);
 RcppExport SEXP _RNASeqQuant_InvSqrtRoot(SEXP xSEXP, SEXP alphaSEXP) {
@@ -549,9 +513,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RNASeqQuant_Adadelta", (DL_FUNC) &_RNASeqQuant_Adadelta, 9},
     {"_RNASeqQuant_RMSProp", (DL_FUNC) &_RNASeqQuant_RMSProp, 9},
     {"_RNASeqQuant_NRMSProp", (DL_FUNC) &_RNASeqQuant_NRMSProp, 9},
-    {"_RNASeqQuant_AccuSum", (DL_FUNC) &_RNASeqQuant_AccuSum, 1},
-    {"_RNASeqQuant_EC2SpeEach", (DL_FUNC) &_RNASeqQuant_EC2SpeEach, 2},
-    {"_RNASeqQuant_EC2Spe", (DL_FUNC) &_RNASeqQuant_EC2Spe, 3},
     {"_RNASeqQuant_InvSqrtRoot", (DL_FUNC) &_RNASeqQuant_InvSqrtRoot, 2},
     {"_RNASeqQuant_ISRU1", (DL_FUNC) &_RNASeqQuant_ISRU1, 3},
     {"_RNASeqQuant_ISRU", (DL_FUNC) &_RNASeqQuant_ISRU, 4},

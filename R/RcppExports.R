@@ -114,18 +114,6 @@ NULL
 #' @keywords internal
 NULL
 
-AccuSum <- function(spenum) {
-    .Call(`_RNASeqQuant_AccuSum`, spenum)
-}
-
-EC2SpeEach <- function(accuIdx, ec) {
-    .Call(`_RNASeqQuant_EC2SpeEach`, accuIdx, ec)
-}
-
-EC2Spe <- function(accuIdx, ec, spefixcounts) {
-    .Call(`_RNASeqQuant_EC2Spe`, accuIdx, ec, spefixcounts)
-}
-
 #' Calculate the Inverse square root unit (ISRU)
 #'
 #' \itemize{

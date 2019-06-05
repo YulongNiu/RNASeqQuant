@@ -82,24 +82,6 @@ arma::vec EMSingle(const arma::vec& startest,
 
 #endif
 
-// [[Rcpp::export]]
-arma::vec EMSingleTest(const arma::vec& startest,
-                       const std::vector<arma::vec>& efflen,
-                       const std::vector<arma::uvec>& ec,
-                       const arma::uvec& count) {
-
-  // startest.n_elem is the number of transcripts
-  // ec.n_elem == count.n_elem == efflen.n_elem is TRUE, which is the number of equivalent classes/reads
-  vec estcount(startest.n_elem, fill::zeros);
-
-  for (uword i = 0; i < ec.size(); ++i) {
-    vec eachcp = startest.elem(ec[i]) / efflen[i];
-    estcount.elem(ec[i]) += eachcp * count(i)/ sum(eachcp);
-  }
-
-  return estcount;
-}
-
 
 //' Expectation maximization (EM) model for RNA-seq quantification.
 //'

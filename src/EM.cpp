@@ -72,7 +72,7 @@ arma::vec EMSingle(const arma::vec& startest,
   // ec.n_elem == count.n_elem == efflen.n_elem is TRUE, which is the number of equivalent classes/reads
   vec estcount(startest.n_elem, fill::zeros);
 
-  for (uword i = 0; i < ec.n_elem; ++i) {
+  for (uword i = 0; i < ec.size(); ++i) {
     vec eachcp = startest.elem(ec[i]) / efflen[i];
     estcount.elem(ec[i]) += eachcp * count(i)/ sum(eachcp);
   }
@@ -81,6 +81,24 @@ arma::vec EMSingle(const arma::vec& startest,
 }
 
 #endif
+
+// [[Rcpp::export]]
+arma::vec EMSingleTest(const arma::vec& startest,
+                       const std::vector<arma::vec>& efflen,
+                       const std::vector<arma::uvec>& ec,
+                       const arma::uvec& count) {
+
+  // startest.n_elem is the number of transcripts
+  // ec.n_elem == count.n_elem == efflen.n_elem is TRUE, which is the number of equivalent classes/reads
+  vec estcount(startest.n_elem, fill::zeros);
+
+  for (uword i = 0; i < ec.size(); ++i) {
+    vec eachcp = startest.elem(ec[i]) / efflen[i];
+    estcount.elem(ec[i]) += eachcp * count(i)/ sum(eachcp);
+  }
+
+  return estcount;
+}
 
 
 //' Expectation maximization (EM) model for RNA-seq quantification.
@@ -193,6 +211,92 @@ Rcpp::List EM(const arma::vec& efflenraw,
       startest = est;
     }
   }
+
+  // check if maxiter
+  if (iter == maxiter) {iter--;} else {}
+
+  // step3: reset small est
+  est.elem(find(est < countLimit)).zeros();
+
+  // step4: may add details
+  List res = List::create(_["counts"] = est,
+                          _["specounts"] = specounts.rows(0, iter),
+                          _["ll"] = resll.subvec(0, iter));
+
+  return res;
+}
+
+
+// [[Rcpp::export]]
+Rcpp::List EMSpe(const arma::vec& efflenraw,
+                 const Rcpp::CharacterVector& ecraw,
+                 const arma::uvec& countraw,
+                 const arma::uvec& spenum,
+                 const arma::vec& spefixcounts,
+                 const arma::uword maxiter = 10000,
+                 const arma::uword miniter = 50,
+                 const bool details = false) {
+
+  // stop iteration params from kallisto
+  double countChangeLimit = 1e-2;
+  double countChange = 1e-2;
+  double countLimit = 1e-8;
+
+  // step1: pseudo information
+  // remove zero counts
+  uvec zeros = find(countraw > 0);
+  IntegerVector zerosidx(zeros.begin(), zeros.end());
+
+  uvec count = countraw.elem(zeros);
+  vector<uvec> ec = SplitEC(ecraw[zerosidx]);
+  vector<vec> efflen = MatchEfflen(ec, efflenraw);
+
+  // step2: EM iteration
+  // startest and est
+  uword tn = sum(spenum);
+  uword sn = spenum.n_elem;
+
+  // average for each species
+  vec startest = InitAve(spenum, spefixcounts);
+  vec est(tn, fill::zeros);
+
+  // details init
+  mat specounts(maxiter, sn, fill::zeros);
+  vec resll(maxiter, fill::zeros);
+
+  uword iter;
+  for (iter = 0; iter < maxiter; ++iter) {
+
+    // record running details
+    if (details) {
+      vec eachc = SpeCount(startest, spenum);
+      specounts.row(iter) = rowvec(eachc.begin(), sn, false);
+      resll(iter) = LL(startest, efflen, ec, count);
+    } else {}
+
+    vec eachlambda = EMSingle(startest, efflen, ec, count);
+    est = LambdaSpe(eachlambda, spenum, spefixcounts);
+
+    // stop iteration condition
+    uword nopassn = 0;
+    for (uword t = 0; t < tn; ++t) {
+      if (est(t) > countChangeLimit && (fabs(est(t) - startest(t))/est(t)) > countChange) {
+        ++nopassn;
+      } else {}
+    }
+
+    if (nopassn == 0 && iter >= miniter - 1) {
+      Rcout << "The iteration number is " << iter + 1
+            << ". The log likelihood is " << std::setprecision (20) << LL(startest, efflen, ec, count)
+            << "." << std::endl;
+      break;
+    } else {
+      startest = est;
+    }
+  }
+
+  // check if maxiter
+  if (iter == maxiter) {iter--;} else {}
 
   // step3: reset small est
   est.elem(find(est < countLimit)).zeros();

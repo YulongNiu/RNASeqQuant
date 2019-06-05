@@ -126,7 +126,7 @@ arma::vec SpeCount(const arma::vec& est,
 
 // [[Rcpp::export]]
 arma::vec InitAve(const arma::uvec& spenum,
-                  const arma::vec& specounts) {
+                  const arma::vec& spefixcounts) {
 
   //spenum.n_elem == specounts_n_elem is true, equal to the number of species
 
@@ -137,7 +137,7 @@ arma::vec InitAve(const arma::uvec& spenum,
 
   for (uword i = 0; i < sn; ++i) {
     uword end = start + spenum(i) - 1;
-    initest.subvec(start, end).fill(specounts(i) / spenum(i));
+    initest.subvec(start, end).fill(spefixcounts(i) / spenum(i));
     start = end + 1;
   }
 
@@ -148,24 +148,24 @@ arma::vec InitAve(const arma::uvec& spenum,
 // [[Rcpp::export]]
 arma::vec LambdaSpe(const arma::vec& emlambda,
                     const arma::uvec& spenum,
-                    const arma::uvec& spefixcounts) {
+                    const arma::vec& spefixcounts) {
 
   // emlambda.n_elem is number of transcripts
   // spenum.n_elem == spefixcounts.n_elem is true, species number
   uword sn = spenum.n_elem;
   uword tn = sum(spenum);
-  vec lspe(tn);
+  vec res(tn);
 
   uword start = 0;
 
   for (uword i = 0; i < sn; ++i) {
     uword end = start + spenum(i) - 1;
     vec eachemlambda = emlambda.subvec(start, end);
-    lspe.subvec(start, end) = eachemlambda * spefixcounts(i) / sum(eachemlambda);
+    res.subvec(start, end) = eachemlambda * spefixcounts(i) / sum(eachemlambda);
     start = end + 1;
   }
 
-  return(lspe);
+  return(res);
 }
 
 

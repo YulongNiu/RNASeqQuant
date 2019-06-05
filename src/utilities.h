@@ -16,11 +16,11 @@ arma::vec SpeCount(const arma::vec& est,
                    const arma::uvec& spenumraw);
 
 arma::vec InitAve(const arma::uvec& spenum,
-                  const arma::vec& specounts);
+                  const arma::vec& spefixcounts);
 
 arma::vec LambdaSpe(const arma::vec& emlambda,
                     const arma::uvec& spenum,
-                    const arma::uvec& spefixcounts);
+                    const arma::vec& spefixcounts);
 
 bool isEqualStr(std::string& str1,
                 std::string str2);

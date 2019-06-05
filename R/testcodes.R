@@ -59,6 +59,7 @@ plist$ec %<>% `[`(zeroidx)
 kallistoest <- read.table('/extDisk1/RESEARCH/RNASeqQuantTestPython/GD/abundance_ath.tsv', stringsAsFactors = FALSE, header = TRUE)[, 4]
 
 ## RNASeqQuant EM
+emest <- EMSpe(plist$efflen, plist$ec, plist$count, c(10000, 10000, 21392), rep(3731388, 3), 10, detail = TRUE)
 emest <- EM(plist$efflen, plist$ec, plist$count, c(10000, 10000, 21392), detail = TRUE)
 emest <- EM(plist$efflen, plist$ec, plist$count, 41392, detail = FALSE)
 

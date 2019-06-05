@@ -4,8 +4,8 @@
 \alias{EM}
 \title{EM model}
 \usage{
-EM(efflenraw, ecraw, countraw, spenumraw, maxiter = 10000L,
-  miniter = 50L, details = FALSE)
+EM(efflenraw, ecraw, countraw, spenum, maxiter = 10000L, miniter = 50L,
+  details = FALSE)
 }
 \arguments{
 \item{efflenraw}{A code{arma::vec} indicating the effect length of transcript.}
@@ -14,7 +14,7 @@ EM(efflenraw, ecraw, countraw, spenumraw, maxiter = 10000L,
 
 \item{countraw}{A \code{arma::uvec} indicates the counts of ec.}
 
-\item{spenumraw}{A \code{arma::uvec} indicated the transcript number in each species.}
+\item{spenum}{A \code{arma::uvec} indicated the transcript number in each species.}
 
 \item{maxiter}{The maximum iteration number with the default value of 10000.}
 

@@ -59,7 +59,7 @@ plist$ec %<>% `[`(zeroidx)
 kallistoest <- read.table('/extDisk1/RESEARCH/RNASeqQuantTestPython/GD/abundance_ath.tsv', stringsAsFactors = FALSE, header = TRUE)[, 4]
 
 ## RNASeqQuant EM
-emest <- EM(plist$efflen, plist$ec, plist$count, c(20000, 21392), detail = TRUE)
+emest <- EM(plist$efflen, plist$ec, plist$count, c(10000, 10000, 21392), detail = TRUE)
 emest <- EM(plist$efflen, plist$ec, plist$count, 41392, detail = FALSE)
 
 ## RNASeqQuant GD
@@ -91,7 +91,7 @@ gdest <- NAdagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300
 ## NRMSProp full batch
 emest <- EM(plist$efflen, plist$ec, plist$count, length(plist$efflen), detail = TRUE)
 gdest <- NRMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 36580, 0.005, list(method = 'Softmax'), list())
-gdest <- NAdagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 36580, 0.3, list(method = 'Softmax'), list())
+gdest <- NAdagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 36580, 0.2, list(method = 'Softmax'), list())
 
 ## merge res
 mergeres <- cbind(kallistoest, emest, gdest)

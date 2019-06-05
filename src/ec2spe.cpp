@@ -13,7 +13,7 @@ using namespace std;
 // [[Rcpp::depends(RcppArmadillo, RcppParallel)]]
 
 // [[Rcpp::export]]
-arma::uvec AccuSum(const arma::uvec spenum) {
+arma::uvec AccuSum(const arma::uvec& spenum) {
 
   uword sn = spenum.n_elem;
   uvec res(sn);
@@ -30,8 +30,8 @@ arma::uvec AccuSum(const arma::uvec spenum) {
 
 
 // [[Rcpp::export]]
-arma::uvec EC2SpeEach(const arma::uvec accuIdx,
-                      const arma::uvec ec) {
+arma::uvec EC2SpeEach(const arma::uvec& accuIdx,
+                      const arma::uvec& ec) {
 
   uword ecn = ec.n_elem;
   uvec eachIdx(ecn);
@@ -46,14 +46,17 @@ arma::uvec EC2SpeEach(const arma::uvec accuIdx,
 
 
 // [[Rcpp::export]]
-std::vector<arma::uvec> EC2Spe(const arma::uvec accuIdx,
-                               const std::vector<arma::uvec> ec) {
+std::vector<arma::vec> EC2Spe(const arma::uvec& accuIdx,
+                              const std::vector<arma::uvec>& ec,
+                              const arma::vec& spefixcounts) {
   uword ecn = ec.size();
-  vector<uvec> res(ecn);
+  vector<vec> res(ecn);
 
   for (uword i = 0; i < ecn; ++i) {
-    res[i] = EC2SpeEach(accuIdx, ec[i]);
+    uvec eachidx = EC2SpeEach(accuIdx, ec[i]);
+    res[i] = spefixcounts.elem(eachidx);
   }
 
   return res;
 }
+

@@ -127,7 +127,7 @@ arma::vec EMSingle(const arma::vec& startest,
 Rcpp::List EM(const arma::vec& efflenraw,
               const Rcpp::CharacterVector& ecraw,
               const arma::uvec& countraw,
-              const arma::uvec& spenumraw,
+              const arma::uvec& spenum,
               const arma::uword maxiter = 10000,
               const arma::uword miniter = 50,
               const bool details = false) {
@@ -148,15 +148,16 @@ Rcpp::List EM(const arma::vec& efflenraw,
 
   // step2: EM iteration
   // startest and est
-  uword tn = sum(spenumraw);
+  uword tn = sum(spenum);
   double cn = sum(count);
-  uword sn = spenumraw.n_elem;
+  uword sn = spenum.n_elem;
 
   // // cn / tn
   // vec startest(cn/tn);
 
   // average for each species
-  vec startest = cn * InitAve(spenumraw);
+  vec scounts(sn);
+  vec startest = InitAve(spenum, scounts.fill(cn / sn));
   vec est(tn, fill::zeros);
 
   // details init
@@ -168,7 +169,7 @@ Rcpp::List EM(const arma::vec& efflenraw,
 
     // record running details
     if (details) {
-      vec eachc = SpeCount(startest, spenumraw);
+      vec eachc = SpeCount(startest, spenum);
       specounts.row(iter) = rowvec(eachc.begin(), sn, false);
       resll(iter) = LL(startest, efflen, ec, count);
     } else {}

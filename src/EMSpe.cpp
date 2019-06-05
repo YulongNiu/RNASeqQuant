@@ -7,6 +7,7 @@
 #include <cmath>
 
 #include "utilities.h"
+#include "ec2spe.h"
 #include "likelihood.h"
 
 using namespace Rcpp;
@@ -17,10 +18,10 @@ using namespace std;
 // [[Rcpp::depends(RcppArmadillo, RcppParallel)]]
 
 
-arma::vec EMSingleSpe(const arma::vec& prob,
-                      const std::vector<arma::vec>& efflen,
-                      const std::vector<arma::uvec>& ec,
-                      const arma::uvec& count) {
+arma::vec EMSingle(const arma::vec& prob,
+                   const std::vector<arma::vec>& efflen,
+                   const std::vector<arma::uvec>& ec,
+                   const arma::uvec& count) {
 
   // prob.n_elem is the number of transcripts
   // ec.n_elem == count.n_elem == efflen.n_elem is TRUE, which is the number of equivalent classes/reads
@@ -79,8 +80,8 @@ arma::vec EMSingleSpe(const arma::vec& prob,
 Rcpp::List EMSpe(const arma::vec& efflenraw,
                  const Rcpp::CharacterVector& ecraw,
                  const arma::uvec& countraw,
-                 const arma::uvec& spenumraw,
-                 const arma::uvec& specounts,
+                 const arma::uvec& spenum,
+                 const arma::vec& spefixcounts,
                  const arma::uword maxiter = 10000,
                  const arma::uword miniter = 50,
                  const bool details = false) {
@@ -100,19 +101,19 @@ Rcpp::List EMSpe(const arma::vec& efflenraw,
   vector<vec> efflen = MatchEfflen(ec, efflenraw);
 
   // step2: EM iteration
-  // start prob and est
-  uword tn = sum(spenumraw);
+  // start startest and est
+  uword tn = sum(spenum);
+  // cn == sum(spefixcounts) is true
   double cn = sum(count);
-  uword sn = spenumraw.n_elem;
+  uword sn = spenum.n_elem;
+  // vector<vec> sfcec = EC2Spe(AccuSum(spenum), ec, spefixcounts);
 
   // // cn / tn
-  // vec prob(tn);
-  // prob.fill(1.0/tn);
+  // vec startest(tn);
+  // startest.fill(1.0/tn);
 
   // average for each species
-  vec prob = InitAve(spenumraw);
-
-  vec startest = cn * prob;
+  vec startest = InitAve(spenum, spefixcounts);
   vec est(tn, fill::zeros);
 
   // details init
@@ -124,12 +125,12 @@ Rcpp::List EMSpe(const arma::vec& efflenraw,
 
     // record running details
     if (details) {
-      vec eachc = SpeCount(startest, spenumraw);
+      vec eachc = SpeCount(startest, spenum);
       specounts.row(iter) = rowvec(eachc.begin(), sn, false);
-      resll(iter) = LL(prob, efflen, ec, count);
+      resll(iter) = LL(startest, efflen, ec, count);
     } else {}
 
-    est = EMSingle(prob, efflen, ec, count);
+    est = EMSingle(startest, efflen, ec, count);
 
     // stop iteration condition
     uword nopassn = 0;
@@ -141,11 +142,10 @@ Rcpp::List EMSpe(const arma::vec& efflenraw,
 
     if (nopassn == 0 && iter >= miniter - 1) {
       Rcout << "The iteration number is " << iter + 1
-            << ". The log likelihood is " << std::setprecision (20) << LL(prob, efflen, ec, count)
+            << ". The log likelihood is " << std::setprecision (20) << LL(startest, efflen, ec, count)
             << "." << std::endl;
       break;
     } else {
-      prob = est / cn;
       startest = est;
     }
   }

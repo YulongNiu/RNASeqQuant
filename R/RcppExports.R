@@ -178,7 +178,7 @@ ISRUGrad <- function(x, isr, weight, alpha) {
 #'
 #' @title Calculate log-likelihood
 #' @return A \code{double} indicates log-likelihood.
-#' @param est A \code{arma::vec} indicates estimated counts of selecting a read from the different transcripts.
+#' @param est A \code{arma::vec} indicates estimated counts.
 #' @param efflen A \code{std::vector<arma::vec>} indicated effective length of transcripts.
 #' @param ec A \code{std::vector<arma::uvec>} indicated equivalence classes (ec).
 #' @param count A \code{arma::uvec} indicated counts of ec.

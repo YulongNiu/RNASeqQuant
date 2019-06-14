@@ -7,7 +7,7 @@
 LL(est, efflen, ec, count)
 }
 \arguments{
-\item{est}{A \code{arma::vec} indicates estimated counts of selecting a read from the different transcripts.}
+\item{est}{A \code{arma::vec} indicates estimated counts.}
 
 \item{efflen}{A \code{std::vector<arma::vec>} indicated effective length of transcripts.}
 

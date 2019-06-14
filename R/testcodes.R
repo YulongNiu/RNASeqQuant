@@ -2,7 +2,6 @@
 ## library('Rcpp')
 ## library('magrittr')
 ## sourceCpp('../src/utilities.cpp')
-## sourceCpp('../src/ec2spe.cpp')
 ## sourceCpp('../src/softmax.cpp')
 ## sourceCpp('../src/softplus.cpp')
 ## sourceCpp('../src/isru.cpp')

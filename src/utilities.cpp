@@ -6,6 +6,8 @@
 #include <iterator>
 #include <vector>
 
+#include "utilities.h"
+
 using namespace std;
 using namespace Rcpp;
 using namespace arma;
@@ -95,26 +97,71 @@ std::vector<arma::vec> MatchEfflen(const std::vector<arma::uvec>& ec,
 
 //' Estimated counts of input species.
 //'
-//' The indices of \code{est} should be consistent with the \code{spenumraw}. For example, the \code{est} is \code{1.5, 2, 3} and \code{spenumraw} is \code{2, 1}, so \code{2.5, 3} will be returned.
+//' The indices of \code{est} should be consistent with the \code{spenum}. For example, the \code{est} is \code{1.5, 2, 3} and \code{spenum} is \code{2, 1}, so \code{2.5, 3} will be returned.
 //'
 //' @title Species estimated counts
 //' @return A \code{arma::vec} represents the total estimated counts of each species.
 //' @param est A \code{arma::vec} estimated counts of each transcripts.
-//' @param spenumraw A \code{arma::uvec} indicated the transcript number in each species.
+//' @param spenum A \code{arma::uvec} indicated the transcript number in each species.
 //' @author Yulong Niu \email{yulong.niu@@hotmail.com}
 //' @keywords internal
 // [[Rcpp::export]]
 arma::vec SpeCount(const arma::vec& est,
-                   const arma::uvec& spenumraw) {
+                   const arma::uvec& spenum) {
 
-  uword sn = spenumraw.n_elem;
+  uword sn = spenum.n_elem;
   vec res(sn, fill::zeros);
 
   uword start = 0;
 
   for (uword i = 0; i < sn; ++i) {
-    uword end = start + spenumraw(i) - 1;
+    uword end = start + spenum(i) - 1;
     res(i) = sum(est.subvec(start, end));
+    start = end + 1;
+  }
+
+  return(res);
+}
+
+
+// [[Rcpp::export]]
+arma::vec InitAve(const arma::uvec& spenum,
+                  const arma::vec& spefixcounts) {
+
+  //spenum.n_elem == specounts_n_elem is true, equal to the number of species
+
+  uword sn = spenum.n_elem;
+  vec initest(sum(spenum));
+
+  uword start = 0;
+
+  for (uword i = 0; i < sn; ++i) {
+    uword end = start + spenum(i) - 1;
+    initest.subvec(start, end).fill(spefixcounts(i) / spenum(i));
+    start = end + 1;
+  }
+
+  return(initest);
+}
+
+
+// [[Rcpp::export]]
+arma::vec LambdaSpe(const arma::vec& emlambda,
+                    const arma::uvec& spenum,
+                    const arma::vec& spefixcounts) {
+
+  // emlambda.n_elem is number of transcripts
+  // spenum.n_elem == spefixcounts.n_elem is true, species number
+  uword sn = spenum.n_elem;
+  uword tn = sum(spenum);
+  vec res(tn);
+
+  uword start = 0;
+
+  for (uword i = 0; i < sn; ++i) {
+    uword end = start + spenum(i) - 1;
+    vec eachemlambda = emlambda.subvec(start, end);
+    res.subvec(start, end) = eachemlambda * spefixcounts(i) / sum(eachemlambda);
     start = end + 1;
   }
 

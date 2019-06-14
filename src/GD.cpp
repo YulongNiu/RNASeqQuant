@@ -88,11 +88,11 @@ arma::vec Momentum(const arma::vec& efflenraw,
     }
   }
 
-  Rcout << "The log likelihood is " << std::setprecision (20) << LL(afc->AFCounts(w), efflen, ec, count) <<
-    "." << std::endl;
-
   // reset small est
   vec est = afc->AFCounts(w) * cn;
+  Rcout << "The log likelihood is " << std::setprecision (20) << LL(est, efflen, ec, count) <<
+    "." << std::endl;
+
   est.elem(find(est < countLimit)).zeros();
 
   return est;
@@ -169,11 +169,11 @@ arma::vec NAG(const arma::vec& efflenraw,
     }
   }
 
-  Rcout << "The log likelihood is " << std::setprecision (20) << LL(afc->AFCounts(w), efflen, ec, count) <<
-    "." << std::endl;
-
   // reset small est
   vec est = afc->AFCounts(w) * cn;
+  Rcout << "The log likelihood is " << std::setprecision (20) << LL(est, efflen, ec, count) <<
+    "." << std::endl;
+
   est.elem(find(est < countLimit)).zeros();
 
   return est;
@@ -253,11 +253,11 @@ arma::vec Adam(const arma::vec& efflenraw,
     }
   }
 
-  Rcout << "The log likelihood is " << std::setprecision (20) << LL(afc->AFCounts(w), efflen, ec, count) <<
-    "." << std::endl;
-
   // step3: reset small est
   vec est = afc->AFCounts(w) * cn;
+  Rcout << "The log likelihood is " << std::setprecision (20) << LL(est, efflen, ec, count) <<
+    "." << std::endl;
+
   est.elem(find(est < countLimit)).zeros();
 
   return est;
@@ -336,11 +336,11 @@ arma::vec NAdam(const arma::vec& efflenraw,
     }
   }
 
-  Rcout << "The log likelihood is " << std::setprecision (20) << LL(afc->AFCounts(w), efflen, ec, count) <<
-    "." << std::endl;
-
   // step3: reset small est
   vec est = afc->AFCounts(w) * cn;
+  Rcout << "The log likelihood is " << std::setprecision (20) << LL(est, efflen, ec, count) <<
+    "." << std::endl;
+
   est.elem(find(est < countLimit)).zeros();
 
   return est;
@@ -416,11 +416,11 @@ arma::vec Adagrad(const arma::vec& efflenraw,
     }
   }
 
+  // reset small est
+  vec est = afc->AFCounts(w) * cn;
   Rcout << "The log likelihood is " << std::setprecision (20) << LL(afc->AFCounts(w), efflen, ec, count) <<
     "." << std::endl;
 
-  // reset small est
-  vec est = afc->AFCounts(w) * cn;
   est.elem(find(est < countLimit)).zeros();
 
   return est;
@@ -502,11 +502,11 @@ arma::vec NAdagrad(const arma::vec& efflenraw,
     }
   }
 
-  Rcout << "The log likelihood is " << std::setprecision (20) << LL(afc->AFCounts(w), efflen, ec, count) <<
-    "." << std::endl;
-
   // reset small est
   vec est = afc->AFCounts(w) * cn;
+  Rcout << "The log likelihood is " << std::setprecision (20) << LL(est, efflen, ec, count) <<
+    "." << std::endl;
+
   est.elem(find(est < countLimit)).zeros();
 
   return est;
@@ -586,11 +586,11 @@ arma::vec Adadelta(const arma::vec& efflenraw,
     }
   }
 
-  Rcout << "The log likelihood is " << std::setprecision (20) << LL(afc->AFCounts(w), efflen, ec, count) <<
-    "." << std::endl;
-
   // reset small est
   vec est = afc->AFCounts(w) * cn;
+  Rcout << "The log likelihood is " << std::setprecision (20) << LL(est, efflen, ec, count) <<
+    "." << std::endl;
+
   est.elem(find(est < countLimit)).zeros();
 
   return est;
@@ -666,11 +666,11 @@ arma::vec RMSProp(const arma::vec& efflenraw,
     }
   }
 
-  Rcout << "The log likelihood is " << std::setprecision (20) << LL(afc->AFCounts(w), efflen, ec, count) <<
-    "." << std::endl;
-
   // reset small est
   vec est = afc->AFCounts(w) * cn;
+  Rcout << "The log likelihood is " << std::setprecision (20) << LL(est, efflen, ec, count) <<
+    "." << std::endl;
+
   est.elem(find(est < countLimit)).zeros();
 
   return est;
@@ -754,11 +754,11 @@ arma::vec NRMSProp(const arma::vec& efflenraw,
     }
   }
 
-  Rcout << "The log likelihood is " << std::setprecision (20) << LL(afc->AFCounts(w), efflen, ec, count) <<
-    "." << std::endl;
-
   // reset small est
   vec est = afc->AFCounts(w) * cn;
+  Rcout << "The log likelihood is " << std::setprecision (20) << LL(est, efflen, ec, count) <<
+    "." << std::endl;
+
   est.elem(find(est < countLimit)).zeros();
 
   return est;

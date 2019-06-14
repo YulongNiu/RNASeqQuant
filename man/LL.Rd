@@ -4,10 +4,10 @@
 \alias{LL}
 \title{Calculate log-likelihood}
 \usage{
-LL(prob, efflen, ec, count)
+LL(est, efflen, ec, count)
 }
 \arguments{
-\item{prob}{A \code{arma::vec} indicates probabilities of selecting a read from the different transcripts.}
+\item{est}{A \code{arma::vec} indicates estimated counts.}
 
 \item{efflen}{A \code{std::vector<arma::vec>} indicated effective length of transcripts.}
 
@@ -22,7 +22,7 @@ A \code{double} indicates log-likelihood.
 Logistic likelihood.
 }
 \details{
-The log-likelihood of given probabilities.
+The log-likelihood of given estimated counts.
 }
 \author{
 Yulong Niu \email{yulong.niu@hotmail.com}

@@ -22,38 +22,38 @@ tbb::mutex countMutex;
 
 struct ExpectEC : public Worker
 {
-  const arma::vec& prob;
+  const arma::vec& startest;
   const std::vector<arma::vec>& efflen;
   const std::vector<arma::uvec>& ec;
   const arma::uvec& count;
   arma::vec& estcount;
 
-  ExpectEC(const arma::vec& prob,
+  ExpectEC(const arma::vec& startest,
            const std::vector<arma::vec>& efflen,
            const std::vector<arma::uvec>& ec,
            const arma::uvec& count,
            arma::vec& estcount)
-    : prob(prob), efflen(efflen), ec(ec), count(count), estcount(estcount) {}
+    : startest(startest), efflen(efflen), ec(ec), count(count), estcount(estcount) {}
 
   void operator()(std::size_t begin, std::size_t end) {
     countMutex.lock();
     for (std::size_t i = begin; i < end; ++i) {
-      vec eachcp = prob.elem(ec[i]) / efflen[i];
+      vec eachcp = startest.elem(ec[i]) / efflen[i];
       estcount.elem(ec[i]) += eachcp * count(i)/ sum(eachcp);
     }
     countMutex.unlock();
   }
 };
 
-arma::vec EMSingle(const arma::vec& prob,
+arma::vec EMSingle(const arma::vec& startest,
                    const std::vector<arma::vec>& efflen,
                    const std::vector<arma::uvec>& ec,
                    const arma::uvec& count) {
 
-  vec estcount(prob.n_elem, fill::zeros);
+  vec estcount(startest.n_elem, fill::zeros);
 
   // create parallel worker and call
-  ExpectEC expectEC(prob, efflen, ec, count, estcount);
+  ExpectEC expectEC(startest, efflen, ec, count, estcount);
 
   // grain size is 1k
   parallelFor(0, efflen.size(), expectEC, 1000);
@@ -63,17 +63,17 @@ arma::vec EMSingle(const arma::vec& prob,
 
 #else
 
-arma::vec EMSingle(const arma::vec& prob,
+arma::vec EMSingle(const arma::vec& startest,
                    const std::vector<arma::vec>& efflen,
                    const std::vector<arma::uvec>& ec,
                    const arma::uvec& count) {
 
-  // prob.n_elem is the number of transcripts
+  // startest.n_elem is the number of transcripts
   // ec.n_elem == count.n_elem == efflen.n_elem is TRUE, which is the number of equivalent classes/reads
-  vec estcount(prob.n_elem, fill::zeros);
+  vec estcount(startest.n_elem, fill::zeros);
 
-  for (uword i = 0; i < ec.n_elem; ++i) {
-    vec eachcp = prob.elem(ec[i]) / efflen[i];
+  for (uword i = 0; i < ec.size(); ++i) {
+    vec eachcp = startest.elem(ec[i]) / efflen[i];
     estcount.elem(ec[i]) += eachcp * count(i)/ sum(eachcp);
   }
 
@@ -127,7 +127,7 @@ arma::vec EMSingle(const arma::vec& prob,
 Rcpp::List EM(const arma::vec& efflenraw,
               const Rcpp::CharacterVector& ecraw,
               const arma::uvec& countraw,
-              const arma::uvec& spenumraw,
+              const arma::uvec& spenum,
               const arma::uword maxiter = 10000,
               const arma::uword miniter = 50,
               const bool details = false) {
@@ -147,15 +147,17 @@ Rcpp::List EM(const arma::vec& efflenraw,
   vector<vec> efflen = MatchEfflen(ec, efflenraw);
 
   // step2: EM iteration
-  // start prob and est
-  uword tn = sum(spenumraw);
+  // startest and est
+  uword tn = sum(spenum);
   double cn = sum(count);
-  uword sn = spenumraw.n_elem;
+  uword sn = spenum.n_elem;
 
-  vec prob(tn);
-  prob.fill(1.0/tn);
-  vec startest(tn);
-  startest.fill(cn/tn);
+  // // cn / tn
+  // vec startest(cn/tn);
+
+  // average for each species
+  vec scounts(sn);
+  vec startest = InitAve(spenum, scounts.fill(cn / sn));
   vec est(tn, fill::zeros);
 
   // details init
@@ -165,13 +167,14 @@ Rcpp::List EM(const arma::vec& efflenraw,
   uword iter;
   for (iter = 0; iter < maxiter; ++iter) {
 
-    est = EMSingle(prob, efflen, ec, count);
-
     // record running details
     if (details) {
-      specounts.row(iter) = SpeCount(est, spenumraw);
-      resll(iter) = LL(prob, efflen, ec, count);
+      vec eachc = SpeCount(startest, spenum);
+      specounts.row(iter) = rowvec(eachc.begin(), sn, false);
+      resll(iter) = LL(startest, efflen, ec, count);
     } else {}
+
+    est = EMSingle(startest, efflen, ec, count);
 
     // stop iteration condition
     uword nopassn = 0;
@@ -183,14 +186,16 @@ Rcpp::List EM(const arma::vec& efflenraw,
 
     if (nopassn == 0 && iter >= miniter - 1) {
       Rcout << "The iteration number is " << iter + 1
-            << ". The log likelihood is " << std::setprecision (20) << LL(prob, efflen, ec, count)
+            << ". The log likelihood is " << std::setprecision (20) << LL(startest, efflen, ec, count)
             << "." << std::endl;
       break;
     } else {
-      prob = est / cn;
       startest = est;
     }
   }
+
+  // check if maxiter
+  if (iter == maxiter) {iter--;} else {}
 
   // step3: reset small est
   est.elem(find(est < countLimit)).zeros();
@@ -202,3 +207,87 @@ Rcpp::List EM(const arma::vec& efflenraw,
 
   return res;
 }
+
+
+// [[Rcpp::export]]
+Rcpp::List EMSpe(const arma::vec& efflenraw,
+                 const Rcpp::CharacterVector& ecraw,
+                 const arma::uvec& countraw,
+                 const arma::uvec& spenum,
+                 const arma::vec& spefixcounts,
+                 const arma::uword maxiter = 10000,
+                 const arma::uword miniter = 50,
+                 const bool details = false) {
+
+  // stop iteration params from kallisto
+  double countChangeLimit = 1e-2;
+  double countChange = 1e-2;
+  double countLimit = 1e-8;
+
+  // step1: pseudo information
+  // remove zero counts
+  uvec zeros = find(countraw > 0);
+  IntegerVector zerosidx(zeros.begin(), zeros.end());
+
+  uvec count = countraw.elem(zeros);
+  vector<uvec> ec = SplitEC(ecraw[zerosidx]);
+  vector<vec> efflen = MatchEfflen(ec, efflenraw);
+
+  // step2: EM iteration
+  // startest and est
+  uword tn = sum(spenum);
+  uword sn = spenum.n_elem;
+
+  // average for each species
+  vec startest = InitAve(spenum, spefixcounts);
+  vec est(tn, fill::zeros);
+
+  // details init
+  mat specounts(maxiter, sn, fill::zeros);
+  vec resll(maxiter, fill::zeros);
+
+  uword iter;
+  for (iter = 0; iter < maxiter; ++iter) {
+
+    // record running details
+    if (details) {
+      vec eachc = SpeCount(startest, spenum);
+      specounts.row(iter) = rowvec(eachc.begin(), sn, false);
+      resll(iter) = LL(startest, efflen, ec, count);
+    } else {}
+
+    vec eachlambda = EMSingle(startest, efflen, ec, count);
+    est = LambdaSpe(eachlambda, spenum, spefixcounts);
+
+    // stop iteration condition
+    uword nopassn = 0;
+    for (uword t = 0; t < tn; ++t) {
+      if (est(t) > countChangeLimit && (fabs(est(t) - startest(t))/est(t)) > countChange) {
+        ++nopassn;
+      } else {}
+    }
+
+    if (nopassn == 0 && iter >= miniter - 1) {
+      Rcout << "The iteration number is " << iter + 1
+            << ". The log likelihood is " << std::setprecision (20) << LL(startest, efflen, ec, count)
+            << "." << std::endl;
+      break;
+    } else {
+      startest = est;
+    }
+  }
+
+  // check if maxiter
+  if (iter == maxiter) {iter--;} else {}
+
+  // step3: reset small est
+  est.elem(find(est < countLimit)).zeros();
+
+  // step4: may add details
+  List res = List::create(_["counts"] = est,
+                          _["specounts"] = specounts.rows(0, iter),
+                          _["ll"] = resll.subvec(0, iter));
+
+  return res;
+}
+

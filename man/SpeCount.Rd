@@ -4,12 +4,12 @@
 \alias{SpeCount}
 \title{Species estimated counts}
 \usage{
-SpeCount(est, spenumraw)
+SpeCount(est, spenum)
 }
 \arguments{
 \item{est}{A \code{arma::vec} estimated counts of each transcripts.}
 
-\item{spenumraw}{A \code{arma::uvec} indicated the transcript number in each species.}
+\item{spenum}{A \code{arma::uvec} indicated the transcript number in each species.}
 }
 \value{
 A \code{arma::vec} represents the total estimated counts of each species.
@@ -18,7 +18,7 @@ A \code{arma::vec} represents the total estimated counts of each species.
 Estimated counts of input species.
 }
 \details{
-The indices of \code{est} should be consistent with the \code{spenumraw}. For example, the \code{est} is \code{1.5, 2, 3} and \code{spenumraw} is \code{2, 1}, so \code{2.5, 3} will be returned.
+The indices of \code{est} should be consistent with the \code{spenum}. For example, the \code{est} is \code{1.5, 2, 3} and \code{spenum} is \code{2, 1}, so \code{2.5, 3} will be returned.
 }
 \author{
 Yulong Niu \email{yulong.niu@hotmail.com}

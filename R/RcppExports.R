@@ -41,8 +41,12 @@
 #' EM(plist$efflen, plist$ec, plist$count, 5)
 #' @author Yulong Niu \email{yulong.niu@@hotmail.com}
 #' @export
-EM <- function(efflenraw, ecraw, countraw, spenumraw, maxiter = 10000L, miniter = 50L, details = FALSE) {
-    .Call(`_RNASeqQuant_EM`, efflenraw, ecraw, countraw, spenumraw, maxiter, miniter, details)
+EM <- function(efflenraw, ecraw, countraw, spenum, maxiter = 10000L, miniter = 50L, details = FALSE) {
+    .Call(`_RNASeqQuant_EM`, efflenraw, ecraw, countraw, spenum, maxiter, miniter, details)
+}
+
+EMSpe <- function(efflenraw, ecraw, countraw, spenum, spefixcounts, maxiter = 10000L, miniter = 50L, details = FALSE) {
+    .Call(`_RNASeqQuant_EMSpe`, efflenraw, ecraw, countraw, spenum, spefixcounts, maxiter, miniter, details)
 }
 
 Momentum <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments) {
@@ -170,18 +174,18 @@ ISRUGrad <- function(x, isr, weight, alpha) {
 
 #' Logistic likelihood.
 #'
-#' The log-likelihood of given probabilities.
+#' The log-likelihood of given estimated counts.
 #'
 #' @title Calculate log-likelihood
 #' @return A \code{double} indicates log-likelihood.
-#' @param prob A \code{arma::vec} indicates probabilities of selecting a read from the different transcripts.
+#' @param est A \code{arma::vec} indicates estimated counts.
 #' @param efflen A \code{std::vector<arma::vec>} indicated effective length of transcripts.
 #' @param ec A \code{std::vector<arma::uvec>} indicated equivalence classes (ec).
 #' @param count A \code{arma::uvec} indicated counts of ec.
 #' @author Yulong Niu \email{yulong.niu@@hotmail.com}
 #' @keywords internal
-LL <- function(prob, efflen, ec, count) {
-    .Call(`_RNASeqQuant_LL`, prob, efflen, ec, count)
+LL <- function(est, efflen, ec, count) {
+    .Call(`_RNASeqQuant_LL`, est, efflen, ec, count)
 }
 
 start_profiler <- function(str) {
@@ -333,16 +337,24 @@ MatchEfflen <- function(ec, efflenraw) {
 
 #' Estimated counts of input species.
 #'
-#' The indices of \code{est} should be consistent with the \code{spenumraw}. For example, the \code{est} is \code{1.5, 2, 3} and \code{spenumraw} is \code{2, 1}, so \code{2.5, 3} will be returned.
+#' The indices of \code{est} should be consistent with the \code{spenum}. For example, the \code{est} is \code{1.5, 2, 3} and \code{spenum} is \code{2, 1}, so \code{2.5, 3} will be returned.
 #'
 #' @title Species estimated counts
 #' @return A \code{arma::vec} represents the total estimated counts of each species.
 #' @param est A \code{arma::vec} estimated counts of each transcripts.
-#' @param spenumraw A \code{arma::uvec} indicated the transcript number in each species.
+#' @param spenum A \code{arma::uvec} indicated the transcript number in each species.
 #' @author Yulong Niu \email{yulong.niu@@hotmail.com}
 #' @keywords internal
-SpeCount <- function(est, spenumraw) {
-    .Call(`_RNASeqQuant_SpeCount`, est, spenumraw)
+SpeCount <- function(est, spenum) {
+    .Call(`_RNASeqQuant_SpeCount`, est, spenum)
+}
+
+InitAve <- function(spenum, spefixcounts) {
+    .Call(`_RNASeqQuant_InitAve`, spenum, spefixcounts)
+}
+
+LambdaSpe <- function(emlambda, spenum, spefixcounts) {
+    .Call(`_RNASeqQuant_LambdaSpe`, emlambda, spenum, spefixcounts)
 }
 
 #' Compare two strings

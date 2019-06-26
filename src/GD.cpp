@@ -160,8 +160,7 @@ arma::vec NAG(const arma::vec& efflenraw,
       uvec eachidx = idx.subvec(biter, endi);
 
       // adam for each batch
-      w -= gamma * v;
-      grad = afgrad->AFGradient(w, efflen, ec, count, eachidx);
+      grad = afgrad->AFGradient(w - gamma * v, efflen, ec, count, eachidx);
       v = gamma * v + eta * grad;
       w -= v;
 
@@ -490,8 +489,7 @@ arma::vec NAdagrad(const arma::vec& efflenraw,
       uvec eachidx = idx.subvec(biter, endi);
 
       // NAG
-      w -= velocity * V;
-      grad = afgrad->AFGradient(w, efflen, ec, count, eachidx);
+      grad = afgrad->AFGradient(w - velocity * V, efflen, ec, count, eachidx);
       G += grad % grad;
 
       // update V
@@ -742,8 +740,7 @@ arma::vec NRMSProp(const arma::vec& efflenraw,
       uvec eachidx = idx.subvec(biter, endi);
 
       // NAG
-      w -= velocity * V;
-      grad = afgrad->AFGradient(w, efflen, ec, count, eachidx);
+      grad = afgrad->AFGradient(w - velocity * V, efflen, ec, count, eachidx);
       eg2 = gamma * eg2 + (1 - gamma) * grad % grad;
 
       // update V

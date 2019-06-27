@@ -79,14 +79,15 @@ gdest <- NRMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200
 
 ## nice test
 ## Adam mini-batch
+gdest <- AdaMax(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 1024, 0.1, list(method = 'Softmax'), list())
 gdest <- Adam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 1024, 0.1, list(method = 'Softmax'), list())
 gdest <- NAdam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 1024, 0.1, list(method = 'Softmax'), list())
 gdest <- NAdagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 1024, 0.1, list(method = 'Softmax'), list())
 
 ## NRMSProp full batch
 emest <- EM(plist$efflen, plist$ec, plist$count, length(plist$efflen), detail = TRUE)
-gdest <- NRMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 36580, 0.005, list(method = 'Softmax'), list())
-gdest <- NAdagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 36580, 0.2, list(method = 'Softmax'), list())
+gdest <- NRMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 500, 36580, 0.005, list(method = 'Softmax'), list())
+gdest <- NAdagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 500, 36580, 0.5, list(method = 'Softmax'), list())
 
 ## merge res
 mergeres <- cbind(kallistoest, emest, gdest)

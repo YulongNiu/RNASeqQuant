@@ -181,3 +181,16 @@ bool isEqualStr(std::string& str1,
                 std::string str2) {
   return str1.compare(str2) == 0;
 }
+
+
+
+// [[Rcpp::export]]
+arma::vec Max(const arma::vec& vec1,
+              const arma::vec& vec2) {
+
+  mat m(vec1.n_elem, 2);
+  m.col(0) = vec1;
+  m.col(1) = vec2;
+
+  return max(m, 1);
+}

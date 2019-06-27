@@ -184,13 +184,19 @@ bool isEqualStr(std::string& str1,
 
 
 
+//' Pairwise maximum elements of two vectors
+//'
+//' @title Extract maximum elements
+//' @return A \code{arma::vec} vector indicating maximum element by pair-wise comparison.
+//' @param vec1 vec2 \code{arma::vec} vectors.
+//' @author Yulong Niu \email{yulong.niu@@hotmail.com}
+//' @keywords internal
 // [[Rcpp::export]]
 arma::vec Max(const arma::vec& vec1,
               const arma::vec& vec2) {
 
-  mat m(vec1.n_elem, 2);
-  m.col(0) = vec1;
-  m.col(1) = vec2;
-
+  mat m = join_rows(vec1, vec2);
   return max(m, 1);
+
 }
+

@@ -7,6 +7,7 @@ sourceCpp('../src/softplus.cpp')
 sourceCpp('../src/isru.cpp')
 sourceCpp('../src/likelihood.cpp')
 sourceCpp('../src/GD.cpp')
+sourceCpp('../src/WGD.cpp')
 sourceCpp('../src/EM.cpp')
 source('ec.R')
 
@@ -81,12 +82,14 @@ gdest <- NRMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200
 ## Adam mini-batch
 gdest <- AdaMax(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 1024, 0.1, list(method = 'Softmax'), list())
 gdest <- Adam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 1024, 0.1, list(method = 'Softmax'), list())
+gdest <- AdamW(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 1024, 0.1, list(method = 'Softmax'), list())
 gdest <- NAdam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 1024, 0.1, list(method = 'Softmax'), list())
 gdest <- NAdagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 1024, 0.1, list(method = 'Softmax'), list())
 
 ## NRMSProp full batch
 emest <- EM(plist$efflen, plist$ec, plist$count, length(plist$efflen), detail = TRUE)
-gdest <- NRMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 500, 36580, 0.005, list(method = 'Softmax'), list())
+gdest <- NRMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 500, 115642, 0.005, list(method = 'Softmax'), list())
+gdest <- NRMSPropW(plist$efflen, plist$ec, plist$count, length(plist$efflen), 500, 115642, 0.005, list(method = 'Softmax'), list())
 gdest <- NAdagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 500, 36580, 0.5, list(method = 'Softmax'), list())
 
 ## merge res

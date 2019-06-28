@@ -31,10 +31,10 @@ read_pseudo <- function(ecpath, countpath, abpath) {
   efflen <- read.table(abpath, header = TRUE, stringsAsFactors = FALSE) %>%
     `[`(, 3)
 
-  ## ## remove zero counts
-  ## zeroidx <- count > 0
-  ## count %<>% `[`(zeroidx)
-  ## ec %<>% `[`(zeroidx)
+  ## remove zero counts
+  zeroidx <- count > 0
+  count %<>% `[`(zeroidx)
+  ec %<>% `[`(zeroidx)
 
   ecList <- list(ec = ec,
                  count = count,

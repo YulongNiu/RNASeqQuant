@@ -41,6 +41,10 @@ ecpath <- file.path(testpath, 'testpseudo/pseudoalignments.ec')
 countpath <- file.path(testpath, 'testpseudo/pseudoalignments.tsv')
 abpath <- file.path(testpath, 'testquant/abundance.tsv')
 plist <- read_pseudo(ecpath, countpath, abpath)
+w <- read.table(ecpath, stringsAsFactors = FALSE) %>%
+  `[`(, 2) %>%
+  SplitEC %>%
+  CountEC
 
 ## plist <- list()
 ## plist$efflen <- read.table('abundance_ath.tsv', stringsAsFactors = FALSE, header = TRUE)[, 3]
@@ -81,15 +85,16 @@ gdest <- NRMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200
 ## nice test
 ## Adam mini-batch
 gdest <- AdaMax(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 1024, 0.1, list(method = 'Softmax'), list())
+gdest <- AdamW(plist$efflen, plist$ec, plist$count, 1/w, length(plist$efflen), 300, 1024, 0.01, list(method = 'Softmax'), list())
+gdest <- AMSGrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 1024, 0.1, list(method = 'Softmax'), list())
 gdest <- Adam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 1024, 0.1, list(method = 'Softmax'), list())
-gdest <- AdamW(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 1024, 0.1, list(method = 'Softmax'), list())
 gdest <- NAdam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 1024, 0.1, list(method = 'Softmax'), list())
 gdest <- NAdagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 1024, 0.1, list(method = 'Softmax'), list())
 
 ## NRMSProp full batch
 emest <- EM(plist$efflen, plist$ec, plist$count, length(plist$efflen), detail = TRUE)
-gdest <- NRMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 500, 115642, 0.005, list(method = 'Softmax'), list())
-gdest <- NRMSPropW(plist$efflen, plist$ec, plist$count, length(plist$efflen), 500, 115642, 0.005, list(method = 'Softmax'), list())
+gdest <- NRMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 500, 36580, 0.005, list(method = 'Softmax'), list())
+gdest <- NRMSPropW(plist$efflen, plist$ec, plist$count, 1/w, length(plist$efflen), 500, 36580, 0.005, list(method = 'Softmax'), list())
 gdest <- NAdagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 500, 36580, 0.5, list(method = 'Softmax'), list())
 
 ## merge res

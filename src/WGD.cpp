@@ -71,6 +71,7 @@ arma::uvec CountEC(const std::vector<arma::uvec>& ec) {
 arma::vec AdamW(const arma::vec& efflenraw,
                 const Rcpp::CharacterVector& ecraw,
                 const arma::uvec& countraw,
+                const arma::uvec& ecw,
                 const arma::uvec& spenumraw,
                 const arma::uword epochs,
                 const arma::uword batchsize,
@@ -106,7 +107,6 @@ arma::vec AdamW(const arma::vec& efflenraw,
   vec w = randn<vec>(tn) / sqrt(tn);
   // vec w(tn); w.fill(0.01);
 
-  uvec ecw = 1/CountEC(SplitEC(ecraw));
   vec m = vec(tn, fill::zeros);
   vec v = vec(tn, fill::zeros);
   uword t = 0;
@@ -161,6 +161,7 @@ arma::vec AdamW(const arma::vec& efflenraw,
 arma::vec NRMSPropW(const arma::vec& efflenraw,
                     const Rcpp::CharacterVector& ecraw,
                     const arma::uvec& countraw,
+                    const arma::uvec& ecw,
                     const arma::uvec& spenumraw,
                     const arma::uword epochs,
                     const arma::uword batchsize,
@@ -198,7 +199,6 @@ arma::vec NRMSPropW(const arma::vec& efflenraw,
   vec w = randn<vec>(tn) / sqrt(tn);
   // vec w(tn); w.fill(0.01);
 
-  uvec ecw = CountEC(SplitEC(ecraw));
   vec eg2 = vec(tn, fill::zeros);
   vec V = vec(tn, fill::zeros);
 

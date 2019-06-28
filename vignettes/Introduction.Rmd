@@ -55,7 +55,7 @@ $$
 
 In single species, if $T=\{t_1, t_2, \dots, t_K\}$ is the set of transcripts (with length $l_i$ for $t_i$) and the copy number of $t_i$ is $c_i$, we define $\rho_k=\frac{c_k}{\sum\limits_{t \in T}c_t} = \frac{c_k}{M}$ is the relative abundances of $t_i$, where $M$ is the total copy number, so that $\sum\limits_{k=1}^K \rho_k=1$.
 
-For a single species RNA-Seq data-set, let $F=\{f_1, f_2, \dots, f_N\}$ be the set of transcription fragments (reads) in a total number of $N=\|F\|$. Fragments mapped to the transcript $t_i$ composes the set $F_t \in F$ in a number of $X_t=\|F_t\|$. We assume that all fragments in $F$ have the same length $m$. In $t_i$, the number of position in which the fragment can start is $\tildel = l_i - m + 1$. $\tildel$ is also called *effective length* [@bray2016near; @pachter2011models].
+For a single species RNA-Seq data-set, let $F=\{f_1, f_2, \dots, f_N\}$ be the set of transcription fragments (reads) in a total number of $N=|F|$. Fragments mapped to the transcript $t_i$ composes the set $F_t \in F$ in a number of $X_t=|F_t|$. We assume that all fragments in $F$ have the same length $m$. In $t_i$, the number of position in which the fragment can start is $\tildel = l_i - m + 1$. $\tildel$ is also called *effective length* [@bray2016near; @pachter2011models].
 
 After mapping, we can observe the alignment positions of $f_i$, which can be mapped to several transcripts, but we do not know the exact transcript. The estimated parameters is $\alpha=\{\alpha_1, \alpha_2, \dots, \alpha_K\}$. The probability that the fragment $f$ comes from the transcripts $t$ is:
 
@@ -107,7 +107,7 @@ $$
 
 where $y_k$ is the $\{0, 1\}$ indicator.
 
-We use expectation–maximization (EM) algorithm to estimate $\alpha$. In the $n$ iteration, $\Pro(f \in t_1\|\mathrm{pos}, \alpha^{(n)})$ equals to:
+We use expectation–maximization (EM) algorithm to estimate $\alpha$. In the $n$ iteration, $\Pro(f \in t_1|\mathrm{pos}, \alpha^{(n)})$ equals to:
 
 $$
 \begin{equation}

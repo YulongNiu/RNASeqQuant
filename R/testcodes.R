@@ -98,7 +98,7 @@ gdest <- NRMSPropW(plist$efflen, plist$ec, plist$count, 1/w, length(plist$efflen
 gdest <- NAdagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 500, 36580, 0.5, list(method = 'Softmax'), list())
 
 ## merge res
-mergeres <- cbind(kallistoest, emest, gdest)
+mergeres <- cbind(kallistoest, emest$counts, gdest)
 colnames(mergeres) <- c('kallistoest', 'emest', 'gdest')
 
 ## correlation coefficient

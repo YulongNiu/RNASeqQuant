@@ -200,3 +200,28 @@ arma::vec Max(const arma::vec& vec1,
 
 }
 
+
+// [[Rcpp::export]]
+arma::uvec TrueTIdx(const std::vector<arma::uvec>& ec) {
+
+  // collapse ec
+  uvec coles;
+  for (auto i : ec) {
+    coles = join_cols(coles, i);
+  }
+
+  return unique(coles);
+}
+
+
+// [[Rcpp::export]]
+arma::uvec FalseTIdx(const std::vector<arma::uvec>& ec,
+                     const arma::uvec& spenum) {
+
+  uword tn = sum(spenum);
+  uvec ftIdx = zeros<uvec>(tn);
+
+  ftIdx.elem(TrueTIdx(ec)).ones();
+
+  return find(ftIdx == 0);
+}

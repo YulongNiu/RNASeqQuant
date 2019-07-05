@@ -709,6 +709,7 @@ arma::vec RMSProp(const arma::vec& efflenraw,
 
   // step2: Adagrad
   // start w and estcount
+  uvec truetidx = TrueTIdx(ec);
   uword tn = sum(spenumraw);
   uword cn = sum(count);
   // uword sn = spenumraw.n_elem;
@@ -795,10 +796,12 @@ arma::vec NRMSProp(const arma::vec& efflenraw,
   uword cn = sum(count);
   // uword sn = spenumraw.n_elem;
   uword ecn = ec.size();
+  uvec ftidx = FalseTIdx(ec, spenumraw);
 
   // Glorot normal initializer/Xavier normal initializer
   vec w = randn<vec>(tn) / sqrt(tn);
-  // vec w(tn); w.fill(0.01);
+  // vec w(tn); w.fill(0.01234);
+  w.elem(ftidx).fill(-1e8);
   vec eg2 = vec(tn, fill::zeros);
   vec V = vec(tn, fill::zeros);
 
@@ -812,7 +815,7 @@ arma::vec NRMSProp(const arma::vec& efflenraw,
 
   for (uword iter = 0; iter < epochs; ++iter) {
 
-    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w), efflen, ec, count) << "|" << t << std::endl;
+    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w), efflen, ec, count) << std::endl;
     idx = shuffle(idx);
     uword biter = 0;
 
@@ -834,12 +837,10 @@ arma::vec NRMSProp(const arma::vec& efflenraw,
     }
   }
 
-  // reset small est
+  // small est & no ec transcripts --> zero
   vec est = afc->AFCounts(w) * cn;
-  Rcout << "The log likelihood is " << std::setprecision (20) << LL(est, efflen, ec, count) <<
-    "." << std::endl;
-
   est.elem(find(est < countLimit)).zeros();
+  Rcout << "The log likelihood is " << std::setprecision (20) << LL(est, efflen, ec, count) << "." << std::endl;
 
   return est;
 }

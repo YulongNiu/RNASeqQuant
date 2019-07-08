@@ -10,9 +10,7 @@ csl: nature.csl
 header-includes:
   - \usepackage{amsmath}
   - \newcommand{\Pro}{\mathrm{P}}
-  - \newcommand{\tildel}{\widetilde{l_t}}
-  - \newcommand{\tildelu}{\widetilde{l_u}}
-  - \newcommand{\tildesv}{\widetilde{l_v}}
+  - \newcommand{\tildel}[1]{\widetilde{l_{#1}}}
 output:
   BiocStyle::pdf_document:
     toc: true
@@ -53,14 +51,14 @@ Rclass <- function(x){sub('%obj%', x, '<span style="font-family:\'Times New Roma
 
 In single species, if $T=\{t_1, t_2, \dots, t_K\}$ is the set of transcripts (with length $l_i$ for $t_i$) and the copy number of $t_i$ is $c_i$, we define $\rho_k=\frac{c_k}{\sum\limits_{t \in T}c_t} = \frac{c_k}{M}$ is the relative abundances of $t_i$, where $M$ is the total copy number, so that $\sum\limits_{k=1}^K \rho_k=1$.
 
-For a single species RNA-Seq data-set, let $F=\{f_1, f_2, \dots, f_N\}$ be the set of transcription fragments (reads) in a total number of $N=|F|$. Fragments mapped to the transcript $t_i$ composes the set $F_t \in F$ in a number of $X_t=|F_t|$. We assume that all fragments in $F$ have the same length $m$. In $t_i$, the number of position in which the fragment can start is $\tildel = l_i - m + 1$. $\tildel$ is also called *effective length* [@bray2016near; @pachter2011models].
+For a single species RNA-Seq data-set, let $F=\{f_1, f_2, \dots, f_N\}$ be the set of transcription fragments (reads) in a total number of $N=|F|$. Fragments mapped to the transcript $t_i$ composes the set $F_t \in F$ in a number of $X_t=|F_t|$. We assume that all fragments in $F$ have the same length $m$. In $t_i$, the number of position in which the fragment can start is $\tildel{t} = l_t - m + 1$. $\tildel{t}$ is also called *effective length* [@bray2016near; @pachter2011models].
 
 After mapping, we can observe the alignment positions of $f_i$, which can be mapped to several transcripts, but we do not know the exact transcript. The estimated parameters is $\alpha=\{\alpha_1, \alpha_2, \dots, \alpha_K\}$. The probability that the fragment $f$ comes from the transcripts $t$ is:
 
 \begin{equation}
 \begin{split}
-\Pro(f \in t) &= \frac{\rho_t M \tildel}{\sum\limits_{k=1}^{K} \rho_k M \widetilde{l_k}} \\
-&= \frac{\rho_t \tildel}{\sum\limits_{k=1}^{K} \rho_k \widetilde{l_k}} \\
+\Pro(f \in t) &= \frac{\rho_t M \tildel{t}}{\sum\limits_{k=1}^{K} \rho_k M \tildel{k}} \\
+&= \frac{\rho_t \tildel{t}}{\sum\limits_{k=1}^{K} \rho_k \tildel{k}} \\
 &= \alpha_t
 \end{split}
 (\#eq:1)
@@ -70,7 +68,7 @@ If $f$ comes from $t$, the probability that $f$ mapped to a certain position of 
 
 \begin{equation}
 \begin{split}
-\Pro(\mathrm{pos}|f \in t) = \frac{1}{\tildel}
+\Pro(\mathrm{pos}|f \in t) = \frac{1}{\tildel{t}}
 \end{split}
 (\#eq:2)
 \end{equation}
@@ -79,7 +77,7 @@ Combining \@ref(eq:1) and \@ref(eq:2), the probability that $f$ mapped to a cert
 
 \begin{equation}
 \begin{split}
-\Pro(\mathrm{pos}, f \in t) = \frac{\alpha_t}{\tildel}
+\Pro(\mathrm{pos}, f \in t) = \frac{\alpha_t}{\tildel{t}}
 \end{split}
 (\#eq:3)
 \end{equation}
@@ -90,7 +88,7 @@ The logarithm of likelihood (LL) function is:
 \begin{split}
 LL &= \sum\limits_{f \in F} \log \left(\Pro(\mathrm{pos}|\alpha)\ \right) \\
 &= \sum\limits_{f \in F} \log \left( \sum_{k=1}^{K} \Pro(\mathrm{pos}, f \in t_k|\alpha) \right) \\
-&= \sum\limits_{f \in F} \log \left( \sum_{k = 1}^{K} y_k \frac{\alpha_k}{\widetilde{l_k}} \right) \\
+&= \sum\limits_{f \in F} \log \left( \sum_{k = 1}^{K} y_k \frac{\alpha_k}{\tildel{k}} \right) \\
 \end{split}
 (\#eq:4)
 \end{equation}
@@ -102,7 +100,7 @@ We use expectation–maximization (EM) algorithm to estimate $\alpha$. In the $n
 \begin{equation}
 \begin{split}
 \Pro(f \in t_1|\mathrm{pos}, \alpha^{(n)}) &= \frac{\Pro(f \in t_1, \mathrm{pos}|\alpha^{(n)})}{\sum\limits_{k=1}^{K} \Pro(f \in t_k, \mathrm{pos}|\alpha^{(n)})} \\
-&= \frac{\alpha_1^{(n)} \frac{y_1}{\widetilde{l_1}}}{\sum\limits_{k=1}^{K} \alpha_k^{(n)} \frac{y_k}{\widetilde{l_k}}} \\
+&= \frac{\alpha_1^{(n)} \frac{y_1}{\tildel{1}}}{\sum\limits_{k=1}^{K} \alpha_k^{(n)} \frac{y_k}{\tildel{k}}} \\
 &= \lambda_1
 \end{split}
 (\#eq:5)
@@ -117,7 +115,7 @@ where $\sum\limits_{k=1}^{K} \lambda_k = 1$.
 \right) \\
 &= \argmax_\alpha \left( 
 \sum_{f \in F} \sum_{k=1}^{K} \lambda_k \log\left(
-\alpha_k \frac{y_k}{\widetilde{l_k}}
+\alpha_k \frac{y_k}{\tildel{k}}
 \right)
 \right) \\
 &= \argmax_\alpha \left(
@@ -147,16 +145,16 @@ The relative abundances in $A$ and $B$ are $\rho_u$, $\sum\limits_{u=1}^U \rho_u
 
 \begin{equation}
 \begin{split}
-\Pro(f \in r_u) = \frac{\rho_u \tildelu}{\sum\limits_{r \in R} \rho_r \widetilde{l_r}} = \alpha_u \\
-\Pro(\mathrm{pos}, f \in r_u) = \frac{\alpha_u}{\tildelu}
+\Pro(f \in r_u) = \frac{\rho_u \tildel{u}}{\sum\limits_{r \in R} \rho_r \tildel{r}} = \alpha_u \\
+\Pro(\mathrm{pos}, f \in r_u) = \frac{\alpha_u}{\tildel{u}}
 \end{split}
 (\#eq:7)
 \end{equation}
 
 \begin{equation}
 \begin{split}
-\Pro(f \in s_v) = \frac{\theta_v \tildesv}{\sum\limits_{s \in S} \theta_s \widetilde{l_s}} = \beta_v \\
-\Pro(\mathrm{pos}, f \in s_v) = \frac{\beta_v}{\tildesv}
+\Pro(f \in s_v) = \frac{\theta_v \tildel{v}}{\sum\limits_{s \in S} \theta_s \tildel{s}} = \beta_v \\
+\Pro(\mathrm{pos}, f \in s_v) = \frac{\beta_v}{\tildel{v}}
 \end{split}
 (\#eq:8)
 \end{equation}
@@ -167,7 +165,7 @@ The probability of single mapped fragment is:
 \begin{split}
 \Pro(\mathrm{pos}|\eta)  &= \Pro(\mathrm{pos}, f \in A|\eta) + \Pro(\mathrm{pos}, f \in B|\eta)\\
 &= \Pro(\mathrm{pos} | f \in A, \eta) \Pro(f \in A) + \Pro(\mathrm{pos} | f \in B, \eta) \Pro(f \in B) \\
-&= \sum_{i=1}^{U}m_i \frac{\alpha_i}{\widetilde{l_i}} \Pro(f \in A) + \sum_{j=U+1}^{U+V}m_j \frac{\beta_j}{\widetilde{l_j}} \Pro(f \in B) 
+&= \sum_{i=1}^{U}m_i \frac{\alpha_i}{\tildel{i}} \Pro(f \in A) + \sum_{j=U+1}^{U+V}m_j \frac{\beta_j}{\tildel{j}} \Pro(f \in B) 
 \end{split}
 (\#eq:9)
 \end{equation}
@@ -184,8 +182,8 @@ In $n+1$ iteration, the parameters in the expanded EM algorithm:
 
 \begin{equation}
 \begin{split}
-\lambda_i^{(n+1)} &= \frac{\alpha_i^{(n)} \frac{m_i}{\widetilde{l_i}} \Pro(f \in A)}{\sum\limits_{i=1}^{U}\alpha_i^{(n)} \frac{m_i}{\widetilde{l_i}} \Pro(f \in A) + \sum\limits_{j=U+1}^{U+V}\beta_j^{(n)} \frac{m_j}{\widetilde{l_j}} \Pro(f \in B)}\\
-\lambda_j^{(n+1)} &= \frac{\beta_j^{(n)} \frac{m_j}{\widetilde{l_j}} \Pro(f \in A)}{\sum\limits_{i=1}^{U}\alpha_i^{(n)} \frac{m_i}{\widetilde{l_i}} \Pro(f \in A) + \sum\limits_{j=U+1}^{U+V}\beta_j^{(n)} \frac{m_j}{\widetilde{l_j}} \Pro(f \in B)}\\
+\lambda_i^{(n+1)} &= \frac{\alpha_i^{(n)} \frac{m_i}{\tildel{i}} \Pro(f \in A)}{\sum\limits_{i=1}^{U}\alpha_i^{(n)} \frac{m_i}{\tildel{i}} \Pro(f \in A) + \sum\limits_{j=U+1}^{U+V}\beta_j^{(n)} \frac{m_j}{\tildel{j}} \Pro(f \in B)}\\
+\lambda_j^{(n+1)} &= \frac{\beta_j^{(n)} \frac{m_j}{\tildel{j}} \Pro(f \in A)}{\sum\limits_{i=1}^{U}\alpha_i^{(n)} \frac{m_i}{\tildel{i}} \Pro(f \in A) + \sum\limits_{j=U+1}^{U+V}\beta_j^{(n)} \frac{m_j}{\tildel{j}} \Pro(f \in B)}\\
 \alpha_i^{(n+1)} &= \frac{\sum\limits_{f \in F} \lambda_i^{(n+1)}}{\sum\limits_{f \in F} \sum\limits_{i=1}^{U} \lambda_i^{(n+1)}} \\
 \beta_j^{(n+1)} &= \frac{\sum\limits_{f \in F} \lambda_j^{(n+1)}}{\sum\limits_{f \in F} \sum\limits_{j=U+1}^{U+V} \lambda_j^{(n+1)}} \\
 \Pro(f \in A)^{(n+1)} &= \frac{\sum\limits_{f \in F} \sum\limits_{i=1}^{U} \lambda_i^{(n+1)}}{\sum\limits_{f \in F} \sum\limits_{i=1}^{U} \lambda_i^{(n+1)} + \sum\limits_{f \in F} \sum\limits_{j=U+1}^{U+V} \lambda_j^{(n+1)}} = \frac{\sum\limits_{f \in F} \sum\limits_{i=1}^{U} \lambda_i^{(n+1)}}{N}\\

@@ -3,20 +3,19 @@ title: "RNASeqQuant: an R package for RNA-Seq quantification"
 author: 
 - Yulong Niu
 - Ruben Garrido-Oter
+package: RNASeqQuant
 date: "`r Sys.Date()`"
 bibliography: RSQref.bib
 csl: nature.csl
 output:
   BiocStyle::pdf_document:
     toc: true
-    includes:
-      in_header: header.tex
   BiocStyle::html_document:
     toc: true
 vignette: >
   %\usepackage[utf8]{inputenc}
   %\VignetteIndexEntry{RNASeqQuant: an R package for RNA-Seq quantification}
-  %\VignetteEngine{knitr::knitr}
+  %\VignetteEngine{knitr::rmarkdown}
 ---
 
 ```{r style, echo=FALSE, results='asis', message=FALSE}
@@ -32,12 +31,6 @@ RNASeqQuant <- function() {"*[RNASeqQuant](https://github.com/YulongNiu/RNASeqQu
 Robject <- function(x){sub('%obj%', x, '<span style="background-color:#F0F0F0;color:#404040;font-family:\'Lucida Console\', monospace">%obj%</span>')}
 Rclass <- function(x){sub('%obj%', x, '<span style="font-family:\'Times New Roman\', Times, serif;font-style: italic">%obj%</span>')}
 ```
-
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-TeX: { equationNumbers: { autoNumber: "AMS" } }
-});
-</script>
 
 \newcommand{\Pro}{\mathrm{P}}
 \newcommand{\tildel}{\widetilde{l_t}}
@@ -69,7 +62,7 @@ $$
 &= \frac{\rho_t \tildel}{\sum\limits_{k=1}^{K} \rho_k \widetilde{l_k}} \\
 &= \alpha_t
 \end{split}
-\label{eq:1}
+(\#eq:1)
 \end{equation}
 $$
 
@@ -80,18 +73,18 @@ $$
 \begin{split}
 \Pro(\mathrm{pos}|f \in t) = \frac{1}{\tildel}
 \end{split}
-\label{eq:2}
+(\#eq:2)
 \end{equation}
 $$
 
-Combining $\eqref{eq:1}$ and $\eqref{eq:2}$, the probability that $f$ mapped to a certain position of $t$ is:
+Combining \@ref(eq:1) and \@ref(eq:2), the probability that $f$ mapped to a certain position of $t$ is:
 
 $$
 \begin{equation}
 \begin{split}
 \Pro(\mathrm{pos}, f \in t) = \frac{\alpha_t}{\tildel}
 \end{split}
-\label{eq:3}
+(\#eq:3)
 \end{equation}
 $$
 
@@ -104,7 +97,7 @@ LL &= \sum\limits_{f \in F} \log \left(\Pro(\mathrm{pos}|\alpha)\ \right) \\
 &= \sum\limits_{f \in F} \log \left( \sum_{k=1}^{K} \Pro(\mathrm{pos}, f \in t_k|\alpha) \right) \\
 &= \sum\limits_{f \in F} \log \left( \sum_{k = 1}^{K} y_k \frac{\alpha_k}{\widetilde{l_k}} \right) \\
 \end{split}
-\label{eq:4}
+(\#eq:4)
 \end{equation}
 $$
 
@@ -119,7 +112,7 @@ $$
 &= \frac{\alpha_1^{(n)} \frac{y_1}{\widetilde{l_1}}}{\sum\limits_{k=1}^{K} \alpha_k^{(n)} \frac{y_k}{\widetilde{l_k}}} \\
 &= \lambda_1
 \end{split}
-\label{eq:5}
+(\#eq:5)
 \end{equation}
 $$
 
@@ -142,7 +135,7 @@ $$
 \right)
 \right)
 \end{split}
-\label{eq:6}
+(\#eq:6)
 \end{equation}
 $$
 
@@ -170,7 +163,7 @@ $$
 \Pro(f \in r_u) = \frac{\rho_u \tildelu}{\sum\limits_{r \in R} \rho_r \widetilde{l_r}} = \alpha_u \\
 \Pro(\mathrm{pos}, f \in r_u) = \frac{\alpha_u}{\tildelu}
 \end{split}
-\label{eq:7}
+(\#eq:7)
 \end{equation}
 $$
 
@@ -180,7 +173,7 @@ $$
 \Pro(f \in s_v) = \frac{\theta_v \tildesv}{\sum\limits_{s \in S} \theta_s \widetilde{l_s}} = \beta_v \\
 \Pro(\mathrm{pos}, f \in s_v) = \frac{\beta_v}{\tildesv}
 \end{split}
-\label{eq:8}
+(\#eq:8)
 \end{equation}
 $$
 
@@ -193,7 +186,7 @@ $$
 &= \Pro(\mathrm{pos} | f \in A, \eta) \Pro(f \in A) + \Pro(\mathrm{pos} | f \in B, \eta) \Pro(f \in B) \\
 &= \sum_{i=1}^{U}m_i \frac{\alpha_i}{\widetilde{l_i}} \Pro(f \in A) + \sum_{j=U+1}^{U+V}m_j \frac{\beta_j}{\widetilde{l_j}} \Pro(f \in B) 
 \end{split}
-\label{eq:9}
+(\#eq:9)
 \end{equation}
 $$
 
@@ -219,9 +212,8 @@ $$
 \Pro(f \in A)^{(n+1)} &= \frac{\sum\limits_{f \in F} \sum\limits_{i=1}^{U} \lambda_i^{(n+1)}}{\sum\limits_{f \in F} \sum\limits_{i=1}^{U} \lambda_i^{(n+1)} + \sum\limits_{f \in F} \sum\limits_{j=U+1}^{U+V} \lambda_j^{(n+1)}} = \frac{\sum\limits_{f \in F} \sum\limits_{i=1}^{U} \lambda_i^{(n+1)}}{N}\\
 \Pro(f \in B)^{(n+1)} &= \frac{\sum\limits_{f \in F} \sum\limits_{j=U+1}^{U+V} \lambda_j^{(n+1)}}{\sum\limits_{f \in F} \sum\limits_{i=1}^{U} \lambda_i^{(n+1)} + \sum\limits_{f \in F} \sum\limits_{j=U+1}^{U+V} \lambda_j^{(n+1)}} = \frac{\sum\limits_{f \in F} \sum\limits_{j=U+1}^{U+V} \lambda_j^{(n+1)}}{N} 
 \end{split}
-\label{eq:10}
+(\#eq:10)
 \end{equation}
 $$
-
 
 # References

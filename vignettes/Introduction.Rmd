@@ -10,6 +10,9 @@ csl: nature.csl
 output:
   BiocStyle::pdf_document:
     toc: true
+    latex_engine: pdflatex
+    includes:
+      in_header: header.tex
   BiocStyle::html_document:
     toc: true
 vignette: >
@@ -32,15 +35,6 @@ Robject <- function(x){sub('%obj%', x, '<span style="background-color:#F0F0F0;co
 Rclass <- function(x){sub('%obj%', x, '<span style="font-family:\'Times New Roman\', Times, serif;font-style: italic">%obj%</span>')}
 ```
 
-\newcommand{\Pro}{\mathrm{P}}
-\newcommand{\tildel}{\widetilde{l_t}}
-\newcommand{\tildelu}{\widetilde{l_u}}
-\newcommand{\tildesv}{\widetilde{l_v}}
-
-$$
-\DeclareMathOperator*{\argmax}{arg\,max}
-$$
-
 # Overview
 
 `r RNASeqQuant()` implements both expectation maximization and gradient descent for RNA-Seq quantification.
@@ -55,7 +49,6 @@ For a single species RNA-Seq data-set, let $F=\{f_1, f_2, \dots, f_N\}$ be the s
 
 After mapping, we can observe the alignment positions of $f_i$, which can be mapped to several transcripts, but we do not know the exact transcript. The estimated parameters is $\alpha=\{\alpha_1, \alpha_2, \dots, \alpha_K\}$. The probability that the fragment $f$ comes from the transcripts $t$ is:
 
-$$
 \begin{equation}
 \begin{split}
 \Pro(f \in t) &= \frac{\rho_t M \tildel}{\sum\limits_{k=1}^{K} \rho_k M \widetilde{l_k}} \\
@@ -64,33 +57,27 @@ $$
 \end{split}
 (\#eq:1)
 \end{equation}
-$$
 
 If $f$ comes from $t$, the probability that $f$ mapped to a certain position of $t$ is:
 
-$$
 \begin{equation}
 \begin{split}
 \Pro(\mathrm{pos}|f \in t) = \frac{1}{\tildel}
 \end{split}
 (\#eq:2)
 \end{equation}
-$$
 
 Combining \@ref(eq:1) and \@ref(eq:2), the probability that $f$ mapped to a certain position of $t$ is:
 
-$$
 \begin{equation}
 \begin{split}
 \Pro(\mathrm{pos}, f \in t) = \frac{\alpha_t}{\tildel}
 \end{split}
 (\#eq:3)
 \end{equation}
-$$
 
 The logarithm of likelihood (LL) function is:
 
-$$
 \begin{equation}
 \begin{split}
 LL &= \sum\limits_{f \in F} \log \left(\Pro(\mathrm{pos}|\alpha)\ \right) \\
@@ -99,13 +86,11 @@ LL &= \sum\limits_{f \in F} \log \left(\Pro(\mathrm{pos}|\alpha)\ \right) \\
 \end{split}
 (\#eq:4)
 \end{equation}
-$$
 
 where $y_k$ is the $\{0, 1\}$ indicator.
 
 We use expectation–maximization (EM) algorithm to estimate $\alpha$. In the $n$ iteration, $\Pro(f \in t_1|\mathrm{pos}, \alpha^{(n)})$ equals to:
 
-$$
 \begin{equation}
 \begin{split}
 \Pro(f \in t_1|\mathrm{pos}, \alpha^{(n)}) &= \frac{\Pro(f \in t_1, \mathrm{pos}|\alpha^{(n)})}{\sum\limits_{k=1}^{K} \Pro(f \in t_k, \mathrm{pos}|\alpha^{(n)})} \\
@@ -114,11 +99,9 @@ $$
 \end{split}
 (\#eq:5)
 \end{equation}
-$$
 
 where $\sum\limits_{k=1}^{K} \lambda_k = 1$.
 
-$$
 \begin{equation}
 \begin{split}
 \alpha^{(n+1)} &= \argmax_\alpha \left( 
@@ -137,27 +120,23 @@ $$
 \end{split}
 (\#eq:6)
 \end{equation}
-$$
 
 The $n+1$ estimation of $\alpha$ is:
 
-$$
 \begin{equation*}
 \begin{split}
-\alpha_k^{(n+1)} &= \frac{\sum_\limits{f \in F} \lambda_k}{\sum\limits_{i=1}^{K} \sum\limits_{f \in F} \lambda_i} \\
+\alpha_k^{(n+1)} &= \frac{\sum\limits_{f \in F} \lambda_k}{\sum\limits_{i=1}^{K} \sum\limits_{f \in F} \lambda_i} \\
 &= \frac{\sum\limits_{f \in F} \lambda_k}{N}
 ,\ k=1, 2, \dots, K
 \end{split}
 \end{equation*}
-$$
 
 ## EM model for multiple species
 
 For a mix species RNA-Seq data-set, species $A$ and $B$ for example, $R=\{r_1, r_2, \dots, r_U\}$ is the set of transcripts (with length $l_u$ for $r_u$) in species $A$ and $S=\{s_1, s_2, \dots, s_V\}$ is the set of transcripts (with length $l_v$ for $s_v$) in species $B$. Total transcripts in species $A$ and $B$ composes the set $T=\{t_1, t_2, \dots, t_{U+V}\}$. 
 
-The relative abundances in $A$ and $B$ are $\rho_u$，$\sum\limits_{u=1}^U \rho_u= 1$ and $\theta_v$, $\sum\limits_{v=1}^V \theta_v= 1$, respectively. Similarly, we define:
+The relative abundances in $A$ and $B$ are $\rho_u$, $\sum\limits_{u=1}^U \rho_u= 1$ and $\theta_v$, $\sum\limits_{v=1}^V \theta_v= 1$, respectively. Similarly, we define:
 
-$$
 \begin{equation}
 \begin{split}
 \Pro(f \in r_u) = \frac{\rho_u \tildelu}{\sum\limits_{r \in R} \rho_r \widetilde{l_r}} = \alpha_u \\
@@ -165,9 +144,7 @@ $$
 \end{split}
 (\#eq:7)
 \end{equation}
-$$
 
-$$
 \begin{equation}
 \begin{split}
 \Pro(f \in s_v) = \frac{\theta_v \tildesv}{\sum\limits_{s \in S} \theta_s \widetilde{l_s}} = \beta_v \\
@@ -175,11 +152,9 @@ $$
 \end{split}
 (\#eq:8)
 \end{equation}
-$$
 
 The probability of single mapped fragment is:
 
-$$
 \begin{equation}
 \begin{split}
 \Pro(\mathrm{pos}|\eta)  &= \Pro(\mathrm{pos}, f \in A|\eta) + \Pro(\mathrm{pos}, f \in B|\eta)\\
@@ -188,21 +163,17 @@ $$
 \end{split}
 (\#eq:9)
 \end{equation}
-$$
 
 Thus, the parameters will be estimated are:
 
-$$
 \begin{equation*}
 \begin{split}
 \eta=\{\alpha_1, \dots, \alpha_u, \beta_1, \dots, \beta_v,  \Pro(f \in A),  \Pro(f \in B)\}
 \end{split}
 \end{equation*}
-$$
 
 In $n+1$ iteration, the parameters in the expanded EM algorithm:
 
-$$
 \begin{equation}
 \begin{split}
 \lambda_i^{(n+1)} &= \frac{\alpha_i^{(n)} \frac{m_i}{\widetilde{l_i}} \Pro(f \in A)}{\sum\limits_{i=1}^{U}\alpha_i^{(n)} \frac{m_i}{\widetilde{l_i}} \Pro(f \in A) + \sum\limits_{j=U+1}^{U+V}\beta_j^{(n)} \frac{m_j}{\widetilde{l_j}} \Pro(f \in B)}\\
@@ -214,6 +185,5 @@ $$
 \end{split}
 (\#eq:10)
 \end{equation}
-$$
 
 # References

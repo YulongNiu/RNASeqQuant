@@ -7,6 +7,12 @@ package: RNASeqQuant
 date: "`r Sys.Date()`"
 bibliography: RSQref.bib
 csl: nature.csl
+header-includes:
+  - \usepackage{amsmath}
+  - \newcommand{\Pro}{\mathrm{P}}
+  - \newcommand{\tildel}{\widetilde{l_t}}
+  - \newcommand{\tildelu}{\widetilde{l_u}}
+  - \newcommand{\tildesv}{\widetilde{l_v}}
 output:
   BiocStyle::pdf_document:
     toc: true
@@ -15,6 +21,8 @@ output:
       in_header: header.tex
   BiocStyle::html_document:
     toc: true
+    includes:
+      before_body: header.html
 vignette: >
   %\usepackage[utf8]{inputenc}
   %\VignetteIndexEntry{RNASeqQuant: an R package for RNA-Seq quantification}

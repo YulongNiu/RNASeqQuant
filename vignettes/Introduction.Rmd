@@ -9,6 +9,7 @@ bibliography: RSQref.bib
 csl: nature.csl
 header-includes:
   - \usepackage{amsmath}
+  - \usepackage{mathtools}
   - \newcommand{\Pro}{\mathrm{P}}
   - \newcommand{\tildel}[1]{\widetilde{l_{#1}}}
 output:
@@ -19,6 +20,7 @@ output:
       in_header: header.tex
   BiocStyle::html_document:
     toc: true
+    toc_float: true
     includes:
       before_body: header.html
 vignette: >
@@ -53,7 +55,7 @@ In single species, if $T=\{t_1, t_2, \dots, t_K\}$ is the set of transcripts (wi
 
 For a single species RNA-Seq data-set, let $F=\{f_1, f_2, \dots, f_N\}$ be the set of transcription fragments (reads) in a total number of $N=|F|$. Fragments mapped to the transcript $t_i$ composes the set $F_t \in F$ in a number of $X_t=|F_t|$. We assume that all fragments in $F$ have the same length $m$. In $t_i$, the number of position in which the fragment can start is $\tildel{t} = l_t - m + 1$. $\tildel{t}$ is also called *effective length* [@bray2016near; @pachter2011models].
 
-After mapping, we can observe the alignment positions of $f_i$, which can be mapped to several transcripts, but we do not know the exact transcript. The estimated parameters is $\alpha=\{\alpha_1, \alpha_2, \dots, \alpha_K\}$. The probability that the fragment $f$ comes from the transcripts $t$ is:
+After mapping, we can observe the alignment positions of $f_i$, which can be mapped to several transcripts, but we do not know the exact transcript. The estimated parameters is $\alpha=\{\alpha_1, \alpha_2, \dots, \alpha_K\}$, $\sum\limits_{k=1}^K \alpha_k=1$. The probability that the fragment $f$ comes from the transcripts $t$ is:
 
 \begin{equation}
 \begin{split}
@@ -191,5 +193,43 @@ In $n+1$ iteration, the parameters in the expanded EM algorithm:
 \end{split}
 (\#eq:10)
 \end{equation}
+
+## GD model for single species
+
+The estimated parameters $\alpha=\{\alpha_1, \alpha_2, \dots, \alpha_K\}$ has restrictions: $\sum\limits_{k=1}^K \alpha_k=1$ and $\alpha_k \in [0, 1]$. We remove the restrictions by transforming $\alpha$ as:
+
+\begin{equation*}
+\begin{split}
+\alpha_t &= \frac{f(x_t)}{\sum\limits_{k=1}^{K} f(x_k)} \\
+&= \frac{f(x_t)}{Z}
+\end{split}
+\end{equation*}
+
+where $x \in (-\infty, +\infty)$, $f(x) > 0$, and $f(x)$ is derivable. Possible candidates of $f(x)$ are:
+
+| Name     | Equation                                          | Derivative                                | Range                    |
+|----------|---------------------------------------------------|-------------------------------------------|--------------------------|
+| Softmax  | $f(x)=e^x$                                        | $f'(x)=f(x)$                              | $(0,+\infty)$            |
+| SoftPlus | $f(x)=\log(1+e^x)$                                | $f'(x)=\frac{1}{1+e^x}$                   | $(0,+\infty)$            |
+| Softsign | $f(x)=\frac{1}{1+\abs{x}} + 1$                    | $f'(x)=\frac{1}{(1+\abs{x})^2}$           | $(0,2)$                  |
+| Sigmoid  | $f(x)=\frac{1}{1+e^x}$                            | $f'(x)=f(x)(1-f(x))$                      | $(0,1)$                  |
+| ISRU     | $f(x)=\frac{x}{\sqrt{1+ax^2}}+\frac{1}{\sqrt{a}}$ | $f'(x)=\left(\frac{1}{(1+ax)^2}\right)^3$ | $(0,\frac{2}{\sqrt{a}})$ |
+| ArcTan   | $f(x)=\tan^{-1}(x)+\frac{\pi}{2}$                 | $f'(x)=\frac{1}{1+x^2}$                   | $(0,\pi)$                |
+| TanH     | $f(x)=\frac{e^x-e^{-x}}{e^x+e^{-x}}+1$            | $f'(x)=1-f(x)^2$                          | $(0,1)$                  |
+
+
+[^1]: Inverse square root unit
+
+Thus the loss function is defined as negative logarithm of likelihood (NLL):
+
+\begin{equation}
+\begin{split}
+NLL &= -\sum\limits_{f \in F} \log \left( \sum_{k = 1}^{K} y_k \frac{\alpha_k}{\tildel{k}} \right) \\
+&=  -\sum\limits_{f \in F} \log \left( \sum_{k = 1}^{K} \frac{f(x_k)}{Z} \frac{y_k}{\tildel{k}} \right) \\
+&=  -\sum\limits_{f \in F} \log \left( \sum_{k = 1}^{K} f(x_k) \frac{y_k}{\tildel{k}} - \log Z \right)
+\end{split}
+(\#eq:11)
+\end{equation}
+
 
 # References

@@ -12,6 +12,7 @@ header-includes:
   - \usepackage{mathtools}
   - \newcommand{\Pro}{\mathrm{P}}
   - \newcommand{\tildel}[1]{\widetilde{l_{#1}}}
+  - \newcommand*{\diff}{\mathop{}\!\mathrm{d}}
 output:
   BiocStyle::pdf_document:
     toc: true
@@ -196,40 +197,63 @@ In $n+1$ iteration, the parameters in the expanded EM algorithm:
 
 ## GD model for single species
 
+### Active functions and gradient
+
 The estimated parameters $\alpha=\{\alpha_1, \alpha_2, \dots, \alpha_K\}$ has restrictions: $\sum\limits_{k=1}^K \alpha_k=1$ and $\alpha_k \in [0, 1]$. We remove the restrictions by transforming $\alpha$ as:
 
 \begin{equation*}
 \begin{split}
-\alpha_t &= \frac{f(x_t)}{\sum\limits_{k=1}^{K} f(x_k)} \\
-&= \frac{f(x_t)}{Z}
+\alpha_t &= \frac{f(x_t)}{\sum\limits_{k=1}^{K} f(x_k)} = \frac{f(x_t)}{Z} \\
 \end{split}
 \end{equation*}
 
-where $x \in (-\infty, +\infty)$, $f(x) > 0$, and $f(x)$ is derivable. Possible candidates of $f(x)$ are:
+where $x \in (-\infty, +\infty)$, $f(x) > 0$, and $f(x)$ is derivable. Then the estimated parameters are $x=\{x_1, x_2, \dots, x_K\}$, which can be estimated by the gradient descent algorithm. Candidates of $f(x)$ are:
 
 | Name     | Equation                                          | Derivative                                | Range                    |
 |----------|---------------------------------------------------|-------------------------------------------|--------------------------|
 | Softmax  | $f(x)=e^x$                                        | $f'(x)=f(x)$                              | $(0,+\infty)$            |
 | SoftPlus | $f(x)=\log(1+e^x)$                                | $f'(x)=\frac{1}{1+e^x}$                   | $(0,+\infty)$            |
-| Softsign | $f(x)=\frac{1}{1+\abs{x}} + 1$                    | $f'(x)=\frac{1}{(1+\abs{x})^2}$           | $(0,2)$                  |
+| Softsign | $f(x)=\frac{1}{1+\lvert x \rvert} + 1$            | $f'(x)=\frac{1}{(1+\lvert x \rvert)^2}$   | $(0,2)$                  |
 | Sigmoid  | $f(x)=\frac{1}{1+e^x}$                            | $f'(x)=f(x)(1-f(x))$                      | $(0,1)$                  |
 | ISRU     | $f(x)=\frac{x}{\sqrt{1+ax^2}}+\frac{1}{\sqrt{a}}$ | $f'(x)=\left(\frac{1}{(1+ax)^2}\right)^3$ | $(0,\frac{2}{\sqrt{a}})$ |
 | ArcTan   | $f(x)=\tan^{-1}(x)+\frac{\pi}{2}$                 | $f'(x)=\frac{1}{1+x^2}$                   | $(0,\pi)$                |
 | TanH     | $f(x)=\frac{e^x-e^{-x}}{e^x+e^{-x}}+1$            | $f'(x)=1-f(x)^2$                          | $(0,1)$                  |
 
+: (\#tab:table1) Active functions for the GD[^1].
 
-[^1]: Inverse square root unit
+[^1]: ISUR: inverse square root unit
 
 Thus the loss function is defined as negative logarithm of likelihood (NLL):
 
 \begin{equation}
 \begin{split}
-NLL &= -\sum\limits_{f \in F} \log \left( \sum_{k = 1}^{K} y_k \frac{\alpha_k}{\tildel{k}} \right) \\
+loss(x) = NLL &= -\sum\limits_{f \in F} \log \left( \sum_{k = 1}^{K} y_k \frac{\alpha_k}{\tildel{k}} \right) \\
 &=  -\sum\limits_{f \in F} \log \left( \sum_{k = 1}^{K} \frac{f(x_k)}{Z} \frac{y_k}{\tildel{k}} \right) \\
 &=  -\sum\limits_{f \in F} \log \left( \sum_{k = 1}^{K} f(x_k) \frac{y_k}{\tildel{k}} - \log Z \right)
 \end{split}
 (\#eq:11)
 \end{equation}
 
+The derivative of $x_i$ is:
+
+\begin{equation}
+\begin{split}
+\frac{\diff loss(x)}{\diff x_i} &= -\sum\limits_{f \in F} \left( 
+   \frac{f'(x_i) \frac{y_i}{\tildel{i}}}{\sum_{k = 1}^{K} f(x_k) \frac{y_k}{\tildel{k}}} - \frac{f'(x_i)}{Z}
+   \right)
+\end{split}
+(\#eq:12)
+\end{equation}
+
+The gradient is:
+
+\begin{equation}
+\begin{split}
+g &= \left( \frac{\diff loss(x)}{\diff x_1}, \frac{\diff loss(x)}{\diff x_2}, \dots, \frac{\diff loss(x)}{\diff x_k}  \right)
+\end{split}
+(\#eq:13)
+\end{equation}
+
+### Optimization
 
 # References

@@ -209,24 +209,27 @@ Similar to \@ref(eq:5),
 
 \begin{equation}
 \begin{split}
-\lambda_i^{(n)} &= \frac{\alpha_i^{(n)} \frac{m_i}{\tildel{i}} \Pro(f \in A)}{\sum\limits_{i=1}^{U}\alpha_i^{(n)} \frac{m_i}{\tildel{i}} \Pro(f \in A) + \sum\limits_{j=U+1}^{U+V}\beta_j^{(n)} \frac{m_j}{\tildel{j}} \Pro(f \in B)}\\
-\lambda_j^{(n)} &= \frac{\beta_j^{(n)} \frac{m_j}{\tildel{j}} \Pro(f \in A)}{\sum\limits_{i=1}^{U}\alpha_i^{(n)} \frac{m_i}{\tildel{i}} \Pro(f \in A) + \sum\limits_{j=U+1}^{U+V}\beta_j^{(n)} \frac{m_j}{\tildel{j}} \Pro(f \in B)}\\
+\Pro(f \in t_u, f \in A | \mathrm{pos}, \eta^{(n)}) &= \frac{\alpha_u^{(n)} \frac{m_u}{\tildel{u}} \Pro(f \in A)^{(n)}}{\Pro(\mathrm{pos}|\eta)}\\
+ &= \lambda_u^{(n)} \\
+\Pro(f \in t_v, f \in B | \mathrm{pos}, \eta^{(n)}) &= \frac{\beta_v^{(n)} \frac{m_v}{\tildel{v}} \Pro(f \in B)^{(n)}}{\Pro(\mathrm{pos}|\eta)}\\
+&= \lambda_v^{(n)}
 \end{split}
 (\#eq:12)
 \end{equation}
 
 In $n+1$ iteration, the parameters in the expanded EM algorithm:
 
-\begin{equation}
+\begin{equation*}
 \begin{split}
+\alpha_u^{(n+1)} &= \frac{\sum\limits_{f \in F} \lambda_u^{(n+1)}}{\sum\limits_{f \in F} \sum\limits_{u \in U} \lambda_u^{(n+1)}} \\
 
-\alpha_i^{(n+1)} &= \frac{\sum\limits_{f \in F} \lambda_i^{(n+1)}}{\sum\limits_{f \in F} \sum\limits_{i=1}^{U} \lambda_i^{(n+1)}} \\
-\beta_j^{(n+1)} &= \frac{\sum\limits_{f \in F} \lambda_j^{(n+1)}}{\sum\limits_{f \in F} \sum\limits_{j=U+1}^{U+V} \lambda_j^{(n+1)}} \\
-\Pro(f \in A)^{(n+1)} &= \frac{\sum\limits_{f \in F} \sum\limits_{i=1}^{U} \lambda_i^{(n+1)}}{\sum\limits_{f \in F} \sum\limits_{i=1}^{U} \lambda_i^{(n+1)} + \sum\limits_{f \in F} \sum\limits_{j=U+1}^{U+V} \lambda_j^{(n+1)}} = \frac{\sum\limits_{f \in F} \sum\limits_{i=1}^{U} \lambda_i^{(n+1)}}{N}\\
-\Pro(f \in B)^{(n+1)} &= \frac{\sum\limits_{f \in F} \sum\limits_{j=U+1}^{U+V} \lambda_j^{(n+1)}}{\sum\limits_{f \in F} \sum\limits_{i=1}^{U} \lambda_i^{(n+1)} + \sum\limits_{f \in F} \sum\limits_{j=U+1}^{U+V} \lambda_j^{(n+1)}} = \frac{\sum\limits_{f \in F} \sum\limits_{j=U+1}^{U+V} \lambda_j^{(n+1)}}{N} 
+\beta_v^{(n+1)} &= \frac{\sum\limits_{f \in F} \lambda_v^{(n+1)}}{\sum\limits_{f \in F} \sum\limits_{v \in V} \lambda_v^{(n+1)}} \\
+
+\Pro(f \in A)^{(n+1)} &= \frac{\sum\limits_{f \in F} \sum\limits_{u \in U} \lambda_u^{(n+1)}}{\sum\limits_{f \in F} \sum\limits_{u \in U} \lambda_u^{(n+1)} + \sum\limits_{f \in F} \sum\limits_{v \in V} \lambda_v^{(n+1)}} = \frac{\sum\limits_{f \in F} \sum\limits_{u \in U} \lambda_u^{(n+1)}}{N}\\
+
+\Pro(f \in B)^{(n+1)} &= \frac{\sum\limits_{f \in F} \sum\limits_{v \in V} \lambda_v^{(n+1)}}{N} 
 \end{split}
-(\#eq:11)
-\end{equation}
+\end{equation*}
 
 ## GD model for single species
 

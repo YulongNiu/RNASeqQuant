@@ -93,7 +93,6 @@ gdest <- NAdagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300
 
 ## NRMSProp full batch
 emest <- EM(plist$efflen, plist$ec, plist$count, length(plist$efflen), detail = TRUE)
-gdest <- RMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 500, 36580, 0.005, list(method = 'Softmax'), list())
 gdest <- NRMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 500, 36580, 0.005, list(method = 'Softmax'), list())
 gdest <- NRMSPropW(plist$efflen, plist$ec, plist$count, 1/w, length(plist$efflen), 500, 36580, 0.005, list(method = 'Softmax'), list())
 gdest <- NAdagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 500, 36580, 0.5, list(method = 'Softmax'), list())

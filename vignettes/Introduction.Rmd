@@ -14,16 +14,16 @@ header-includes:
   - \newcommand{\tildel}[1]{\widetilde{l_{#1}}}
   - \newcommand*{\diff}{\mathop{}\!\mathrm{d}}
 output:
-  BiocStyle::pdf_document:
-    toc: true
-    latex_engine: pdflatex
-    includes:
-      in_header: header.tex
   BiocStyle::html_document:
     toc: true
     toc_float: true
     includes:
       before_body: header.html
+  BiocStyle::pdf_document:
+    toc: true
+    latex_engine: pdflatex
+    includes:
+      in_header: header.tex
 vignette: >
   %\usepackage[utf8]{inputenc}
   %\VignetteIndexEntry{RNASeqQuant: an R package for RNA-Seq quantification}
@@ -130,7 +130,7 @@ where $\sum\limits_{k=1}^{K} \lambda_k = 1$.
 (\#eq:6)
 \end{equation}
 
-The $n+1$ estimation of $\alpha_k$ is:
+In the $n+1$ iteration, the estimated $\alpha_k$ is:
 
 \begin{equation*}
 \begin{split}
@@ -241,7 +241,7 @@ The estimated parameters $\alpha=\{\alpha_1, \alpha_2, \dots, \alpha_K\}$ has re
 (\#eq:13)
 \end{equation}
 
-where $x \in (-\infty, +\infty)$, $f(x) > 0$, and $f(x)$ is derivable and monotonically increasing. Then the parameters are $x=\{x_1, x_2, \dots, x_K\}$, which can be estimated by the gradient descent algorithm. Candidates of $f(x)$ are:
+where $x \in (-\infty, +\infty)$, $f(x) > 0$, and $f(x)$ is derivable and monotonically increasing. Then the parameters are $x=\{x_1, x_2, \dots, x_K\}$, which can be estimated by the gradient descent (GD) algorithm. Candidates of $f(x)$ are:
 
 | Name     | Equation                                          | Derivative                                | Range                    |
 |----------|---------------------------------------------------|-------------------------------------------|--------------------------|
@@ -288,6 +288,23 @@ g^{(n)} &= \left( \frac{\diff Loss(x)}{\diff x_1^{(n)}}, \frac{\diff Loss(x)}{\d
 (\#eq:16)
 \end{equation}
 
+In the $n+1$ iteration, the estimated $x$ by the vanilla GD is:
+
+\begin{equation}
+\begin{split}
+x^{(n+1)} &= x^{(n)} - \eta g^{(n)}
+\end{split}
+(\#eq:17)
+\end{equation}
+
+where $\eta$ is the learning rate, which is a small value like $10^{-3}$.
+
 ### Optimization
+
+The GD optimization algorithm has been thoroughly reviewed[@ruder2016overview]. 
+
+* Momentum
+
+
 
 # References

@@ -174,7 +174,7 @@ The probability of single mapped fragment is:
 (\#eq:9)
 \end{equation}
 
-where $m_u$ and $m_v$ are ${0, 1}$ indicators. The estimated parameters are:
+where $m_u$ and $m_v$ are $\{0, 1\}$ indicators. The estimated parameters are:
 
 \begin{equation*}
 \begin{split}
@@ -198,19 +198,28 @@ Note that \@ref(eq:10) also equals to:
 
 \begin{equation}
 \begin{split}
-LL(\eta) &= \sum\limits_{f \in F}  \log \left( \sum_{t \in T} \left(
+LL(\eta) &= \sum\limits_{f \in F}  \log \left( \sum_{t \in T, S \in \{A, B\}} \left(
 \Pro(\mathrm{pos} | f \in t, f \in S, \eta) \Pro(f \in t, f \in S)
 \right) \right)
 \end{split}
 (\#eq:11)
 \end{equation}
 
+Similar to \@ref(eq:5), 
+
+\begin{equation}
+\begin{split}
+\lambda_i^{(n)} &= \frac{\alpha_i^{(n)} \frac{m_i}{\tildel{i}} \Pro(f \in A)}{\sum\limits_{i=1}^{U}\alpha_i^{(n)} \frac{m_i}{\tildel{i}} \Pro(f \in A) + \sum\limits_{j=U+1}^{U+V}\beta_j^{(n)} \frac{m_j}{\tildel{j}} \Pro(f \in B)}\\
+\lambda_j^{(n)} &= \frac{\beta_j^{(n)} \frac{m_j}{\tildel{j}} \Pro(f \in A)}{\sum\limits_{i=1}^{U}\alpha_i^{(n)} \frac{m_i}{\tildel{i}} \Pro(f \in A) + \sum\limits_{j=U+1}^{U+V}\beta_j^{(n)} \frac{m_j}{\tildel{j}} \Pro(f \in B)}\\
+\end{split}
+(\#eq:12)
+\end{equation}
+
 In $n+1$ iteration, the parameters in the expanded EM algorithm:
 
 \begin{equation}
 \begin{split}
-\lambda_i^{(n+1)} &= \frac{\alpha_i^{(n)} \frac{m_i}{\tildel{i}} \Pro(f \in A)}{\sum\limits_{i=1}^{U}\alpha_i^{(n)} \frac{m_i}{\tildel{i}} \Pro(f \in A) + \sum\limits_{j=U+1}^{U+V}\beta_j^{(n)} \frac{m_j}{\tildel{j}} \Pro(f \in B)}\\
-\lambda_j^{(n+1)} &= \frac{\beta_j^{(n)} \frac{m_j}{\tildel{j}} \Pro(f \in A)}{\sum\limits_{i=1}^{U}\alpha_i^{(n)} \frac{m_i}{\tildel{i}} \Pro(f \in A) + \sum\limits_{j=U+1}^{U+V}\beta_j^{(n)} \frac{m_j}{\tildel{j}} \Pro(f \in B)}\\
+
 \alpha_i^{(n+1)} &= \frac{\sum\limits_{f \in F} \lambda_i^{(n+1)}}{\sum\limits_{f \in F} \sum\limits_{i=1}^{U} \lambda_i^{(n+1)}} \\
 \beta_j^{(n+1)} &= \frac{\sum\limits_{f \in F} \lambda_j^{(n+1)}}{\sum\limits_{f \in F} \sum\limits_{j=U+1}^{U+V} \lambda_j^{(n+1)}} \\
 \Pro(f \in A)^{(n+1)} &= \frac{\sum\limits_{f \in F} \sum\limits_{i=1}^{U} \lambda_i^{(n+1)}}{\sum\limits_{f \in F} \sum\limits_{i=1}^{U} \lambda_i^{(n+1)} + \sum\limits_{f \in F} \sum\limits_{j=U+1}^{U+V} \lambda_j^{(n+1)}} = \frac{\sum\limits_{f \in F} \sum\limits_{i=1}^{U} \lambda_i^{(n+1)}}{N}\\

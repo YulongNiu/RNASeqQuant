@@ -14,16 +14,16 @@ header-includes:
   - \newcommand{\tildel}[1]{\widetilde{l_{#1}}}
   - \newcommand*{\diff}{\mathop{}\!\mathrm{d}}
 output:
-  BiocStyle::html_document:
-    toc: true
-    toc_float: true
-    includes:
-      before_body: header.html
   BiocStyle::pdf_document:
     toc: true
     latex_engine: pdflatex
     includes:
       in_header: header.tex
+  BiocStyle::html_document:
+    toc: true
+    toc_float: true
+    includes:
+      before_body: header.html
 vignette: >
   %\usepackage[utf8]{inputenc}
   %\VignetteIndexEntry{RNASeqQuant: an R package for RNA-Seq quantification}
@@ -130,11 +130,11 @@ where $\sum\limits_{k=1}^{K} \lambda_k = 1$.
 (\#eq:6)
 \end{equation}
 
-The $n+1$ estimation of $\alpha_i$ is:
+The $n+1$ estimation of $\alpha_k$ is:
 
 \begin{equation*}
 \begin{split}
-\alpha_i^{(n+1)} &= \frac{\sum\limits_{f \in F} \lambda_k^{(n)}}{\sum\limits_{t \in T} \sum\limits_{f \in F} \lambda_t^{(n)}} \\
+\alpha_k^{(n+1)} &= \frac{\sum\limits_{f \in F} \lambda_k^{(n)}}{\sum\limits_{t \in T} \sum\limits_{f \in F} \lambda_t^{(n)}} \\
 &= \frac{\sum\limits_{f \in F} \lambda_k^{(n)}}{N}
 ,\ k=1, 2, \dots, K
 \end{split}
@@ -222,11 +222,8 @@ In $n+1$ iteration, the parameters in the expanded EM algorithm:
 \begin{equation*}
 \begin{split}
 \alpha_u^{(n+1)} &= \frac{\sum\limits_{f \in F} \lambda_u^{(n+1)}}{\sum\limits_{f \in F} \sum\limits_{u \in U} \lambda_u^{(n+1)}} \\
-
 \beta_v^{(n+1)} &= \frac{\sum\limits_{f \in F} \lambda_v^{(n+1)}}{\sum\limits_{f \in F} \sum\limits_{v \in V} \lambda_v^{(n+1)}} \\
-
 \Pro(f \in A)^{(n+1)} &= \frac{\sum\limits_{f \in F} \sum\limits_{u \in U} \lambda_u^{(n+1)}}{\sum\limits_{f \in F} \sum\limits_{u \in U} \lambda_u^{(n+1)} + \sum\limits_{f \in F} \sum\limits_{v \in V} \lambda_v^{(n+1)}} = \frac{\sum\limits_{f \in F} \sum\limits_{u \in U} \lambda_u^{(n+1)}}{N}\\
-
 \Pro(f \in B)^{(n+1)} &= \frac{\sum\limits_{f \in F} \sum\limits_{v \in V} \lambda_v^{(n+1)}}{N} 
 \end{split}
 \end{equation*}
@@ -235,15 +232,16 @@ In $n+1$ iteration, the parameters in the expanded EM algorithm:
 
 ### Active functions and gradient
 
-The estimated parameters $\alpha=\{\alpha_1, \alpha_2, \dots, \alpha_K\}$ has restrictions: $\sum\limits_{k=1}^K \alpha_k=1$ and $\alpha_k \in [0, 1]$. We remove the restrictions by transforming $\alpha$ as:
+The estimated parameters $\alpha=\{\alpha_1, \alpha_2, \dots, \alpha_K\}$ has restrictions: $\sum\limits_{t \in T} \alpha_k=1$ and $\alpha_k \in [0, 1]$. We remove the restrictions by transforming $\alpha$ as:
 
-\begin{equation*}
+\begin{equation}
 \begin{split}
-\alpha_t &= \frac{f(x_t)}{\sum\limits_{k=1}^{K} f(x_k)} = \frac{f(x_t)}{Z} \\
+\alpha_k &= \frac{f(x_k)}{\sum\limits_{t \in T} f(x_t)} = \frac{f(x_k)}{Z} \\
 \end{split}
-\end{equation*}
+(\#eq:13)
+\end{equation}
 
-where $x \in (-\infty, +\infty)$, $f(x) > 0$, and $f(x)$ is derivable and monotonically increasing. Then the estimated parameters are $x=\{x_1, x_2, \dots, x_K\}$, which can be estimated by the gradient descent algorithm. Candidates of $f(x)$ are:
+where $x \in (-\infty, +\infty)$, $f(x) > 0$, and $f(x)$ is derivable and monotonically increasing. Then the parameters are $x=\{x_1, x_2, \dots, x_K\}$, which can be estimated by the gradient descent algorithm. Candidates of $f(x)$ are:
 
 | Name     | Equation                                          | Derivative                                | Range                    |
 |----------|---------------------------------------------------|-------------------------------------------|--------------------------|
@@ -259,35 +257,35 @@ where $x \in (-\infty, +\infty)$, $f(x) > 0$, and $f(x)$ is derivable and monoto
 
 [^1]: ISUR: inverse square root unit
 
-Thus the loss function is defined as negative logarithm of likelihood (NLL):
+The loss function is defined as negative logarithm of likelihood (NLL):
 
 \begin{equation}
 \begin{split}
-loss(x) = NLL &= -\sum\limits_{f \in F} \log \left( \sum_{k = 1}^{K} y_k \frac{\alpha_k}{\tildel{k}} \right) \\
-&=  -\sum\limits_{f \in F} \log \left( \sum_{k = 1}^{K} \frac{f(x_k)}{Z} \frac{y_k}{\tildel{k}} \right) \\
-&=  -\sum\limits_{f \in F} \log \left( \sum_{k = 1}^{K} f(x_k) \frac{y_k}{\tildel{k}} - \log Z \right)
+Loss(x) = NLL(x) &= -\sum\limits_{f \in F} \log \left( \sum_{t \in T} y_t \frac{\alpha_t}{\tildel{t}} \right) \\
+&=  -\sum\limits_{f \in F} \log \left( \sum_{t \in T} \frac{f(x_t)}{Z} \frac{y_t}{\tildel{t}} \right) \\
+&=  -\sum\limits_{f \in F} \log \left( \sum_{t \in T} f(x_t) \frac{y_t}{\tildel{t}} - \log Z \right)
 \end{split}
-(\#eq:12)
+(\#eq:14)
 \end{equation}
 
-The derivative of $x_i$ is:
+The derivative of $x_k$ is:
 
 \begin{equation}
 \begin{split}
-\frac{\diff loss(x)}{\diff x_i} &= -\sum\limits_{f \in F} \left( 
-   \frac{f'(x_i) \frac{y_i}{\tildel{i}}}{\sum_{k = 1}^{K} f(x_k) \frac{y_k}{\tildel{k}}} - \frac{f'(x_i)}{Z}
+\frac{\diff Loss(x)}{\diff x_k} &= -\sum\limits_{f \in F} \left( 
+   \frac{f'(x_k) \frac{y_k}{\tildel{k}}}{\sum\limits_{t \in T} f(x_t) \frac{y_t}{\tildel{t}}} - \frac{f'(x_k)}{Z}
    \right)
 \end{split}
-(\#eq:13)
+(\#eq:15)
 \end{equation}
 
 The gradient is:
 
 \begin{equation}
 \begin{split}
-g &= \left( \frac{\diff loss(x)}{\diff x_1}, \frac{\diff loss(x)}{\diff x_2}, \dots, \frac{\diff loss(x)}{\diff x_k}  \right)
+g^{(n)} &= \left( \frac{\diff Loss(x)}{\diff x_1^{(n)}}, \frac{\diff Loss(x)}{\diff x_2^{(n)}}, \dots, \frac{\diff Loss(x)}{\diff x_k^{(n)}}  \right)
 \end{split}
-(\#eq:14)
+(\#eq:16)
 \end{equation}
 
 ### Optimization

@@ -52,35 +52,35 @@ Rclass <- function(x){sub('%obj%', x, '<span style="font-family:\'Times New Roma
 
 ## EM model for single species
 
-In single species, if $T=\{t_1, t_2, \dots, t_K\}$ is the set of transcripts (with length $l_i$ for $t_i$) and the copy number of $t_i$ is $c_i$, we define $\rho_k=\frac{c_k}{\sum\limits_{t \in T}c_t} = \frac{c_k}{M}$ is the relative abundances of $t_i$, where $M$ is the total copy number, so that $\sum\limits_{k=1}^K \rho_k=1$.
+In single species, if $T=\{t_1, t_2, \dots, t_K\}$ is the set of transcripts (with length $l_k$ for $t_k$) and the copy number of $t_k$ is $c_k$, we define $\rho_k=\frac{c_k}{\sum\limits_{t \in T}c_t} = \frac{c_k}{M}$ is the relative abundances of $t_i$, where $M$ is the total copy number, so that $\sum\limits_{t \in T} \rho_k=1$.
 
-For a single species RNA-Seq data-set, let $F=\{f_1, f_2, \dots, f_N\}$ be the set of transcription fragments (reads) in a total number of $N=|F|$. Fragments mapped to the transcript $t_i$ composes the set $F_t \in F$ in a number of $X_t=|F_t|$. We assume that all fragments in $F$ have the same length $m$. In $t_i$, the number of position in which the fragment can start is $\tildel{t} = l_t - m + 1$. $\tildel{t}$ is also called *effective length* [@bray2016near; @pachter2011models].
+For a single species RNA-Seq data-set, let $F=\{f_1, f_2, \dots, f_N\}$ be the set of transcription fragments (reads) in a total number of $N=|F|$. We assume that all fragments in $F$ have the same length $m$. In $t_k$, the number of position in which the fragment can start is $\tildel{k} = l_k - m + 1$. $\tildel{k}$ is also called *effective length* [@bray2016near; @pachter2011models].
 
-After mapping, we can observe the alignment positions of $f_i$, which can be mapped to several transcripts, but we do not know the exact transcript. The estimated parameters is $\alpha=\{\alpha_1, \alpha_2, \dots, \alpha_K\}$, $\sum\limits_{k=1}^K \alpha_k=1$. The probability that the fragment $f$ comes from the transcripts $t$ is:
+After mapping, we can observe the alignment positions of $f$, which can be mapped to several transcripts, but we do not know the exact transcript. The estimated parameters is $\alpha=\{\alpha_1, \alpha_2, \dots, \alpha_K\}$, $\sum\limits_{t \in T} \alpha_t=1$. The probability that the fragment $f$ comes from the transcripts $t_k$ is:
 
 \begin{equation}
 \begin{split}
-\Pro(f \in t) &= \frac{\rho_t M \tildel{t}}{\sum\limits_{k=1}^{K} \rho_k M \tildel{k}} \\
-&= \frac{\rho_t \tildel{t}}{\sum\limits_{k=1}^{K} \rho_k \tildel{k}} \\
-&= \alpha_t
+\Pro(f \in t_k) &= \frac{\rho_k M \tildel{k}}{\sum\limits_{t \in T} \rho_t M \tildel{t}} \\
+&= \frac{\rho_k \tildel{k}}{\sum\limits_{t \in T} \rho_t \tildel{t}} \\
+&= \alpha_k
 \end{split}
 (\#eq:1)
 \end{equation}
 
-If $f$ comes from $t$, the probability that $f$ mapped to a certain position of $t$ is:
+If $f$ comes from $t_k$, the probability that $f$ mapped to a certain position of $t_k$ is:
 
 \begin{equation}
 \begin{split}
-\Pro(\mathrm{pos}|f \in t) = \frac{1}{\tildel{t}}
+\Pro(\mathrm{pos}|f \in t_k) = \frac{1}{\tildel{k}}
 \end{split}
 (\#eq:2)
 \end{equation}
 
-Combining \@ref(eq:1) and \@ref(eq:2), the probability that $f$ mapped to a certain position of $t$ is:
+Combining \@ref(eq:1) and \@ref(eq:2), the probability that $f$ mapped to a certain position of $t_k$ is:
 
 \begin{equation}
 \begin{split}
-\Pro(f \in t, \mathrm{pos}) = \frac{\alpha_t}{\tildel{t}}
+\Pro(f \in t_k, \mathrm{pos}) = \frac{\alpha_k}{\tildel{k}}
 \end{split}
 (\#eq:3)
 \end{equation}
@@ -89,9 +89,9 @@ The logarithm of likelihood (LL) function is:
 
 \begin{equation}
 \begin{split}
-LL &= \sum\limits_{f \in F} \log \left(\Pro(\mathrm{pos}|\alpha)\ \right) \\
-&= \sum\limits_{f \in F} \log \left( \sum_{k=1}^{K} \Pro(\mathrm{pos}, f \in t_k|\alpha) \right) \\
-&= \sum\limits_{f \in F} \log \left( \sum_{k = 1}^{K} y_k \frac{\alpha_k}{\tildel{k}} \right) \\
+LL(\alpha) &= \sum\limits_{f \in F} \log \left(\Pro(\mathrm{pos}|\alpha)\ \right) \\
+&= \sum\limits_{f \in F} \log \left( \sum_{t \in T} \Pro(\mathrm{pos}, f \in t|\alpha) \right) \\
+&= \sum\limits_{f \in F} \log \left( \sum_{t \in T} y_t \frac{\alpha_t}{\tildel{t}} \right) \\
 \end{split}
 (\#eq:4)
 \end{equation}
@@ -102,8 +102,8 @@ We use expectation–maximization (EM) algorithm to estimate $\alpha$. In the $n
 
 \begin{equation}
 \begin{split}
-\Pro(f \in t_k|\mathrm{pos}, \alpha^{(n)}) &= \frac{\Pro(f \in t_k, \mathrm{pos}|\alpha^{(n)})}{\sum\limits_{k=1}^{K} \Pro(f \in t_k, \mathrm{pos}|\alpha^{(n)})} \\
-&= \frac{\alpha_k^{(n)} \frac{y_k}{\tildel{k}}}{\sum\limits_{k=1}^{K} \alpha_k^{(n)} \frac{y_k}{\tildel{k}}} \\
+\Pro(f \in t_k|\mathrm{pos}, \alpha^{(n)}) &= \frac{\Pro(f \in t_k, \mathrm{pos}|\alpha^{(n)})}{\sum\limits_{t \in T} \Pro(f \in t, \mathrm{pos}|\alpha^{(n)})} \\
+&= \frac{\alpha_k^{(n)} \frac{y_k}{\tildel{k}}}{\sum\limits_{t \in T} \alpha_t^{(n)} \frac{y_t}{\tildel{t}}} \\
 &= \lambda_k^{(n)}
 \end{split}
 (\#eq:5)
@@ -114,27 +114,27 @@ where $\sum\limits_{k=1}^{K} \lambda_k = 1$.
 \begin{equation}
 \begin{split}
 \alpha^{(n+1)} &= \argmax_\alpha \left( 
-\sum_{f \in F} \sum_{k=1}^{K} \Pro(f \in t_k|\mathrm{pos}, \alpha^{(n)})  \log \left( \Pro(f \in t_1, \mathrm{pos}|\alpha^{(n)}) \right) 
+\sum_{f \in F} \sum_{t \in T} \Pro(f \in t|\mathrm{pos}, \alpha^{(n)})  \log \left( \Pro(f \in t, \mathrm{pos}|\alpha^{(n)}) \right) 
 \right) \\
 &= \argmax_\alpha \left( 
-\sum_{f \in F} \sum_{k=1}^{K} \lambda_k^{(n)} \log\left(
-\alpha_k^{(n)} \frac{y_k}{\tildel{k}}
+\sum_{f \in F} \sum_{t \in T} \lambda_t^{(n)} \log\left(
+\alpha_t^{(n)} \frac{y_t}{\tildel{t}}
 \right)
 \right) \\
 &= \argmax_\alpha \left(
-\sum_{f \in F} \sum_{k=1}^{K}  \lambda_k^{(n)} \log\left(
-\alpha_k^{(n)}
+\sum_{f \in F} \sum_{i \in T}  \lambda_t^{(n)} \log\left(
+\alpha_t^{(n)}
 \right)
 \right)
 \end{split}
 (\#eq:6)
 \end{equation}
 
-The $n+1$ estimation of $\alpha$ is:
+The $n+1$ estimation of $\alpha_i$ is:
 
 \begin{equation*}
 \begin{split}
-\alpha_k^{(n+1)} &= \frac{\sum\limits_{f \in F} \lambda_k^{(n)}}{\sum\limits_{i=1}^{K} \sum\limits_{f \in F} \lambda_i^{(n)}} \\
+\alpha_i^{(n+1)} &= \frac{\sum\limits_{f \in F} \lambda_k^{(n)}}{\sum\limits_{t \in T} \sum\limits_{f \in F} \lambda_t^{(n)}} \\
 &= \frac{\sum\limits_{f \in F} \lambda_k^{(n)}}{N}
 ,\ k=1, 2, \dots, K
 \end{split}
@@ -148,16 +148,16 @@ The relative abundances in $A$ and $B$ are $\rho_u$, $\sum\limits_{u \in U} \rho
 
 \begin{equation}
 \begin{split}
-\Pro(f \in r_u) = \frac{\rho_u \tildel{u}}{\sum\limits_{u \in U} \rho_u \tildel{u}} = \alpha_u \\
-\Pro(\mathrm{pos}, f \in r_u) = \frac{\alpha_u}{\tildel{u}}
+\Pro(f \in t_u) = \frac{\rho_u \tildel{u}}{\sum\limits_{u \in U} \rho_u \tildel{u}} = \alpha_u \\
+\Pro(\mathrm{pos}, f \in t_u) = \frac{\alpha_u}{\tildel{u}}
 \end{split}
 (\#eq:7)
 \end{equation}
 
 \begin{equation}
 \begin{split}
-\Pro(f \in s_v) = \frac{\theta_v \tildel{v}}{\sum\limits_{v \in V} \theta_v \tildel{v}} = \beta_v \\
-\Pro(\mathrm{pos}, f \in s_v) = \frac{\beta_v}{\tildel{v}}
+\Pro(f \in t_v) = \frac{\theta_v \tildel{v}}{\sum\limits_{v \in V} \theta_v \tildel{v}} = \beta_v \\
+\Pro(\mathrm{pos}, f \in t_v) = \frac{\beta_v}{\tildel{v}}
 \end{split}
 (\#eq:8)
 \end{equation}
@@ -174,13 +174,36 @@ The probability of single mapped fragment is:
 (\#eq:9)
 \end{equation}
 
-Thus, the parameters will be estimated are:
+where $m_u$ and $m_v$ are ${0, 1}$ indicators. The estimated parameters are:
 
 \begin{equation*}
 \begin{split}
-\eta=\{\alpha_1, \dots, \alpha_u, \beta_1, \dots, \beta_v,  \Pro(f \in A),  \Pro(f \in B)\}
+\eta=\{\alpha_1, \dots, \alpha_u, \beta_1, \dots, \beta_v, \Pro(f \in A), \Pro(f \in B)\}
 \end{split}
 \end{equation*}
+
+The LL function is:
+
+\begin{equation}
+\begin{split}
+LL(\eta) &= \sum\limits_{f \in F} \log \left(\Pro(\mathrm{pos}|\eta)\ \right) \\
+&= \sum\limits_{f \in F} \log \left(
+\sum_{u \in U} m_u \frac{\alpha_u}{\tildel{u}} \Pro(f \in A) + \sum_{v \in V} m_v \frac{\beta_v}{\tildel{v}} \Pro(f \in B)
+\right)
+\end{split}
+(\#eq:10)
+\end{equation}
+
+Note that \@ref(eq:10) also equals to:
+
+\begin{equation}
+\begin{split}
+LL(\eta) &= \sum\limits_{f \in F}  \log \left( \sum_{t \in T} \left(
+\Pro(\mathrm{pos} | f \in t, f \in S, \eta) \Pro(f \in t, f \in S)
+\right) \right)
+\end{split}
+(\#eq:11)
+\end{equation}
 
 In $n+1$ iteration, the parameters in the expanded EM algorithm:
 
@@ -193,7 +216,7 @@ In $n+1$ iteration, the parameters in the expanded EM algorithm:
 \Pro(f \in A)^{(n+1)} &= \frac{\sum\limits_{f \in F} \sum\limits_{i=1}^{U} \lambda_i^{(n+1)}}{\sum\limits_{f \in F} \sum\limits_{i=1}^{U} \lambda_i^{(n+1)} + \sum\limits_{f \in F} \sum\limits_{j=U+1}^{U+V} \lambda_j^{(n+1)}} = \frac{\sum\limits_{f \in F} \sum\limits_{i=1}^{U} \lambda_i^{(n+1)}}{N}\\
 \Pro(f \in B)^{(n+1)} &= \frac{\sum\limits_{f \in F} \sum\limits_{j=U+1}^{U+V} \lambda_j^{(n+1)}}{\sum\limits_{f \in F} \sum\limits_{i=1}^{U} \lambda_i^{(n+1)} + \sum\limits_{f \in F} \sum\limits_{j=U+1}^{U+V} \lambda_j^{(n+1)}} = \frac{\sum\limits_{f \in F} \sum\limits_{j=U+1}^{U+V} \lambda_j^{(n+1)}}{N} 
 \end{split}
-(\#eq:10)
+(\#eq:11)
 \end{equation}
 
 ## GD model for single species
@@ -232,7 +255,7 @@ loss(x) = NLL &= -\sum\limits_{f \in F} \log \left( \sum_{k = 1}^{K} y_k \frac{\
 &=  -\sum\limits_{f \in F} \log \left( \sum_{k = 1}^{K} \frac{f(x_k)}{Z} \frac{y_k}{\tildel{k}} \right) \\
 &=  -\sum\limits_{f \in F} \log \left( \sum_{k = 1}^{K} f(x_k) \frac{y_k}{\tildel{k}} - \log Z \right)
 \end{split}
-(\#eq:11)
+(\#eq:12)
 \end{equation}
 
 The derivative of $x_i$ is:
@@ -243,7 +266,7 @@ The derivative of $x_i$ is:
    \frac{f'(x_i) \frac{y_i}{\tildel{i}}}{\sum_{k = 1}^{K} f(x_k) \frac{y_k}{\tildel{k}}} - \frac{f'(x_i)}{Z}
    \right)
 \end{split}
-(\#eq:12)
+(\#eq:13)
 \end{equation}
 
 The gradient is:
@@ -252,7 +275,7 @@ The gradient is:
 \begin{split}
 g &= \left( \frac{\diff loss(x)}{\diff x_1}, \frac{\diff loss(x)}{\diff x_2}, \dots, \frac{\diff loss(x)}{\diff x_k}  \right)
 \end{split}
-(\#eq:13)
+(\#eq:14)
 \end{equation}
 
 ### Optimization

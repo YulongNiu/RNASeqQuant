@@ -138,7 +138,7 @@ arma::vec AdamW(const arma::vec& efflenraw,
       m = beta1 * m + (1 - beta1) * grad;
       v = beta2 * v + (1 - beta2) * square(grad);
       double etat = eta * sqrt(1 - pow(beta2, t)) / (1 - pow(beta1, t));
-      w = w - etat * m / (sqrt(v) + epsilon) - eta * ecw % grad;
+      w = w - etat * m / (sqrt(v) + epsilon) - eta * ecw % w;
 
       biter += batchsize;
     }
@@ -194,10 +194,12 @@ arma::vec NRMSPropW(const arma::vec& efflenraw,
   uword cn = sum(count);
   // uword sn = spenumraw.n_elem;
   uword ecn = ec.size();
+  uvec ftidx = FalseTIdx(ec, spenumraw);
 
   // Glorot normal initializer/Xavier normal initializer
   vec w = randn<vec>(tn) / sqrt(tn);
   // vec w(tn); w.fill(0.01);
+  w.elem(ftidx).fill(-1e8);
 
   vec eg2 = vec(tn, fill::zeros);
   vec V = vec(tn, fill::zeros);
@@ -227,8 +229,8 @@ arma::vec NRMSPropW(const arma::vec& efflenraw,
       eg2 = gamma * eg2 + (1 - gamma) * grad % grad;
 
       // update V
-      V = velocity * V + eta / sqrt(eg2 + epsilon) % grad + eta * ecw % grad;
-      w -= V;
+      V = velocity * V + eta / sqrt(eg2 + epsilon) % grad;
+      w = w - V - eta * ecw % w;
 
       biter += batchsize;
     }

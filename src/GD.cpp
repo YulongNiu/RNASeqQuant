@@ -659,9 +659,9 @@ arma::vec Adadelta(const arma::vec& efflenraw,
       // adam for each batch
       grad = afgrad->AFGradient(w, efflen, ec, count, eachidx);
       eg2 = gamma * eg2 + (1 - gamma) * grad % grad;
-      vec dx = sqrt(edx2 + epsilon) / sqrt(eg2 + epsilon) % grad;
+      vec dx = -sqrt(edx2 + epsilon) / sqrt(eg2 + epsilon) % grad;
       edx2 = gamma * edx2 + (1 - gamma) * dx % dx;
-      w -= dx;
+      w += dx;
 
       biter += batchsize;
     }

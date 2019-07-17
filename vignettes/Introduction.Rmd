@@ -306,7 +306,7 @@ where $\eta$ is the learning rate, which is a small value like $10^{-3}$.
 
 ### Optimization
 
-The GD optimization algorithm has been thoroughly reviewed[@ruder2016overview]. 
+The GD optimization algorithms have been thoroughly reviewed[@ruder2016overview]. 
 
 * Momentum
 
@@ -318,17 +318,26 @@ x^{(n+1)} &= x^{(n)} - v^{(n)}
 (\#eq:18)
 \end{equation}
 
-* Adam
+* Adagrad
 
 \begin{equation}
 \begin{split}
-m^{(n)} &= \beta_1 m^{(n-1)} + (1-\beta_1) g(x)^{(n)} \\
-v^{(n)} &= \beta_2 v^{(n-1)} + (1-\beta_2) g^2(x)^{(n)} \\
-\hat{m}^{(n)} &= \frac{m^{(n)}}{1-\beta_1^n} \\
-\hat{v}^{(n)} &= \frac{v^{(n)}}{1-\beta_2^n} \\
-x^{(n+1)} &= x^{(n)} - \frac{\eta}{\sqrt{\hat{v}^{(n)}} + \epsilon}\hat{m}^{(n)}
+G^{(n)} &= \sum_{i=1}^n g^2(x)^{(i)} \\
+x^{(n+1)} &= x^{(n)} - \frac{\eta}{\sqrt{G^{(n)}+ \epsilon}} g(x)^{(n)}
 \end{split}
 (\#eq:19)
+\end{equation}
+
+* Adadelta
+
+\begin{equation}
+\begin{split}
+E[g^2]^{(n)} &= \lambda E[g^2]^{(n-1)} + (1-\lambda)g^2(x)^{(n)} \\
+\Delta x^{(n)} &= - \frac{\sqrt{E[\Delta x^2]^{(n-1)}+\epsilon}}{\sqrt{E[g^2]^{(n)}+\epsilon}} g^{(n)} \\
+x^{(n+1)} &= x^{(n)} + \Delta x^{(n)} \\
+E[\Delta x^2]^{(n+1)} &= \lambda E[\Delta x^2]^{(n)} + (1-\lambda) \Delta x^{2(n)} \\
+\end{split}
+(\#eq:20)
 \end{equation}
 
 * RMSProp
@@ -338,7 +347,20 @@ x^{(n+1)} &= x^{(n)} - \frac{\eta}{\sqrt{\hat{v}^{(n)}} + \epsilon}\hat{m}^{(n)}
 E[g^2]^{(n)} &= \lambda E[g^2]^{(n-1)} + (1-\lambda)g^2(x)^{(n)} \\
 x^{(n+1)} &= x^{(n)} - \frac{\eta}{\sqrt{E[g^2]^{(n)}+\epsilon}} g(x)^{(n)}
 \end{split}
-(\#eq:20)
+(\#eq:21)
+\end{equation}
+
+* Adam[@kingma2014adam]
+
+\begin{equation}
+\begin{split}
+m^{(n)} &= \beta_1 m^{(n-1)} + (1-\beta_1) g(x)^{(n)} \\
+v^{(n)} &= \beta_2 v^{(n-1)} + (1-\beta_2) g^2(x)^{(n)} \\
+\hat{m}^{(n)} &= \frac{m^{(n)}}{1-\beta_1^n} \\
+\hat{v}^{(n)} &= \frac{v^{(n)}}{1-\beta_2^n} \\
+x^{(n+1)} &= x^{(n)} - \frac{\eta}{\sqrt{\hat{v}^{(n)}} + \epsilon}\hat{m}^{(n)}
+\end{split}
+(\#eq:22)
 \end{equation}
 
 * Nesterov accelerated gradient (NAG)
@@ -348,7 +370,7 @@ x^{(n+1)} &= x^{(n)} - \frac{\eta}{\sqrt{E[g^2]^{(n)}+\epsilon}} g(x)^{(n)}
 v^{(n)} &= \gamma v^{(n-1)} + \eta g(x^{(n-1)} - \gamma v^{(n-1)})^{(n)} \\
 x^{(n+1)} &= x^{(n)} - v^{(n)}
 \end{split}
-(\#eq:21)
+(\#eq:23)
 \end{equation}
 
 

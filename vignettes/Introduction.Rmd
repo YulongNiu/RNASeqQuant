@@ -166,9 +166,9 @@ The probability of single mapped fragment is:
 
 \begin{equation}
 \begin{split}
-\Pro(\mathrm{pos}|\eta)  &= \Pro(\mathrm{pos}, f \in A|\eta) + \Pro(\mathrm{pos}, f \in B|\eta)\\
-&= \Pro(\mathrm{pos} | f \in A, \eta) \Pro(f \in A) + \Pro(\mathrm{pos} | f \in B, \eta) \Pro(f \in B) \\
-&= \sum_{u \in U} \Pro(f \in t_u, \mathrm{pos} | f \in A, \eta) \Pro(f \in A) + \sum_{v \in V} \Pro(f \in t_v, \mathrm{pos} | f \in B, \eta) \Pro(f \in B) \\
+\Pro(\mathrm{pos})  &= \Pro(\mathrm{pos}, f \in A) + \Pro(\mathrm{pos}, f \in B)\\
+&= \Pro(\mathrm{pos} | f \in A) \Pro(f \in A) + \Pro(\mathrm{pos} | f \in B) \Pro(f \in B) \\
+&= \sum_{u \in U} \Pro(f \in t_u, \mathrm{pos} | f \in A) \Pro(f \in A) + \sum_{v \in V} \Pro(f \in t_v, \mathrm{pos} | f \in B) \Pro(f \in B) \\
 &= \sum_{u \in U} m_u \frac{\alpha_u}{\tildel{u}} \Pro(f \in A) + \sum_{v \in V} m_v \frac{\beta_v}{\tildel{v}} \Pro(f \in B) 
 \end{split}
 (\#eq:9)
@@ -181,6 +181,8 @@ where $m_u$ and $m_v$ are $\{0, 1\}$ indicators. The estimated parameters are:
 \eta=\{\alpha_1, \dots, \alpha_u, \beta_1, \dots, \beta_v, \Pro(f \in A), \Pro(f \in B)\}
 \end{split}
 \end{equation*}
+
+where $\sum\limits_{u \in U} \alpha_u=1$, $\sum\limits_{v \in V} \alpha_v=1$, and $\Pro(f \in A)+\Pro(f \in B)=1$.
 
 The LL function is:
 
@@ -200,6 +202,9 @@ Note that \@ref(eq:10) also equals to:
 \begin{split}
 LL(\eta) &= \sum\limits_{f \in F}  \log \left( \sum_{t \in T, S \in \{A, B\}} \left(
 \Pro(\mathrm{pos} | f \in t, f \in S, \eta) \Pro(f \in t, f \in S)
+\right) \right) \\
+&=  \sum\limits_{f \in F}  \log \left( \sum_{t \in T, S \in \{A, B\}} \left(
+m_t \frac{1}{\tildel{t}} \Pro(f \in t, f \in S)
 \right) \right)
 \end{split}
 (\#eq:11)
@@ -283,7 +288,7 @@ The gradient is:
 
 \begin{equation}
 \begin{split}
-g^{(n)} &= \left( \frac{\diff Loss(x)}{\diff x_1^{(n)}}, \frac{\diff Loss(x)}{\diff x_2^{(n)}}, \dots, \frac{\diff Loss(x)}{\diff x_k^{(n)}}  \right)
+g(x)^{(n)} &= \left( \frac{\diff Loss(x)}{\diff x_1^{(n)}}, \frac{\diff Loss(x)}{\diff x_2^{(n)}}, \dots, \frac{\diff Loss(x)}{\diff x_k^{(n)}}  \right)
 \end{split}
 (\#eq:16)
 \end{equation}
@@ -292,7 +297,7 @@ In the $n+1$ iteration, the estimated $x$ by the vanilla GD is:
 
 \begin{equation}
 \begin{split}
-x^{(n+1)} &= x^{(n)} - \eta g^{(n)}
+x^{(n+1)} &= x^{(n)} - \eta g(x)^{(n)}
 \end{split}
 (\#eq:17)
 \end{equation}
@@ -305,6 +310,46 @@ The GD optimization algorithm has been thoroughly reviewed[@ruder2016overview].
 
 * Momentum
 
+\begin{equation}
+\begin{split}
+v^{(n)} &= \gamma v^{(n-1)} + \eta g(x)^{(n)} \\
+x^{(n+1)} &= x^{(n)} - v^{(n)}
+\end{split}
+(\#eq:18)
+\end{equation}
+
+* Adam
+
+\begin{equation}
+\begin{split}
+m^{(n)} &= \beta_1 m^{(n-1)} + (1-\beta_1) g(x)^{(n)} \\
+v^{(n)} &= \beta_2 v^{(n-1)} + (1-\beta_2) g^2(x)^{(n)} \\
+\hat{m}^{(n)} &= \frac{m^{(n)}}{1-\beta_1^n} \\
+\hat{v}^{(n)} &= \frac{v^{(n)}}{1-\beta_2^n} \\
+x^{(n+1)} &= x^{(n)} - \frac{\eta}{\sqrt{\hat{v}^{(n)}} + \epsilon}\hat{m}^{(n)}
+\end{split}
+(\#eq:19)
+\end{equation}
+
+* RMSProp
+
+\begin{equation}
+\begin{split}
+E[g^2]^{(n)} &= \lambda E[g^2]^{(n-1)} + (1-\lambda)g^2(x)^{(n)} \\
+x^{(n+1)} &= x^{(n)} - \frac{\eta}{\sqrt{E[g^2]^{(n)}+\epsilon}} g(x)^{(n)}
+\end{split}
+(\#eq:20)
+\end{equation}
+
+* Nesterov accelerated gradient (NAG)
+
+\begin{equation}
+\begin{split}
+v^{(n)} &= \gamma v^{(n-1)} + \eta g(x^{(n-1)} - \gamma v^{(n-1)})^{(n)} \\
+x^{(n+1)} &= x^{(n)} - v^{(n)}
+\end{split}
+(\#eq:21)
+\end{equation}
 
 
 # References

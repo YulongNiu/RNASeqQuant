@@ -65,6 +65,10 @@ NAdam <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta,
     .Call(`_RNASeqQuant_NAdam`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments)
 }
 
+AdaMax <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments) {
+    .Call(`_RNASeqQuant_AdaMax`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments)
+}
+
 Adagrad <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments) {
     .Call(`_RNASeqQuant_Adagrad`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments)
 }
@@ -83,6 +87,26 @@ RMSProp <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, et
 
 NRMSProp <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments) {
     .Call(`_RNASeqQuant_NRMSProp`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments)
+}
+
+AMSGrad <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments) {
+    .Call(`_RNASeqQuant_AMSGrad`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments)
+}
+
+CountRepeat <- function(x) {
+    .Call(`_RNASeqQuant_CountRepeat`, x)
+}
+
+CountEC <- function(ec) {
+    .Call(`_RNASeqQuant_CountEC`, ec)
+}
+
+AdamW <- function(efflenraw, ecraw, countraw, ecw, spenumraw, epochs, batchsize, eta, attrs, arguments) {
+    .Call(`_RNASeqQuant_AdamW`, efflenraw, ecraw, countraw, ecw, spenumraw, epochs, batchsize, eta, attrs, arguments)
+}
+
+NRMSPropW <- function(efflenraw, ecraw, countraw, ecw, spenumraw, epochs, batchsize, eta, attrs, arguments) {
+    .Call(`_RNASeqQuant_NRMSPropW`, efflenraw, ecraw, countraw, ecw, spenumraw, epochs, batchsize, eta, attrs, arguments)
 }
 
 #' Gradient.
@@ -366,5 +390,24 @@ LambdaSpe <- function(emlambda, spenum, spefixcounts) {
 #' @keywords internal
 isEqualStr <- function(str1, str2) {
     .Call(`_RNASeqQuant_isEqualStr`, str1, str2)
+}
+
+#' Pairwise maximum elements of two vectors
+#'
+#' @title Extract maximum elements
+#' @return A \code{arma::vec} vector indicating maximum element by pair-wise comparison.
+#' @param vec1 vec2 \code{arma::vec} vectors.
+#' @author Yulong Niu \email{yulong.niu@@hotmail.com}
+#' @keywords internal
+Max <- function(vec1, vec2) {
+    .Call(`_RNASeqQuant_Max`, vec1, vec2)
+}
+
+TrueTIdx <- function(ec) {
+    .Call(`_RNASeqQuant_TrueTIdx`, ec)
+}
+
+FalseTIdx <- function(ec, spenum) {
+    .Call(`_RNASeqQuant_FalseTIdx`, ec, spenum)
 }
 

@@ -780,7 +780,7 @@ arma::vec NRMSProp(const arma::vec& efflenraw,
   double gamma = 0.9;
   double epsilon = 1e-8;
   double velocity = 0.9;
-  double decay = 0.004;
+  double decay = 0.003;
 
   // step1: pseudo information
   // remove zero counts

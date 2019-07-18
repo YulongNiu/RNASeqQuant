@@ -363,6 +363,30 @@ x^{(n+1)} &= x^{(n)} - \frac{\eta}{\sqrt{\hat{v}^{(n)}} + \epsilon}\hat{m}^{(n)}
 (\#eq:22)
 \end{equation}
 
+* AdaMax[@kingma2014adam]
+
+\begin{equation}
+\begin{split}
+m^{(n)} &= \beta_1 m^{(n-1)} + (1-\beta_1) g(x)^{(n)} \\
+u^{(n)} &= \max \left( \beta_2 u^{(n-1)}, \left\lvert g(x)^{(n)} \right\rvert \right) \\
+x^{(n+1)} &= x^{(n)} - \frac{\eta}{u^{(n)}} m^{(n)}
+\end{split}
+(\#eq:23)
+\end{equation}
+
+
+* AMSGrad
+
+\begin{equation}
+\begin{split}
+m^{(n)} &= \beta_1 m^{(n-1)} + (1-\beta_1) g(x)^{(n)} \\
+v^{(n)} &= \beta_2 v^{(n-1)} + (1-\beta_2) g^2(x)^{(n)} \\
+\hat{v}^{(n)} &= \max \left( \hat{v}^{(n-1)}, v^{(n)} \right) \\
+x^{(n+1)} &= x^{(n)} - \frac{\eta}{\sqrt{\hat{v}^{(n)}} + \epsilon} m^{(n)}
+\end{split}
+(\#eq:24)
+\end{equation}
+
 * Nesterov accelerated gradient (NAG)
 
 \begin{equation}

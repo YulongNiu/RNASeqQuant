@@ -611,7 +611,7 @@ arma::vec Adadelta(const arma::vec& efflenraw,
   double countLimit = 1e-8;
 
   // adagrad settings
-  double gamma = 0.9;
+  double gamma = 0.01;
   double epsilon = 1e-8;
 
   // step1: pseudo information

@@ -780,6 +780,7 @@ arma::vec NRMSProp(const arma::vec& efflenraw,
   double gamma = 0.9;
   double epsilon = 1e-8;
   double velocity = 0.9;
+  double decay = 0.004;
 
   // step1: pseudo information
   // remove zero counts
@@ -818,6 +819,7 @@ arma::vec NRMSProp(const arma::vec& efflenraw,
     // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w), efflen, ec, count) << std::endl;
     idx = shuffle(idx);
     uword biter = 0;
+    double etai = eta / (1 + decay * iter);
 
     // mini-batch
     while (biter < ecn) {
@@ -830,7 +832,7 @@ arma::vec NRMSProp(const arma::vec& efflenraw,
       eg2 = gamma * eg2 + (1 - gamma) * grad % grad;
 
       // update V
-      V = velocity * V + eta / sqrt(eg2 + epsilon) % grad;
+      V = velocity * V + etai / sqrt(eg2 + epsilon) % grad;
       w -= V;
 
       biter += batchsize;

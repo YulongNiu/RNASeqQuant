@@ -84,12 +84,12 @@ gdest <- NRMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200
 
 ## nice test
 ## Adam mini-batch
-gdest <- AdaMax(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 1024, 0.1, list(method = 'Softmax'), list())
-gdest <- AdamW(plist$efflen, plist$ec, plist$count, 1/w, length(plist$efflen), 300, 1024, 0.01, list(method = 'Softmax'), list())
-gdest <- AMSGrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 1024, 0.1, list(method = 'Softmax'), list())
-gdest <- Adam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 1024, 0.1, list(method = 'Softmax'), list())
-gdest <- NAdam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 1024, 0.1, list(method = 'Softmax'), list())
-gdest <- NAdagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 1024, 0.1, list(method = 'Softmax'), list())
+gdest <- AdaMax(plist$efflen, plist$ec, plist$count, length(plist$efflen), 500, 1024, 0.1, list(method = 'Softmax'), list())
+gdest <- AdamW(plist$efflen, plist$ec, plist$count, 1/w, length(plist$efflen), 500, 1024, 0.01, list(method = 'Softmax'), list())
+gdest <- AMSGrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 500, 1024, 0.1, list(method = 'Softmax'), list())
+gdest <- Adam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 500, 1024, 0.1, list(method = 'Softmax'), list())
+gdest <- NAdam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 500, 1024, 0.1, list(method = 'Softmax'), list())
+gdest <- NAdagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 500, 1024, 0.1, list(method = 'Softmax'), list())
 
 ## NRMSProp full batch
 emest <- EM(plist$efflen, plist$ec, plist$count, length(plist$efflen), detail = TRUE)

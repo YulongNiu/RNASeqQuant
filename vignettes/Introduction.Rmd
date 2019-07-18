@@ -340,7 +340,7 @@ E[\Delta x^2]^{(n+1)} &= \lambda E[\Delta x^2]^{(n)} + (1-\lambda) \Delta x^{2(n
 (\#eq:20)
 \end{equation}
 
-* RMSProp
+* RMSProp[@tieleman2012rmsprop]
 
 \begin{equation}
 \begin{split}
@@ -375,7 +375,7 @@ x^{(n+1)} &= x^{(n)} - \frac{\eta}{u^{(n)}} m^{(n)}
 \end{equation}
 
 
-* AMSGrad
+* AMSGrad[@reddi2019convergence]
 
 \begin{equation}
 \begin{split}

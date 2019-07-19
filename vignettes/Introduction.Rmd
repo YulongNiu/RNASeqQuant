@@ -306,6 +306,16 @@ where $\eta$ is the learning rate, which is a small value like $10^{-3}$.
 
 ### Optimization
 
+#### Learning rate decay
+
+\begin{equation}
+\begin{split}
+\eta ^{(n)} &= \frac{\eta}{1 + decay * n} \\
+\end{split}
+(\#eq:18)
+\end{equation}
+
+
 The GD optimization algorithms have been thoroughly reviewed[@ruder2016overview]. 
 
 * Momentum

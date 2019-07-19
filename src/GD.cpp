@@ -199,6 +199,7 @@ arma::vec Adam(const arma::vec& efflenraw,
   double beta1 = 0.9;
   double beta2 = 0.999;
   double epsilon = 1e-8;
+  double decay = 0.05;
 
   // step1: pseudo information remove zero counts
   uvec zeros = find(countraw > 0);
@@ -233,6 +234,7 @@ arma::vec Adam(const arma::vec& efflenraw,
 
     idx = shuffle(idx);
     uword biter = 0;
+    double etai = eta / (1 + decay * iter);
 
     // mini-batch
     while (biter < ecn) {
@@ -245,7 +247,7 @@ arma::vec Adam(const arma::vec& efflenraw,
       grad = afgrad->AFGradient(w, efflen, ec, count, eachidx);
       m = beta1 * m + (1 - beta1) * grad;
       v = beta2 * v + (1 - beta2) * square(grad);
-      double etat = eta * sqrt(1 - pow(beta2, t)) / (1 - pow(beta1, t));
+      double etat = etai * sqrt(1 - pow(beta2, t)) / (1 - pow(beta1, t));
       w -= etat * m / (sqrt(v) + epsilon);
 
       biter += batchsize;

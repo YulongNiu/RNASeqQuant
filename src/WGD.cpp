@@ -161,7 +161,7 @@ arma::vec AdamW(const arma::vec& efflenraw,
 arma::vec NRMSPropW(const arma::vec& efflenraw,
                     const Rcpp::CharacterVector& ecraw,
                     const arma::uvec& countraw,
-                    const arma::uvec& ecw,
+                    const arma::vec& ecw,
                     const arma::uvec& spenumraw,
                     const arma::uword epochs,
                     const arma::uword batchsize,
@@ -178,6 +178,8 @@ arma::vec NRMSPropW(const arma::vec& efflenraw,
   double gamma = 0.9;
   double epsilon = 1e-8;
   double velocity = 0.9;
+  double decay = 0.003;
+  double decayw = 0.001;
 
   // step1: pseudo information
   // remove zero counts
@@ -217,6 +219,8 @@ arma::vec NRMSPropW(const arma::vec& efflenraw,
     // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w), efflen, ec, count) << "|" << t << std::endl;
     idx = shuffle(idx);
     uword biter = 0;
+    double etai = eta / (1 + decay * iter);
+    vec ecwi = ecw / (1 + decayw * iter);
 
     // mini-batch
     while (biter < ecn) {
@@ -229,8 +233,8 @@ arma::vec NRMSPropW(const arma::vec& efflenraw,
       eg2 = gamma * eg2 + (1 - gamma) * grad % grad;
 
       // update V
-      V = velocity * V + eta / sqrt(eg2 + epsilon) % grad;
-      w = w - V - eta * ecw % w;
+      V = velocity * V + etai / sqrt(eg2 + epsilon) % grad;
+      w = w - V - etai * w % ecwi;
 
       biter += batchsize;
     }

@@ -268,7 +268,7 @@ The loss function is defined as negative logarithm of likelihood (NLL):
 \begin{split}
 Loss(x) = NLL(x) &= -\sum\limits_{f \in F} \log \left( \sum_{t \in T} y_t \frac{\alpha_t}{\tildel{t}} \right) \\
 &=  -\sum\limits_{f \in F} \log \left( \sum_{t \in T} \frac{f(x_t)}{Z} \frac{y_t}{\tildel{t}} \right) \\
-&=  -\sum\limits_{f \in F} \log \left( \sum_{t \in T} f(x_t) \frac{y_t}{\tildel{t}} - \log Z \right)
+&=  -\sum\limits_{f \in F} \left( \log\sum_{t \in T} f(x_t) \frac{y_t}{\tildel{t}} - \log Z \right)
 \end{split}
 (\#eq:14)
 \end{equation}
@@ -315,6 +315,7 @@ where $\eta$ is the learning rate, which is a small value like $10^{-3}$.
 (\#eq:18)
 \end{equation}
 
+#### Optimization algorithms
 
 The GD optimization algorithms have been thoroughly reviewed[@ruder2016overview]. 
 

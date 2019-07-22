@@ -530,6 +530,7 @@ arma::vec NAdagrad(const arma::vec& efflenraw,
   // adagrad settings
   double epsilon = 1e-8;
   double velocity = 0.9;
+  double decay = 0.00001;
 
   // step1: pseudo information
   // remove zero counts
@@ -566,6 +567,7 @@ arma::vec NAdagrad(const arma::vec& efflenraw,
     // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w), efflen, ec, count) << "|" << t << std::endl;
     idx = shuffle(idx);
     uword biter = 0;
+    double etai = eta / (1 + decay * iter);
 
     // mini-batch
     while (biter < ecn) {
@@ -578,7 +580,7 @@ arma::vec NAdagrad(const arma::vec& efflenraw,
       G += grad % grad;
 
       // update V
-      V = velocity * V + eta / sqrt(G + epsilon) % grad;
+      V = velocity * V + etai / sqrt(G + epsilon) % grad;
       w -= V;
 
       biter += batchsize;

@@ -199,7 +199,7 @@ arma::vec Adam(const arma::vec& efflenraw,
   double beta1 = 0.9;
   double beta2 = 0.999;
   double epsilon = 1e-8;
-  double decay = 0.05;
+  double decay = 0.03;
 
   // step1: pseudo information remove zero counts
   uvec zeros = find(countraw > 0);
@@ -285,6 +285,7 @@ arma::vec NAdam(const arma::vec& efflenraw,
   double beta1 = 0.9;
   double beta2 = 0.999;
   double epsilon = 1e-8;
+  double decay = 0.03;
 
   // step1: pseudo information remove zero counts
   uvec zeros = find(countraw > 0);
@@ -318,6 +319,7 @@ arma::vec NAdam(const arma::vec& efflenraw,
     // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w), efflen, ec, count) << "|" << t << std::endl;
     idx = shuffle(idx);
     uword biter = 0;
+    double etai = eta / (1 + decay * iter);
 
     // mini-batch
     while (biter < ecn) {
@@ -331,7 +333,7 @@ arma::vec NAdam(const arma::vec& efflenraw,
       m = beta1 * m + (1 - beta1) * grad;
       v = beta2 * v + (1 - beta2) * square(grad);
       vec etat = beta1 * m + (1 - beta1) * grad / (1 - pow(beta1, t));
-      w -= eta * etat / (sqrt(v) + epsilon);
+      w -= etai * etat / (sqrt(v) + epsilon);
 
       biter += batchsize;
     }

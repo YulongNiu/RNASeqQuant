@@ -14,16 +14,16 @@ header-includes:
   - \newcommand{\tildel}[1]{\widetilde{l_{#1}}}
   - \newcommand*{\diff}{\mathop{}\!\mathrm{d}}
 output:
-  BiocStyle::html_document:
-    toc: true
-    toc_float: true
-    includes:
-      before_body: header.html
   BiocStyle::pdf_document:
     toc: true
     latex_engine: pdflatex
     includes:
       in_header: header.tex
+  BiocStyle::html_document:
+    toc: true
+    toc_float: true
+    includes:
+      before_body: header.html
 vignette: >
   %\usepackage[utf8]{inputenc}
   %\VignetteIndexEntry{RNASeqQuant: an R package for RNA-Seq quantification}

@@ -1,4 +1,7 @@
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~test codes~~~~~~~~~~~~~~~~~~~~~~~
+library('tibble')
+library('dplyr')
+library('ggplot2')
 library('Rcpp')
 library('magrittr')
 sourceCpp('../src/utilities.cpp')
@@ -61,7 +64,7 @@ kallistoest <- read.table('/extDisk1/RESEARCH/RNASeqQuantTestPython/GD/abundance
 ## RNASeqQuant EM
 emest <- EMSpe(plist$efflen, plist$ec, plist$count, c(10000, 10000, 21392), rep(3731388, 3), detail = TRUE)
 emest <- EM(plist$efflen, plist$ec, plist$count, c(10000, 10000, 21392), detail = TRUE)
-emest <- EM(plist$efflen, plist$ec, plist$count, 41392, detail = FALSE)
+emest <- EM(plist$efflen, plist$ec, plist$count, 41392, detail = TRUE)
 
 ## RNASeqQuant GD
 gdest <- Adam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(method = 'Softmax'), list())
@@ -93,12 +96,21 @@ gdest <- NAdagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 500
 
 ## NRMSProp full batch
 emest <- EM(plist$efflen, plist$ec, plist$count, length(plist$efflen), detail = TRUE)
-gdest <- NRMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 600, 36580, 0.005, list(method = 'Softmax'), list())
+gdest <- NRMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 1067, 36580, 0.005, TRUE, list(method = 'Softmax'), list())
 gdest <- NRMSPropW(plist$efflen, plist$ec, plist$count, 1/w, length(plist$efflen), 600, 36580, 0.005, list(method = 'Softmax'), list())
-gdest <- NAdagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 600, 36580, 0.7, list(method = 'Softmax'), list())
+gdest <- NAdagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 1067, 36580, 0.7, list(method = 'Softmax'), list())
+
+## plot
+tibble(iter = c(1 : length(emest$ll), 1 : length(gdest$ll)),
+       ll = -c(emest$ll, gdest$ll),
+       method = c(rep('EM', length(emest$ll)), rep('GD', length(gdest$ll)))) %>%
+  slice(200 : length(emest$ll), (200 + length(emest$ll)) : (length(emest$ll) + length(emest$ll))) %>%
+  ggplot(aes(x = iter, y = ll, group = method)) +
+  geom_point(aes(color = method), size = 0.01)
+
 
 ## merge res
-mergeres <- cbind(kallistoest, emest$counts, gdest)
+mergeres <- cbind(kallistoest, emest$counts, gdest$counts)
 colnames(mergeres) <- c('kallistoest', 'emest', 'gdest')
 
 ## correlation coefficient

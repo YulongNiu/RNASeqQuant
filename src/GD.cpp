@@ -566,6 +566,10 @@ arma::vec NAdagrad(const arma::vec& efflenraw,
 
   for (uword iter = 0; iter < epochs; ++iter) {
 
+    if (details) {
+      resll(iter) = LL(afc->AFCounts(w) * cn, efflen, ec, count);
+    } else {}
+
     // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w), efflen, ec, count) << "|" << t << std::endl;
     idx = shuffle(idx);
     uword biter = 0;
@@ -767,15 +771,16 @@ arma::vec RMSProp(const arma::vec& efflenraw,
 
 
 // [[Rcpp::export]]
-arma::vec NRMSProp(const arma::vec& efflenraw,
-                   const Rcpp::CharacterVector& ecraw,
-                   const arma::uvec& countraw,
-                   const arma::uvec& spenumraw,
-                   const arma::uword epochs,
-                   const arma::uword batchsize,
-                   const double eta,
-                   const Rcpp::List attrs,
-                   const Rcpp::List arguments) {
+Rcpp::List NRMSProp(const arma::vec& efflenraw,
+                    const Rcpp::CharacterVector& ecraw,
+                    const arma::uvec& countraw,
+                    const arma::uvec& spenumraw,
+                    const arma::uword epochs,
+                    const arma::uword batchsize,
+                    const double eta,
+                    const bool details,
+                    const Rcpp::List attrs,
+                    const Rcpp::List arguments) {
 
   // stop iteration settings from kallisto
   // double countChangeLimit = 1e-2
@@ -797,13 +802,14 @@ arma::vec NRMSProp(const arma::vec& efflenraw,
   vector<uvec> ec = SplitEC(ecraw[zerosidx]);
   vector<vec> efflen = MatchEfflen(ec, efflenraw);
 
-  // step2: Adagrad
+  // step2: NRMSProp
   // start w and estcount
   uword tn = sum(spenumraw);
   uword cn = sum(count);
   // uword sn = spenumraw.n_elem;
   uword ecn = ec.size();
   uvec ftidx = FalseTIdx(ec, spenumraw);
+  vec resll(epochs, fill::zeros);
 
   // Glorot normal initializer/Xavier normal initializer
   vec w = randn<vec>(tn) / sqrt(tn);
@@ -820,7 +826,12 @@ arma::vec NRMSProp(const arma::vec& efflenraw,
   std::shared_ptr<AFmeasure> afgrad = AFfactory().createAFGradient(attrs, arguments);
   std::shared_ptr<AFmeasure> afc = AFfactory().createAFCounts(attrs, arguments);
 
-  for (uword iter = 0; iter < epochs; ++iter) {
+  uword iter;
+  for (iter = 0; iter < epochs; ++iter) {
+
+    if (details) {
+      resll(iter) = LL(afc->AFCounts(w) * cn, efflen, ec, count);
+    } else {}
 
     // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w), efflen, ec, count) << std::endl;
     idx = shuffle(idx);
@@ -834,7 +845,8 @@ arma::vec NRMSProp(const arma::vec& efflenraw,
       uvec eachidx = idx.subvec(biter, endi);
 
       // NAG
-      grad = afgrad->AFGradient(w - velocity * V, efflen, ec, count, eachidx);
+      w -= velocity * V;
+      grad = afgrad->AFGradient(w, efflen, ec, count, eachidx);
       eg2 = gamma * eg2 + (1 - gamma) * grad % grad;
 
       // update V
@@ -848,9 +860,13 @@ arma::vec NRMSProp(const arma::vec& efflenraw,
   // small est & no ec transcripts --> zero
   vec est = afc->AFCounts(w) * cn;
   est.elem(find(est < countLimit)).zeros();
+
+  List res = List::create(_["counts"] = est,
+                          _["ll"] = resll.subvec(0, iter - 1));
+
   Rcout << "The log likelihood is " << std::setprecision (20) << LL(est, efflen, ec, count) << "." << std::endl;
 
-  return est;
+  return res;
 }
 
 
@@ -936,3 +952,6 @@ arma::vec AMSGrad(const arma::vec& efflenraw,
 
   return est;
 }
+
+
+

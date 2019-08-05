@@ -19,21 +19,21 @@ plist <- list(ec = c('0,1,2', '1,2', '0,2', '0', '0,1'), count = rep(1, 5), effl
 
 EM(plist$efflen, plist$ec, plist$count, spenum = 3) %>% .$counts
 
-Adam(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(method = 'Softmax'), list())
-Adam(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(method = 'Softplus'), list())
-Adam(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(method = 'ISRU'), list(alpha = 0.1))
+Adam(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(af = 'Softmax'), list())
+Adam(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(af = 'Softplus'), list())
+Adam(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(af = 'ISRU'), list(alpha = 0.1))
 
-Adagrad(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(method = 'Softmax'), list())
-Adagrad(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(method = 'Softplus'), list())
-Adagrad(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(method = 'ISRU'), list(alpha = 0.1))
+Adagrad(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(af = 'Softmax'), list())
+Adagrad(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(af = 'Softplus'), list())
+Adagrad(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(af = 'ISRU'), list(alpha = 0.1))
 
-RMSProp(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(method = 'Softmax'), list())
-RMSProp(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(method = 'Softplus'), list())
-RMSProp(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(method = 'ISRU'), list(alpha = 0.1))
+RMSProp(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(af = 'Softmax'), list())
+RMSProp(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(af = 'Softplus'), list())
+RMSProp(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(af = 'ISRU'), list(alpha = 0.1))
 
-NRMSProp(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(method = 'Softmax'), list())
-NRMSProp(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(method = 'Softplus'), list())
-NRMSProp(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(method = 'ISRU'), list(alpha = 0.1))
+NRMSProp(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(af = 'Softmax'), list())
+NRMSProp(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(af = 'Softplus'), list())
+NRMSProp(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(af = 'ISRU'), list(alpha = 0.1))
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -67,44 +67,44 @@ emest <- EM(plist$efflen, plist$ec, plist$count, c(10000, 10000, 21392), detail 
 emest <- EM(plist$efflen, plist$ec, plist$count, 41392, detail = TRUE)
 
 ## RNASeqQuant GD
-gdest <- Adam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(method = 'Softmax'), list())
-gdest <- Adam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(method = 'Softplus'), list())
-gdest <- Adam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(method = 'ISRU'), list(alpha = 0.1))
+gdest <- Adam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(af = 'Softmax'), list())
+gdest <- Adam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(af = 'Softplus'), list())
+gdest <- Adam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(af = 'ISRU'), list(alpha = 0.1))
 
 
-gdest <- Adagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(method = 'Softmax'), list())
-gdest <- Adagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(method = 'Softplus'), list())
-gdest <- Adagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(method = 'ISRU'), list(alpha = 0.1))
+gdest <- Adagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(af = 'Softmax'), list())
+gdest <- Adagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(af = 'Softplus'), list())
+gdest <- Adagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(af = 'ISRU'), list(alpha = 0.1))
 
-gdest <- RMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(method = 'Softmax'), list())
-gdest <- RMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(method = 'Softplus'), list())
-gdest <- RMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(method = 'ISRU'), list(alpha = 0.1))
+gdest <- RMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(af = 'Softmax'), list())
+gdest <- RMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(af = 'Softplus'), list())
+gdest <- RMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(af = 'ISRU'), list(alpha = 0.1))
 
-gdest <- NRMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(method = 'Softmax'), list())
-gdest <- NRMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(method = 'Softplus'), list())
-gdest <- NRMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(method = 'ISRU'), list(alpha = 0.1))
+gdest <- NRMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(af = 'Softmax'), list())
+gdest <- NRMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(af = 'Softplus'), list())
+gdest <- NRMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(af = 'ISRU'), list(alpha = 0.1))
 
 
 ## nice test
 ## Adam mini-batch
-gdest <- AdaMax(plist$efflen, plist$ec, plist$count, length(plist$efflen), 500, 1024, 0.1, list(method = 'Softmax'), list())
-gdest <- AdamW(plist$efflen, plist$ec, plist$count, 1/w, length(plist$efflen), 500, 1024, 0.01, list(method = 'Softmax'), list())
-gdest <- AMSGrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 500, 1024, 0.1, list(method = 'Softmax'), list())
-gdest <- Adam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 600, 1024, 0.25, list(method = 'Softmax'), list())
-gdest <- NAdam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 600, 1024, 0.25, list(method = 'Softmax'), list())
-gdest <- NAdagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 500, 1024, 0.1, list(method = 'Softmax'), list())
+gdest <- AdaMax(plist$efflen, plist$ec, plist$count, length(plist$efflen), 500, 1024, 0.1, list(af = 'Softmax'), list())
+gdest <- AdamW(plist$efflen, plist$ec, plist$count, 1/w, length(plist$efflen), 500, 1024, 0.01, list(af = 'Softmax'), list())
+gdest <- AMSGrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 500, 1024, 0.1, list(af = 'Softmax'), list())
+gdest <- Adam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 600, 1024, 0.25, list(af = 'Softmax'), list())
+gdest <- NAdam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 600, 1024, 0.25, list(af = 'Softmax'), list())
+gdest <- NAdagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 500, 1024, 0.1, list(af = 'Softmax'), list())
 
 ## NRMSProp full batch
 emest <- EM(plist$efflen, plist$ec, plist$count, length(plist$efflen), detail = TRUE)
-gdest <- NRMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 1067, 36580, 0.005, TRUE, list(method = 'Softmax'), list())
-gdest <- NRMSPropW(plist$efflen, plist$ec, plist$count, 1/w, length(plist$efflen), 600, 36580, 0.005, list(method = 'Softmax'), list())
-gdest <- NAdagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 1067, 36580, 0.7, list(method = 'Softmax'), list())
+gdest <- NRMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 1067, 36580, 0.005, TRUE, list(af = 'Softmax'), list())
+gdest <- NRMSPropW(plist$efflen, plist$ec, plist$count, 1/w, length(plist$efflen), 600, 36580, 0.005, list(af = 'Softmax'), list())
+gdest <- NAdagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 1067, 36580, 0.7, FALSE, list(af = 'Softmax'), list())
 
 ## plot
 tibble(iter = c(1 : length(emest$ll), 1 : length(gdest$ll)),
        ll = -c(emest$ll, gdest$ll),
        method = c(rep('EM', length(emest$ll)), rep('GD', length(gdest$ll)))) %>%
-  slice(200 : length(emest$ll), (200 + length(emest$ll)) : (length(emest$ll) + length(emest$ll))) %>%
+  slice(300 : length(emest$ll), (300 + length(emest$ll)) : (length(emest$ll) + length(emest$ll))) %>%
   ggplot(aes(x = iter, y = ll, group = method)) +
   geom_point(aes(color = method), size = 0.01)
 

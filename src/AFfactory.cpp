@@ -5,7 +5,7 @@
 std::shared_ptr<AFmeasure> AFfactory::createAFGradient(const Rcpp::List &attrs,
                                                        const Rcpp::List &arguments) {
 
-  std::string afName = attrs["method"];
+  std::string afName = attrs["af"];
   std::shared_ptr<AFmeasure> afgrad = NULL;
 
   if (isEqualStr(afName, "Softmax")) {
@@ -35,7 +35,7 @@ std::shared_ptr<AFmeasure> AFfactory::createAFGradient(const Rcpp::List &attrs,
 std::shared_ptr<AFmeasure> AFfactory::createAFCounts(const Rcpp::List &attrs,
                                                      const Rcpp::List &arguments) {
 
-  std::string afName = attrs["method"];
+  std::string afName = attrs["af"];
   std::shared_ptr<AFmeasure> afc = NULL;
 
   if (isEqualStr(afName, "Softmax")) {

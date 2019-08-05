@@ -26,6 +26,7 @@ arma::vec Momentum(const arma::vec& efflenraw,
                    const arma::uword epochs,
                    const arma::uword batchsize,
                    const double eta,
+                   const bool details,
                    const Rcpp::List attrs,
                    const Rcpp::List arguments) {
 
@@ -66,7 +67,8 @@ arma::vec Momentum(const arma::vec& efflenraw,
   std::shared_ptr<AFmeasure> afgrad = AFfactory().createAFGradient(attrs, arguments);
   std::shared_ptr<AFmeasure> afc = AFfactory().createAFCounts(attrs, arguments);
 
-  for (uword iter = 0; iter < epochs; ++iter) {
+  uword iter;
+  for (iter = 0; iter < epochs; ++iter) {
 
     // Rcout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w), efflen, ec, count) << std::endl;
 
@@ -100,14 +102,14 @@ arma::vec Momentum(const arma::vec& efflenraw,
 
 // [[Rcpp::export]]
 arma::vec NAG(const arma::vec& efflenraw,
-                  const Rcpp::CharacterVector& ecraw,
-                  const arma::uvec& countraw,
-                  const arma::uvec& spenumraw,
-                  const arma::uword epochs,
-                  const arma::uword batchsize,
-                  const double eta,
-                  const Rcpp::List attrs,
-                  const Rcpp::List arguments) {
+              const Rcpp::CharacterVector& ecraw,
+              const arma::uvec& countraw,
+              const arma::uvec& spenumraw,
+              const arma::uword epochs,
+              const arma::uword batchsize,
+              const double eta,
+              const Rcpp::List attrs,
+              const Rcpp::List arguments) {
 
   // stop iteration settings from kallisto
   // double countChangeLimit = 1e-2
@@ -267,14 +269,14 @@ arma::vec Adam(const arma::vec& efflenraw,
 
 // [[Rcpp::export]]
 arma::vec NAdam(const arma::vec& efflenraw,
-               const Rcpp::CharacterVector& ecraw,
-               const arma::uvec& countraw,
-               const arma::uvec& spenumraw,
-               const arma::uword epochs,
-               const arma::uword batchsize,
-               const double eta,
-               const Rcpp::List attrs,
-               const Rcpp::List arguments) {
+                const Rcpp::CharacterVector& ecraw,
+                const arma::uvec& countraw,
+                const arma::uvec& spenumraw,
+                const arma::uword epochs,
+                const arma::uword batchsize,
+                const double eta,
+                const Rcpp::List attrs,
+                const Rcpp::List arguments) {
 
   // stop iteration settings from kallisto
   // double countChangeLimit = 1e-2
@@ -494,9 +496,9 @@ arma::vec Adagrad(const arma::vec& efflenraw,
       uvec eachidx = idx.subvec(biter, endi);
 
       // adam for each batch
-        grad = afgrad->AFGradient(w, efflen, ec, count, eachidx);
-        G += grad % grad;
-        w -= eta / sqrt(G + epsilon) % grad;
+      grad = afgrad->AFGradient(w, efflen, ec, count, eachidx);
+      G += grad % grad;
+      w -= eta / sqrt(G + epsilon) % grad;
 
       biter += batchsize;
     }
@@ -514,15 +516,16 @@ arma::vec Adagrad(const arma::vec& efflenraw,
 
 
 // [[Rcpp::export]]
-arma::vec NAdagrad(const arma::vec& efflenraw,
-                  const Rcpp::CharacterVector& ecraw,
-                  const arma::uvec& countraw,
-                  const arma::uvec& spenumraw,
-                  const arma::uword epochs,
-                  const arma::uword batchsize,
-                  const double eta,
-                  const Rcpp::List attrs,
-                  const Rcpp::List arguments) {
+Rcpp::List NAdagrad(const arma::vec& efflenraw,
+                    const Rcpp::CharacterVector& ecraw,
+                    const arma::uvec& countraw,
+                    const arma::uvec& spenumraw,
+                    const arma::uword epochs,
+                    const arma::uword batchsize,
+                    const double eta,
+                    const bool details,
+                    const Rcpp::List attrs,
+                    const Rcpp::List arguments) {
 
   // stop iteration settings from kallisto
   // double countChangeLimit = 1e-2
@@ -549,10 +552,13 @@ arma::vec NAdagrad(const arma::vec& efflenraw,
   uword cn = sum(count);
   // uword sn = spenumraw.n_elem;
   uword ecn = ec.size();
+  uvec ftidx = FalseTIdx(ec, spenumraw);
+  vec resll(epochs, fill::zeros);
 
   // Glorot normal initializer/Xavier normal initializer
   vec w = randn<vec>(tn) / sqrt(tn);
   // vec w(tn); w.fill(0.01);
+  w.elem(ftidx).fill(-1e8);
   vec G = vec(tn, fill::zeros);
   vec V = vec(tn, fill::zeros);
 
@@ -564,7 +570,8 @@ arma::vec NAdagrad(const arma::vec& efflenraw,
   std::shared_ptr<AFmeasure> afgrad = AFfactory().createAFGradient(attrs, arguments);
   std::shared_ptr<AFmeasure> afc = AFfactory().createAFCounts(attrs, arguments);
 
-  for (uword iter = 0; iter < epochs; ++iter) {
+  uword iter;
+  for (iter = 0; iter < epochs; ++iter) {
 
     if (details) {
       resll(iter) = LL(afc->AFCounts(w) * cn, efflen, ec, count);
@@ -595,25 +602,29 @@ arma::vec NAdagrad(const arma::vec& efflenraw,
 
   // reset small est
   vec est = afc->AFCounts(w) * cn;
+  est.elem(find(est < countLimit)).zeros();
+
+  List res = List::create(_["counts"] = est,
+                          _["ll"] = resll.subvec(0, iter - 1));
+
   Rcout << "The log likelihood is " << std::setprecision (20) << LL(est, efflen, ec, count) <<
     "." << std::endl;
 
-  est.elem(find(est < countLimit)).zeros();
 
-  return est;
+  return res;
 }
 
 
 // [[Rcpp::export]]
 arma::vec Adadelta(const arma::vec& efflenraw,
-                  const Rcpp::CharacterVector& ecraw,
-                  const arma::uvec& countraw,
-                  const arma::uvec& spenumraw,
-                  const arma::uword epochs,
-                  const arma::uword batchsize,
-                  const double eta,
-                  const Rcpp::List attrs,
-                  const Rcpp::List arguments) {
+                   const Rcpp::CharacterVector& ecraw,
+                   const arma::uvec& countraw,
+                   const arma::uvec& spenumraw,
+                   const arma::uword epochs,
+                   const arma::uword batchsize,
+                   const double eta,
+                   const Rcpp::List attrs,
+                   const Rcpp::List arguments) {
 
   // stop iteration settings from kallisto
   // double countChangeLimit = 1e-2
@@ -845,8 +856,8 @@ Rcpp::List NRMSProp(const arma::vec& efflenraw,
       uvec eachidx = idx.subvec(biter, endi);
 
       // NAG
-      w -= velocity * V;
-      grad = afgrad->AFGradient(w, efflen, ec, count, eachidx);
+      // w -= velocity * V;
+      grad = afgrad->AFGradient(w - velocity * V, efflen, ec, count, eachidx);
       eg2 = gamma * eg2 + (1 - gamma) * grad % grad;
 
       // update V
@@ -872,14 +883,14 @@ Rcpp::List NRMSProp(const arma::vec& efflenraw,
 
 // [[Rcpp::export]]
 arma::vec AMSGrad(const arma::vec& efflenraw,
-               const Rcpp::CharacterVector& ecraw,
-               const arma::uvec& countraw,
-               const arma::uvec& spenumraw,
-               const arma::uword epochs,
-               const arma::uword batchsize,
-               const double eta,
-               const Rcpp::List attrs,
-               const Rcpp::List arguments) {
+                  const Rcpp::CharacterVector& ecraw,
+                  const arma::uvec& countraw,
+                  const arma::uvec& spenumraw,
+                  const arma::uword epochs,
+                  const arma::uword batchsize,
+                  const double eta,
+                  const Rcpp::List attrs,
+                  const Rcpp::List arguments) {
 
   // stop iteration settings from kallisto
   // double countChangeLimit = 1e-2

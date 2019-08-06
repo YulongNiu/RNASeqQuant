@@ -11,7 +11,8 @@ class Optimizer {
 public:
   virtual ~Optimizer() {};
 
-  // virtual void update(const arma::vec grad) = 0;
+  virtual arma::vec update(arma::vec& grad,
+                      arma::vec& w) = 0;
 };
 
 
@@ -20,20 +21,26 @@ public:
 //======//
 class Adam : public Optimizer {
 public:
-  const arma::uword tn; // transcription number
+  const arma::uword tn; // #transcripts
+
   arma::vec m;
   arma::vec v;
   arma::uword t;
-  const double beta1;
-  const double beta2;
+
+  const double beta1; // para1
+  const double beta2; // para2
+  double eta; // learning rate in each epoch
+  const double epsilon; // small value, not change
 
   Adam(const arma::uword tn,
        const double beta1,
-       const double beta2);
+       const double beta2,
+       double eta,
+       const double epsilon);
 
-  // void init(const arma::uword tn);
 
-  void update(const arma::vec grad);
+  arma::vec update(arma::vec& grad,
+                   arma::vec& w);
 
 };
 

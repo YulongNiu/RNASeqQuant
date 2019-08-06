@@ -12,7 +12,7 @@ public:
   virtual ~Optimizer() {};
 
   virtual arma::vec update(arma::vec& grad,
-                      arma::vec& w) = 0;
+                           arma::vec& w) = 0;
 };
 
 
@@ -43,18 +43,5 @@ public:
                    arma::vec& w);
 
 };
-
-// class Adam : public Optimizer {
-// public:
-//   const arma::uword tn; // transcription number
-//   arma::vec& m;
-//   arma::uword t;
-//   const double beta1;
-
-//   Adam(const arma::uword tn,
-//        const double beta1);
-
-// };
-
 
 #endif

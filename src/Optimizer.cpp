@@ -28,20 +28,13 @@ arma::vec Adam::update (arma::vec& grad,
   m = beta1 * m + (1 - beta1) * grad;
   v = beta2 * v + (1 - beta2) * square(grad);
   double etat = eta * sqrt(1 - pow(beta2, t)) / (1 - pow(beta1, t));
+  w -= etat * m / (sqrt(v) + epsilon);
 
   ++t;
 
-  return w -= etat * m / (sqrt(v) + epsilon);
+  return w;
 
 }
-
-// Adam::Adam (const arma::uword tn,
-//             const double beta1)
-//   : tn(tn), beta1(beta1) {
-
-//   m = vec(tn, fill::zeros);
-//   t = 0;
-// }
 
 
 // [[Rcpp::export]]

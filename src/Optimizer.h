@@ -11,9 +11,9 @@ class Optimizer {
 public:
   virtual ~Optimizer() {};
 
-  virtual arma::vec update(arma::vec& w,
-                           arma::vec& grad,
-                           double eta) = 0;
+  virtual arma::vec update(const arma::vec& w,
+                           const arma::vec& grad,
+                           const double eta) = 0;
 };
 
 
@@ -30,18 +30,33 @@ public:
 
   const double beta1; // para1 for Adam
   const double beta2; // para2 for Adam
-  double eta; // learning rate in each epoch
   const double epsilon; // small value, not change
 
   Adam(const arma::uword tn,
        const double beta1,
        const double beta2,
-       const double epsilon);
+       const double epsilon)
+    : tn(tn), beta1(beta1), beta2(beta2), epsilon(epsilon) {
 
-  arma::vec update(arma::vec& w,
-                   arma::vec& grad,
-                   double eta);
+    m = vec(tn, fill::zeros);
+    v = vec(tn, fill::zeros);
+    t = 1;
 
+  }
+
+  arma::vec update(const arma::vec& w,
+                   const arma::vec& grad,
+                   const double eta) {
+
+    m = beta1 * m + (1 - beta1) * grad;
+    v = beta2 * v + (1 - beta2) * square(grad);
+    double etat = eta * sqrt(1 - pow(beta2, t)) / (1 - pow(beta1, t));
+    vec nextw = w - etat * m / (sqrt(v) + epsilon);
+    ++t;
+
+    return nextw;
+
+  }
 };
 
 
@@ -62,15 +77,28 @@ public:
   NRMSProp(const arma::uword tn,
            const double gamma,
            const double velocity,
-           const double epsilon);
+           const double epsilon)
+    : tn(tn), gamma(gamma), velocity(velocity), epsilon(epsilon) {
+
+    eg2 = vec(tn, fill::zeros);
+    v = vec(tn, fill::zeros);
+
+  }
 
   // w: estimation
   // grad: gradient
   // eta: learning rate in each epoch
-  arma::vec update(arma::vec& w,
-                   arma::vec& grad,
-                   double eta);
+  arma::vec update(const arma::vec& w,
+                   const arma::vec& grad,
+                   const double eta) {
 
+    eg2 = gamma * eg2 + (1 - gamma) * grad % grad;
+    v = velocity * v + eta / sqrt(eg2 + epsilon) % grad;
+    vec nextw = w - v;
+
+    return nextw;
+
+  }
 };
 
 #endif

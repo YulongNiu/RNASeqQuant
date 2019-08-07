@@ -11,8 +11,9 @@ class Optimizer {
 public:
   virtual ~Optimizer() {};
 
-  virtual arma::vec update(arma::vec& grad,
-                           arma::vec& w) = 0;
+  virtual arma::vec update(arma::vec& w,
+                           arma::vec& grad,
+                           double eta) = 0;
 };
 
 
@@ -27,20 +28,48 @@ public:
   arma::vec v;
   arma::uword t;
 
-  const double beta1; // para1
-  const double beta2; // para2
+  const double beta1; // para1 for Adam
+  const double beta2; // para2 for Adam
   double eta; // learning rate in each epoch
   const double epsilon; // small value, not change
 
   Adam(const arma::uword tn,
        const double beta1,
        const double beta2,
-       double eta,
        const double epsilon);
 
+  arma::vec update(arma::vec& w,
+                   arma::vec& grad,
+                   double eta);
 
-  arma::vec update(arma::vec& grad,
-                   arma::vec& w);
+};
+
+
+//==========//
+// NRMSProp //
+//==========//
+class NRMSProp : public Optimizer {
+public:
+  const arma::uword tn; // #transcripts
+
+  arma::vec eg2;
+  arma::vec v;
+
+  const double gamma; // para1 for RMSProp
+  const double velocity; // para2 for NAG
+  const double epsilon; // small value, not change
+
+  NRMSProp(const arma::uword tn,
+           const double gamma,
+           const double velocity,
+           const double epsilon);
+
+  // w: estimation
+  // grad: gradient
+  // eta: learning rate in each epoch
+  arma::vec update(arma::vec& w,
+                   arma::vec& grad,
+                   double eta);
 
 };
 

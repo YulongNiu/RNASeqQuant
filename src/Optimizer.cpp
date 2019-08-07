@@ -12,18 +12,18 @@ using namespace std;
 Adam::Adam(const arma::uword tn,
            const double beta1,
            const double beta2,
-           double eta,
            const double epsilon)
-  : tn(tn), beta1(beta1), beta2(beta2), eta(eta), epsilon(epsilon){
+  : tn(tn), beta1(beta1), beta2(beta2), epsilon(epsilon){
 
-  t = 1;
   m = vec(tn, fill::zeros);
   v = vec(tn, fill::zeros);
+  t = 1;
 
 }
 
-arma::vec Adam::update (arma::vec& grad,
-                        arma::vec& w) {
+arma::vec Adam::update (arma::vec& w,
+                        arma::vec& grad,
+                        double eta) {
 
   m = beta1 * m + (1 - beta1) * grad;
   v = beta2 * v + (1 - beta2) * square(grad);
@@ -37,10 +37,37 @@ arma::vec Adam::update (arma::vec& grad,
 }
 
 
+//==========//
+// NRMSProp //
+//==========//
+NRMSProp::NRMSProp(const arma::uword tn,
+                   const double gamma,
+                   const double velocity,
+                   const double epsilon)
+  : tn(tn), gamma(gamma), velocity(velocity), epsilon(epsilon){
+
+  eg2 = vec(tn, fill::zeros);
+  v = vec(tn, fill::zeros);
+
+}
+
+arma::vec NRMSProp::update (arma::vec& w,
+                            arma::vec& grad,
+                            double eta) {
+
+  eg2 = gamma * eg2 + (1 - gamma) * grad % grad;
+  v = velocity * v + eta / sqrt(eg2 + epsilon) % grad;
+  w -= v;
+
+  return w;
+
+}
+
+
 // [[Rcpp::export]]
 void Test() {
 
-  Adam testadam(10, 0.9, 0.99, 0.1, 1e-8);
+  Adam testadam(10, 0.9, 0.99, 1e-8);
 
   Rcout << testadam.tn << endl;
   Rcout << testadam.m << endl;
@@ -53,7 +80,7 @@ void Test() {
   vec w = vec(10); w.fill(20);
 
   Rcout << w << endl;
-  Rcout << testadam.update(g, w) << endl;
+  Rcout << testadam.update(w, g, 0.1) << endl;
   Rcout << testadam.t << endl;
 
 }

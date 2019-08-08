@@ -11,9 +11,15 @@ class Optimizer {
 public:
   virtual ~Optimizer() {};
 
+  // w: estimation
+  // grad: gradient
+  // eta: learning rate in each epoch
   virtual arma::vec update(const arma::vec& w,
                            const arma::vec& grad,
                            const double eta) = 0;
+
+  virtual arma::vec preupdate(const arma::vec& w) = 0;
+
 };
 
 
@@ -57,6 +63,10 @@ public:
     return nextw;
 
   }
+
+  arma::vec preupdate(const arma::vec& w) {
+    return w;
+  }
 };
 
 
@@ -85,9 +95,6 @@ public:
 
   }
 
-  // w: estimation
-  // grad: gradient
-  // eta: learning rate in each epoch
   arma::vec update(const arma::vec& w,
                    const arma::vec& grad,
                    const double eta) {
@@ -99,6 +106,54 @@ public:
     return nextw;
 
   }
+
+  arma::vec preupdate(const arma::vec& w) {
+    return w - velocity * v;
+  }
+};
+
+
+//===========//
+// Adadelta //
+//=========//
+class Adadelta : public Optimizer {
+public:
+  const arma::uword tn; // #transcripts
+
+  arma::vec eg2;
+  arma::vec edx2;
+
+  const double gamma; // para1 for Adadelta
+  const double epsilon; // small value, not change
+
+  Adadelta(const arma::uword tn,
+           const double gamma,
+           const double epsilon)
+    : tn(tn), gamma(gamma), epsilon(epsilon) {
+
+    eg2 = vec(tn, fill::zeros);
+    edx2 = vec(tn, fill::zeros);
+
+  }
+
+  arma::vec update(const arma::vec& w,
+                   const arma::vec& grad,
+                   const double eta) {
+
+    eg2 = gamma * eg2 + (1 - gamma) * grad % grad;
+    vec dx = -sqrt(edx2 + epsilon) / sqrt(eg2 + epsilon) % grad;
+    edx2 = gamma * edx2 + (1 - gamma) * dx % dx;
+    vec nextw = w + dx;
+
+    return nextw;
+
+  }
+
+  arma::vec preupdate(const arma::vec& w) {
+    return w;
+  }
 };
 
 #endif
+
+

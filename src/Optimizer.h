@@ -2,10 +2,7 @@
 #define OPTIMIZER_H_
 
 #include <RcppArmadillo.h>
-
-using namespace std;
-using namespace arma;
-using namespace Rcpp;
+#include <cmath>
 
 class Optimizer {
 public:
@@ -44,8 +41,8 @@ public:
        const double epsilon)
     : tn(tn), beta1(beta1), beta2(beta2), epsilon(epsilon) {
 
-    m = vec(tn, fill::zeros);
-    v = vec(tn, fill::zeros);
+    m = arma::vec(tn, arma::fill::zeros);
+    v = arma::vec(tn, arma::fill::zeros);
     t = 1;
 
   }
@@ -55,9 +52,9 @@ public:
                    const double eta) {
 
     m = beta1 * m + (1 - beta1) * grad;
-    v = beta2 * v + (1 - beta2) * square(grad);
-    double etat = eta * sqrt(1 - pow(beta2, t)) / (1 - pow(beta1, t));
-    vec nextw = w - etat * m / (sqrt(v) + epsilon);
+    v = beta2 * v + (1 - beta2) * arma::square(grad);
+    double etat = eta * std::sqrt(1 - std::pow(beta2, t)) / (1 - std::pow(beta1, t));
+    arma::vec nextw = w - etat * m / (arma::sqrt(v) + epsilon);
     ++t;
 
     return nextw;
@@ -90,8 +87,8 @@ public:
            const double epsilon)
     : tn(tn), gamma(gamma), velocity(velocity), epsilon(epsilon) {
 
-    eg2 = vec(tn, fill::zeros);
-    v = vec(tn, fill::zeros);
+    eg2 = arma::vec(tn, arma::fill::zeros);
+    v = arma::vec(tn, arma::fill::zeros);
 
   }
 
@@ -100,8 +97,8 @@ public:
                    const double eta) {
 
     eg2 = gamma * eg2 + (1 - gamma) * grad % grad;
-    v = velocity * v + eta / sqrt(eg2 + epsilon) % grad;
-    vec nextw = w - v;
+    v = velocity * v + eta / arma::sqrt(eg2 + epsilon) % grad;
+    arma::vec nextw = w - v;
 
     return nextw;
 
@@ -131,8 +128,8 @@ public:
            const double epsilon)
     : tn(tn), gamma(gamma), epsilon(epsilon) {
 
-    eg2 = vec(tn, fill::zeros);
-    edx2 = vec(tn, fill::zeros);
+    eg2 = arma::vec(tn, arma::fill::zeros);
+    edx2 = arma::vec(tn, arma::fill::zeros);
 
   }
 
@@ -141,9 +138,9 @@ public:
                    const double eta) {
 
     eg2 = gamma * eg2 + (1 - gamma) * grad % grad;
-    vec dx = -sqrt(edx2 + epsilon) / sqrt(eg2 + epsilon) % grad;
+    arma::vec dx = -arma::sqrt(edx2 + epsilon) / arma::sqrt(eg2 + epsilon) % grad;
     edx2 = gamma * edx2 + (1 - gamma) * dx % dx;
-    vec nextw = w + dx;
+    arma::vec nextw = w + dx;
 
     return nextw;
 

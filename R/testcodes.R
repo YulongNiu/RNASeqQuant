@@ -62,7 +62,6 @@ emest <- EM(plist$efflen, plist$ec, plist$count, 41392, detail = TRUE)
 
 ## RNASeqQuant GD
 ## nice test
-## Adam mini-batch
 gdest <- AdaMax(plist$efflen, plist$ec, plist$count, length(plist$efflen), 500, 1024, 0.1, list(af = 'Softmax'), list())
 gdest <- AdamW(plist$efflen, plist$ec, plist$count, 1/w, length(plist$efflen), 500, 1024, 0.01, list(af = 'Softmax'), list())
 gdest <- AMSGrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 500, 1024, 0.1, list(af = 'Softmax'), list())
@@ -73,9 +72,6 @@ gdest <- NAdagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 500
 ## NRMSProp full batch
 emest <- EM(plist$efflen, plist$ec, plist$count, length(plist$efflen), detail = TRUE)
 gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), 600, 36580, list(af = 'Softmax', opt = 'NRMSProp'), list(eta = 0.005, decay = 0.003)) %>% .$counts
-
-gdest <- NRMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 600, 36580, 0.005, TRUE, list(af = 'Softmax'), list())
-
 gdest <- NRMSPropW(plist$efflen, plist$ec, plist$count, 1/w, length(plist$efflen), 600, 36580, 0.005, list(af = 'Softmax'), list())
 gdest <- NAdagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 1067, 36580, 0.7, FALSE, list(af = 'Softmax'), list())
 
@@ -99,15 +95,6 @@ cor(mergeres, method = 'spearman')
 ## test full batch
 set.seed(12345)
 w <- rnorm(41392, 0, sqrt(1/41392))
-
-LL(Softmax1(w), MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count)
-w <- w - 0.01 * GradientSM(w, MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count, length(plist$efflen), 0:30000)
-
-LL(Softplus1(w)/sum(Softplus1(w)), MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count)
-w <- w - 0.01 * GradientSP(w, MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count, 0:30000)
-
-## w <- rnorm(41392, 0, sqrt(1/41392))
-w <- w - 0.01 * GradientSM(w, MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count, idx)[idx+1]
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 

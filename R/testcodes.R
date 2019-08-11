@@ -4,10 +4,8 @@ library('dplyr')
 library('ggplot2')
 library('Rcpp')
 library('magrittr')
+
 sourceCpp('../src/utilities.cpp')
-sourceCpp('../src/softmax.cpp')
-sourceCpp('../src/softplus.cpp')
-sourceCpp('../src/isru.cpp')
 sourceCpp('../src/likelihood.cpp')
 sourceCpp('../src/GD.cpp')
 sourceCpp('../src/WGD.cpp')
@@ -18,6 +16,8 @@ source('ec.R')
 plist <- list(ec = c('0,1,2', '1,2', '0,2', '0', '0,1'), count = rep(1, 5), efflen = rep(1, 3))
 
 EM(plist$efflen, plist$ec, plist$count, spenum = 3) %>% .$counts
+
+GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'Adam'), list(eta = 0.1, decay = 0.03)) %>% .$counts
 
 Adam(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(af = 'Softmax'), list())
 Adam(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(af = 'Softplus'), list())

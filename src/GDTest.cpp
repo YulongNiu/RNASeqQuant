@@ -45,23 +45,24 @@ void TestObj(arma::uword tn,
 
 
 // [[Rcpp::export]]
-arma::vec GD(const arma::vec& efflenraw,
-             const Rcpp::CharacterVector& ecraw,
-             const arma::uvec& countraw,
-             const arma::uvec& spenumraw,
-             const arma::uword epochs,
-             const arma::uword batchsize,
-             const double eta,
-             const Rcpp::List attrs,
-             const Rcpp::List arguments) {
+Rcpp::List GD(const arma::vec& efflenraw,
+              const Rcpp::CharacterVector& ecraw,
+              const arma::uvec& countraw,
+              const arma::uvec& spenumraw,
+              const arma::uword epochs,
+              const arma::uword batchsize,
+              const Rcpp::List attrs,
+              const Rcpp::List arguments,
+              const bool details = false) {
 
   // stop iteration settings from kallisto
   // double countChangeLimit = 1e-2
   // double countChange = 1e-2
   double countLimit = 1e-8;
 
-  // adam settings
-  double decay = 0.03;
+  // gd settings
+  double eta = arguments.containsElementNamed("eta") ? arguments["eta"] : 0.1;
+  double decay = arguments.containsElementNamed("beta1") ? arguments["beta1"] : 0.03;
 
   // step1: pseudo information remove zero counts
   uvec zeros = find(countraw > 0);
@@ -75,10 +76,13 @@ arma::vec GD(const arma::vec& efflenraw,
   uword tn = sum(spenumraw);
   uword cn = sum(count);
   uword ecn = ec.size();
+  uvec ftidx = FalseTIdx(ec, spenumraw);
+  vec resll(epochs, fill::zeros);
 
   // Glorot normal initializer/Xavier normal initializer
   vec w = randn<vec>(tn) / sqrt(tn);
   // vec w(tn); w.fill(0.01);
+  w.elem(ftidx).fill(-1e8);
   vec grad = vec(tn);
   uvec idx = linspace<uvec>(0, ecn - 1, ecn);
 
@@ -90,9 +94,14 @@ arma::vec GD(const arma::vec& efflenraw,
   std::shared_ptr<Optimizer> gd = Optfactory().createOpt(tn, attrs, arguments);
 
   // step3: gradient decent
-  for (uword iter = 0; iter < epochs; ++iter) {
+  uword iter;
+  for (iter = 0; iter < epochs; ++iter) {
 
     // Rcout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w), efflen, ec, count) << std::endl;
+
+    if (details) {
+      resll(iter) = LL(afc->AFCounts(w) * cn, efflen, ec, count);
+    } else {}
 
     idx = shuffle(idx);
     uword biter = 0;
@@ -111,12 +120,16 @@ arma::vec GD(const arma::vec& efflenraw,
     }
   }
 
-  // step3: reset small est
-  vec est = afc -> AFCounts(w) * cn;
-  Rcout << "The log likelihood is " << std::setprecision (20) << LL(est, efflen, ec, count) <<
-    "." << std::endl;
-
+  // step4: small est & no ec transcripts --> zero
+  vec est = afc->AFCounts(w) * cn;
   est.elem(find(est < countLimit)).zeros();
 
-  return est;
+  List res = List::create(_["counts"] = est,
+                          _["ll"] = resll.subvec(0, iter - 1));
+
+  Rcout << "The iteration number is " << epochs
+        << ". The log likelihood is " << std::setprecision (20) << LL(est, efflen, ec, count)
+        << "." << std::endl;
+
+  return res;
 }

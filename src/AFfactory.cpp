@@ -15,10 +15,7 @@ std::shared_ptr<AFmeasure> AFfactory::createAFGradient(const Rcpp::List &attrs,
     afgrad = std::make_shared<AFSP>();
   }
   else if (isEqualStr(afName, "ISRU")) {
-    double alpha = 0.01;
-    if (arguments.containsElementNamed("alpha")) {
-      alpha = arguments["alpha"];
-    } else {}
+    double alpha = arguments.containsElementNamed("alpha") ? arguments["alpha"] : 0.01;
     afgrad = std::make_shared<AFISRU>(alpha);
   }
   // else if (isEqualStr(afName, "custom")) {
@@ -45,10 +42,7 @@ std::shared_ptr<AFmeasure> AFfactory::createAFCounts(const Rcpp::List &attrs,
     afc = std::make_shared<AFSP>();
   }
   else if (isEqualStr(afName, "ISRU")) {
-    double alpha = 0.01;
-    if (arguments.containsElementNamed("alpha")) {
-      alpha = arguments["alpha"];
-    } else {}
+    double alpha = arguments.containsElementNamed("alpha") ? arguments["alpha"] : 0.01;
     afc = std::make_shared<AFISRU>(alpha);
   }
   // else if (isEqualStr(afName, "custom")) {

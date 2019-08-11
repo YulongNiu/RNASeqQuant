@@ -6,9 +6,6 @@
 #include "utilities.h"
 #include "likelihood.h"
 #include "AFfactory.h"
-#include "AFmeasure.h"
-#include "activation.h"
-#include "Optimizer.h"
 #include "Optfactory.h"
 
 using namespace Rcpp;

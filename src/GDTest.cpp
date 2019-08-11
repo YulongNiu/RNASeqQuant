@@ -59,7 +59,7 @@ Rcpp::List GD(const arma::vec& efflenraw,
 
   // gd settings
   double eta = arguments.containsElementNamed("eta") ? arguments["eta"] : 0.1;
-  double decay = arguments.containsElementNamed("beta1") ? arguments["beta1"] : 0.03;
+  double decay = arguments.containsElementNamed("decay") ? arguments["decay"] : 0.03;
 
   // step1: pseudo information remove zero counts
   uvec zeros = find(countraw > 0);
@@ -94,7 +94,7 @@ Rcpp::List GD(const arma::vec& efflenraw,
   uword iter;
   for (iter = 0; iter < epochs; ++iter) {
 
-    // Rcout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w), efflen, ec, count) << std::endl;
+    // Rcout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w) * cn, efflen, ec, count) << std::endl;
 
     if (details) {
       resll(iter) = LL(afc->AFCounts(w) * cn, efflen, ec, count);
@@ -113,6 +113,7 @@ Rcpp::List GD(const arma::vec& efflenraw,
 
       grad = afgrad -> AFGradient(gd -> preupdate(w), efflen, ec, count, eachidx);
       w = gd -> update(w, grad, etai);
+
       biter += batchsize;
     }
   }

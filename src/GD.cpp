@@ -824,7 +824,7 @@ Rcpp::List NRMSProp(const arma::vec& efflenraw,
 
   // Glorot normal initializer/Xavier normal initializer
   vec w = randn<vec>(tn) / sqrt(tn);
-  // vec w(tn); w.fill(0.01234);
+  // vec w(tn); w.fill(0.01);
   w.elem(ftidx).fill(-1e8);
   vec eg2 = vec(tn, fill::zeros);
   vec V = vec(tn, fill::zeros);
@@ -844,7 +844,7 @@ Rcpp::List NRMSProp(const arma::vec& efflenraw,
       resll(iter) = LL(afc->AFCounts(w) * cn, efflen, ec, count);
     } else {}
 
-    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w), efflen, ec, count) << std::endl;
+    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w) * cn, efflen, ec, count) << std::endl;
     idx = shuffle(idx);
     uword biter = 0;
     double etai = eta / (1 + decay * iter);

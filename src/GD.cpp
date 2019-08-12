@@ -378,12 +378,13 @@ arma::vec AdaMax(const arma::vec& efflenraw,
   // step2: Adam
   uword tn = sum(spenumraw);
   uword cn = sum(count);
-  // uword sn = spenumraw.n_elem;
   uword ecn = ec.size();
+  uvec ftidx = FalseTIdx(ec, spenumraw);
 
   // Glorot normal initializer/Xavier normal initializer
   vec w = randn<vec>(tn) / sqrt(tn);
   // vec w(tn); w.fill(0.01);
+  w.elem(ftidx).fill(-1e8);
 
   vec m = vec(tn, fill::zeros);
   vec u = vec(tn, fill::zeros);
@@ -398,7 +399,7 @@ arma::vec AdaMax(const arma::vec& efflenraw,
 
   for (uword iter = 0; iter < epochs; ++iter) {
 
-    // Rcout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(af->AFCounts(w), efflen, ec, count) << std::endl;
+    Rcout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(af->AFCounts(w), efflen, ec, count) << std::endl;
 
     idx = shuffle(idx);
     uword biter = 0;

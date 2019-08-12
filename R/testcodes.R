@@ -6,6 +6,7 @@ library('Rcpp')
 library('magrittr')
 
 sourceCpp('../src/GDTest.cpp')
+sourceCpp('../src/GD.cpp')
 ## sourceCpp('../src/WGD.cpp')
 sourceCpp('../src/EM.cpp')
 source('ec.R')
@@ -76,7 +77,7 @@ emest <- EM(plist$efflen, plist$ec, plist$count, 41392, detail = TRUE)
 
 ## RNASeqQuant GD
 ## nice test
-gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), 600, 1024, list(af = 'Softmax', opt = 'AdaMax'), list(eta = 0.1, decay = 0.003)) %>% .$counts
+gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), 600, 1024, list(af = 'Softmax', opt = 'AdaMax'), list(eta = 0.1, decay = 0)) %>% .$counts
 gdest <- AdaMax(plist$efflen, plist$ec, plist$count, length(plist$efflen), 500, 1024, 0.1, list(af = 'Softmax'), list())
 gdest <- AdamW(plist$efflen, plist$ec, plist$count, 1/w, length(plist$efflen), 500, 1024, 0.01, list(af = 'Softmax'), list())
 gdest <- AMSGrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 500, 1024, 0.1, list(af = 'Softmax'), list())

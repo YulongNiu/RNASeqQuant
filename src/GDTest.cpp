@@ -84,8 +84,7 @@ Rcpp::List GD(const arma::vec& efflenraw,
   uvec idx = linspace<uvec>(0, ecn - 1, ecn);
 
   // active function
-  std::shared_ptr<AFmeasure> afgrad = AFfactory().createAFGradient(attrs, arguments);
-  std::shared_ptr<AFmeasure> afc = AFfactory().createAFCounts(attrs, arguments);
+  std::shared_ptr<AFmeasure> af = AFfactory().createAF(attrs, arguments);
 
   // GD method
   std::shared_ptr<Optimizer> gd = Optfactory().createOpt(tn, attrs, arguments);
@@ -97,7 +96,7 @@ Rcpp::List GD(const arma::vec& efflenraw,
     // Rcout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w) * cn, efflen, ec, count) << std::endl;
 
     if (details) {
-      resll(iter) = LL(afc->AFCounts(w) * cn, efflen, ec, count);
+      resll(iter) = LL(af->AFCounts(w) * cn, efflen, ec, count);
     } else {}
 
     idx = shuffle(idx);
@@ -111,15 +110,15 @@ Rcpp::List GD(const arma::vec& efflenraw,
       endi = (endi >= ecn) ? (ecn - 1) : endi;
       uvec eachidx = idx.subvec(biter, endi);
 
-      grad = afgrad -> AFGradient(gd -> preupdate(w), efflen, ec, count, eachidx);
-      w = gd -> update(w, grad, etai);
+      grad = af->AFGradient(gd->preupdate(w), efflen, ec, count, eachidx);
+      w = gd->update(w, grad, etai);
 
       biter += batchsize;
     }
   }
 
   // step4: small est & no ec transcripts --> zero
-  vec est = afc->AFCounts(w) * cn;
+  vec est = af->AFCounts(w) * cn;
   est.elem(find(est < countLimit)).zeros();
 
   List res = List::create(_["counts"] = est,

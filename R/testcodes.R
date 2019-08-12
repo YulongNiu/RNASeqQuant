@@ -19,7 +19,7 @@ EM(plist$efflen, plist$ec, plist$count, spenum = 3) %>% .$counts
 
 GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'Adam'), list(eta = 0.1, decay = 0.03)) %>% .$counts
 GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softplus', opt = 'Adam'), list(eta = 0.1, decay = 0.03)) %>% .$counts
-GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'ISRU', opt = 'Adam'), list(eta = 0.1, decay = 0.03, alpha = 1)) %>% .$counts
+GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'ISRU', opt = 'Adam'), list(eta = 0.1, decay = 0.03, alpha = 5)) %>% .$counts
 
 GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'Adadelta'), list(eta = 0.1, decay = 0.03)) %>% .$counts
 GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softplus', opt = 'Adadelta'), list(eta = 0.1, decay = 0.03)) %>% .$counts

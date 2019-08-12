@@ -19,6 +19,82 @@ public:
 
 };
 
+//==========//
+// Momentum //
+//==========//
+class Momentum : public Optimizer {
+public:
+  const arma::uword tn; // #transcripts
+
+  arma::vec v;
+
+  const double gamma; //para1 for Momentum
+  const double epsilon; // small value, not change
+
+  Momentum(const arma::uword tn,
+           const double gamma,
+           const double epsilon)
+    : tn(tn), gamma(gamma), epsilon(epsilon) {
+
+    v = arma::vec(tn, arma::fill::zeros);
+
+  }
+
+  arma::vec update(const arma::vec& w,
+                   const arma::vec& grad,
+                   const double eta) {
+
+    v = gamma * v + eta * grad;
+    arma::vec nextw = w - v;
+
+    return nextw;
+
+  }
+
+  arma::vec preupdate(const arma::vec& w) {
+    return w;
+  }
+};
+
+
+//==========//
+// Momentum //
+//==========//
+class NAG : public Optimizer {
+public:
+  const arma::uword tn; // #transcripts
+
+  arma::vec v;
+
+  const double gamma; //para1 for NAG
+  const double velocity; // para2 for NAG
+  const double epsilon; // small value, not change
+
+  NAG(const arma::uword tn,
+      const double gamma,
+      const double velocity,
+      const double epsilon)
+    : tn(tn), gamma(gamma), velocity(velocity), epsilon(epsilon) {
+
+    v = arma::vec(tn, arma::fill::zeros);
+
+  }
+
+  arma::vec update(const arma::vec& w,
+                   const arma::vec& grad,
+                   const double eta) {
+
+    v = gamma * v + eta * grad;
+    arma::vec nextw = w - v;
+
+    return nextw;
+
+  }
+
+  arma::vec preupdate(const arma::vec& w) {
+    return w - velocity * v;
+  }
+};
 
 //======//
 // Adam //
@@ -78,7 +154,7 @@ public:
   arma::vec v;
 
   const double gamma; // para1 for RMSProp
-  const double velocity; // para2 for NAG
+  const double velocity; // para2 for RMSProp
   const double epsilon; // small value, not change
 
   NRMSProp(const arma::uword tn,

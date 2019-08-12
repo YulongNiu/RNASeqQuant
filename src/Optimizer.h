@@ -121,7 +121,7 @@ public:
                    const double eta) {
 
     G += grad % grad;
-    arma::vec nextw = w - eta / sqrt(G + epsilon) % grad;
+    arma::vec nextw = w - eta / arma::sqrt(G + epsilon) % grad;
 
     return nextw;
 
@@ -161,7 +161,7 @@ public:
                    const double eta) {
 
     G += grad % grad;
-    arma::vec nextw = w - eta / sqrt(G + epsilon) % grad;
+    arma::vec nextw = w - eta / arma::sqrt(G + epsilon) % grad;
 
     return nextw;
 
@@ -244,7 +244,7 @@ public:
                    const double eta) {
 
     eg2 = gamma * eg2 + (1 - gamma) * grad % grad;
-    arma::vec nextw = w - eta / sqrt(eg2 + epsilon) % grad;
+    arma::vec nextw = w - eta / arma::sqrt(eg2 + epsilon) % grad;
 
     return nextw;
 
@@ -346,11 +346,52 @@ public:
 };
 
 
+//=======//
+// NAdam //
+//=======//
+class NAdam : public Optimizer {
+public:
+  const arma::uword tn; // #transcripts
+
+  arma::vec m;
+  arma::vec v;
+  arma::uword t;
+
+  const double beta1; // para1 for Adam
+  const double beta2; // para2 for Adam
+  const double epsilon; // small value, not change
+
+  NAdam(const arma::uword tn,
+       const double beta1,
+       const double beta2,
+       const double epsilon)
+    : tn(tn), beta1(beta1), beta2(beta2), epsilon(epsilon) {
+
+    m = arma::vec(tn, arma::fill::zeros);
+    v = arma::vec(tn, arma::fill::zeros);
+    t = 1;
+
+  }
+
+  arma::vec update(const arma::vec& w,
+                   const arma::vec& grad,
+                   const double eta) {
+
+    m = beta1 * m + (1 - beta1) * grad;
+    v = beta2 * v + (1 - beta2) * square(grad);
+    arma::vec etat = beta1 * m + (1 - beta1) * grad / (1 - std::pow(beta1, t));
+    arma::vec nextw = w - eta * etat / (arma::sqrt(v) + epsilon);
+    ++t;
+
+    return nextw;
+
+  }
+
+  arma::vec preupdate(const arma::vec& w) {
+    return w;
+  }
+};
+
 
 #endif
-
-
-
-
-
 

@@ -33,7 +33,7 @@ std::shared_ptr<Optimizer> Optfactory::createOpt(arma::uword tn,
   }
   else if (isEqualStr(optName, "RMSProp")) {
     double gamma = arguments.containsElementNamed("gamma") ? arguments["gamma"] : 0.9;
-    optobj = std::make_shared<NRMSProp>(tn, gamma, epsilon);
+    optobj = std::make_shared<RMSProp>(tn, gamma, epsilon);
   }
   else if (isEqualStr(optName, "NRMSProp")) {
     double gamma = arguments.containsElementNamed("gamma") ? arguments["gamma"] : 0.9;
@@ -42,7 +42,7 @@ std::shared_ptr<Optimizer> Optfactory::createOpt(arma::uword tn,
   }
   else if (isEqualStr(optName, "Adam")) {
     double beta1 = arguments.containsElementNamed("beta1") ? arguments["beta1"] : 0.9;
-    double beta2 = arguments.containsElementNamed("beta2") ? arguments["beta1"] : 0.999;
+    double beta2 = arguments.containsElementNamed("beta2") ? arguments["beta2"] : 0.999;
     optobj = std::make_shared<Adam>(tn, beta1, beta2, epsilon);
   }
   else {}

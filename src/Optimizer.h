@@ -4,6 +4,8 @@
 #include <cmath>
 #include <RcppArmadillo.h>
 
+#include "utilities.h"
+
 class Optimizer {
 public:
   virtual ~Optimizer() {};
@@ -266,8 +268,8 @@ public:
   arma::vec eg2;
   arma::vec v;
 
-  const double gamma; // para1 for RMSProp
-  const double velocity; // para2 for RMSProp
+  const double gamma; // para1 for NRMSProp
+  const double velocity; // para2 for NRMSProp
   const double epsilon; // small value, not change
 
   NRMSProp(const arma::uword tn,
@@ -357,14 +359,14 @@ public:
   arma::vec v;
   arma::uword t;
 
-  const double beta1; // para1 for Adam
-  const double beta2; // para2 for Adam
+  const double beta1; // para1 for NAdam
+  const double beta2; // para2 for NAdam
   const double epsilon; // small value, not change
 
   NAdam(const arma::uword tn,
-       const double beta1,
-       const double beta2,
-       const double epsilon)
+        const double beta1,
+        const double beta2,
+        const double epsilon)
     : tn(tn), beta1(beta1), beta2(beta2), epsilon(epsilon) {
 
     m = arma::vec(tn, arma::fill::zeros);
@@ -393,5 +395,88 @@ public:
 };
 
 
-#endif
+//========//
+// AdaMax //
+//========//
+class AdaMax : public Optimizer {
+public:
+  const arma::uword tn; // #transcripts
 
+  arma::vec m;
+  arma::vec u;
+
+  const double beta1; // para1 for AdaMax
+  const double beta2; // para2 for AdaMax
+  const double epsilon; // small value, not change
+
+  AdaMax(const arma::uword tn,
+         const double beta1,
+         const double beta2,
+         const double epsilon)
+    : tn(tn), beta1(beta1), beta2(beta2), epsilon(epsilon) {
+
+    m = arma::vec(tn, arma::fill::zeros);
+    u = arma::vec(tn, arma::fill::zeros);
+
+  }
+
+  arma::vec update(const arma::vec& w,
+                   const arma::vec& grad,
+                   const double eta) {
+
+    m = beta1 * m + (1 - beta1) * grad;
+    u = Max(beta2 * u, arma::abs(grad));
+    arma::vec nextw = w - eta * m / u;
+
+    return nextw;
+
+  }
+
+  arma::vec preupdate(const arma::vec& w) {
+    return w;
+  }
+};
+
+//=========//
+// AMSGrad //
+//=========//
+class AMSGrad : public Optimizer {
+public:
+  const arma::uword tn; // #transcripts
+
+  arma::vec m;
+  arma::vec v;
+
+  const double beta1; // para1 for AMSGrad
+  const double beta2; // para2 for AMSGrad
+  const double epsilon; // small value, not change
+
+  AMSGrad(const arma::uword tn,
+          const double beta1,
+          const double beta2,
+          const double epsilon)
+    : tn(tn), beta1(beta1), beta2(beta2), epsilon(epsilon) {
+
+    m = arma::vec(tn, arma::fill::zeros);
+    v = arma::vec(tn, arma::fill::zeros);
+
+  }
+
+  arma::vec update(const arma::vec& w,
+                   const arma::vec& grad,
+                   const double eta) {
+
+    m = beta1 * m + (1 - beta1) * grad;
+    v = Max(v, beta2 * v + (1 - beta2) * arma::square(grad));
+    arma::vec nextw = w - eta * m / (sqrt(v) + epsilon);
+
+    return nextw;
+
+  }
+
+  arma::vec preupdate(const arma::vec& w) {
+    return w;
+  }
+};
+
+#endif

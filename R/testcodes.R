@@ -17,6 +17,7 @@ plist <- list(ec = c('0,1,2', '1,2', '0,2', '0', '0,1'), count = rep(1, 5), effl
 
 EM(plist$efflen, plist$ec, plist$count, spenum = 3) %>% .$counts
 
+## test diff GD
 GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'Momentum'), list(eta = 0.5, decay = 0.03)) %>% .$counts
 
 GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'NAG'), list(eta = 0.5, decay = 0.03)) %>% .$counts
@@ -35,7 +36,12 @@ GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softma
 
 GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'NAdam'), list(eta = 0.1, decay = 0.03)) %>% .$counts
 
+GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'AdaMax'), list(eta = 0.1, decay = 0.03)) %>% .$counts
 
+GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'AMSGrad'), list(eta = 0.1, decay = 0.03)) %>% .$counts
+
+## test active functions
+GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03)) %>% .$counts
 GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softplus', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03)) %>% .$counts
 GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'ISRU', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03)) %>% .$counts
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

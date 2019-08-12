@@ -48,7 +48,17 @@ std::shared_ptr<Optimizer> Optfactory::createOpt(arma::uword tn,
   else if (isEqualStr(optName, "NAdam")) {
     double beta1 = arguments.containsElementNamed("beta1") ? arguments["beta1"] : 0.9;
     double beta2 = arguments.containsElementNamed("beta2") ? arguments["beta2"] : 0.999;
-    optobj = std::make_shared<Adam>(tn, beta1, beta2, epsilon);
+    optobj = std::make_shared<NAdam>(tn, beta1, beta2, epsilon);
+  }
+  else if (isEqualStr(optName, "AdaMax")) {
+    double beta1 = arguments.containsElementNamed("beta1") ? arguments["beta1"] : 0.9;
+    double beta2 = arguments.containsElementNamed("beta2") ? arguments["beta2"] : 0.999;
+    optobj = std::make_shared<AdaMax>(tn, beta1, beta2, epsilon);
+  }
+  else if (isEqualStr(optName, "AMSGrad")) {
+    double beta1 = arguments.containsElementNamed("beta1") ? arguments["beta1"] : 0.9;
+    double beta2 = arguments.containsElementNamed("beta2") ? arguments["beta2"] : 0.999;
+    optobj = std::make_shared<AMSGrad>(tn, beta1, beta2, epsilon);
   }
   else {}
 

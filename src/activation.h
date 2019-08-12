@@ -6,10 +6,6 @@
 #include "softplus.h"
 #include "isru.h"
 
-using namespace Rcpp;
-using namespace arma;
-using namespace std;
-
 // [[Rcpp::depends(RcppArmadillo)]]
 
 //' Gradient.
@@ -38,13 +34,13 @@ public:
                        const std::vector<arma::uvec>& ec,
                        const arma::uvec& count,
                        const arma::uvec& idx) {
-    vec grad(w.n_elem, fill::zeros);
+    arma::vec grad(w.n_elem, fill::zeros);
 
     for (auto i : idx) {
       grad.elem(ec[i]) += count(i) * Softmax(w.elem(ec[i]), 1/efflen[i]);
     }
 
-    return sum(count.elem(idx)) * Softmax1(w) - grad;
+    return arma::sum(count.elem(idx)) * Softmax1(w) - grad;
   }
 
   arma::vec AFCounts(const arma::vec& w) {
@@ -65,13 +61,13 @@ public:
                        const std::vector<arma::uvec>& ec,
                        const arma::uvec& count,
                        const arma::uvec& idx) {
-    vec grad(w.n_elem, fill::zeros);
+    arma::vec grad(w.n_elem, fill::zeros);
 
     for (auto i : idx) {
       grad.elem(ec[i]) += count(i) * SoftplusGrad(w.elem(ec[i]), 1/efflen[i]);
     }
 
-    return sum(count.elem(idx)) * SoftplusGrad1(w) - grad;
+    return arma::sum(count.elem(idx)) * SoftplusGrad1(w) - grad;
   }
 
   arma::vec AFCounts(const arma::vec& w) {
@@ -100,13 +96,13 @@ public:
                        const std::vector<arma::uvec>& ec,
                        const arma::uvec& count,
                        const arma::uvec& idx) {
-    vec grad(w.n_elem, fill::zeros);
+    arma::vec grad(w.n_elem, fill::zeros);
 
     for (auto i : idx) {
       grad.elem(ec[i]) += count(i) * ISRUGrad(w.elem(ec[i]), InvSqrtRoot(w.elem(ec[i]), alpha), 1/efflen[i], alpha);
     }
 
-    return sum(count.elem(idx)) * ISRUGrad1(w, InvSqrtRoot(w, alpha), alpha) - grad;
+    return arma::sum(count.elem(idx)) * ISRUGrad1(w, InvSqrtRoot(w, alpha), alpha) - grad;
   }
 
   arma::vec AFCounts(const arma::vec& w) {

@@ -132,30 +132,27 @@ public:
   }
 };
 
-//======//
-// Adam //
-//======//
-class Adam : public Optimizer {
+
+//==========//
+// NAdagrad //
+//==========//
+class NAdagrad : public Optimizer {
 public:
   const arma::uword tn; // #transcripts
 
-  arma::vec m;
+  arma::vec G;
   arma::vec v;
-  arma::uword t;
 
-  const double beta1; // para1 for Adam
-  const double beta2; // para2 for Adam
+  const double velocity; // para1 for NAdagrad
   const double epsilon; // small value, not change
 
-  Adam(const arma::uword tn,
-       const double beta1,
-       const double beta2,
-       const double epsilon)
-    : tn(tn), beta1(beta1), beta2(beta2), epsilon(epsilon) {
+  NAdagrad(const arma::uword tn,
+           const double velocity,
+           const double epsilon)
+    : tn(tn), velocity(velocity), epsilon(epsilon) {
 
-    m = arma::vec(tn, arma::fill::zeros);
+    G = arma::vec(tn, arma::fill::zeros);
     v = arma::vec(tn, arma::fill::zeros);
-    t = 1;
 
   }
 
@@ -163,11 +160,91 @@ public:
                    const arma::vec& grad,
                    const double eta) {
 
-    m = beta1 * m + (1 - beta1) * grad;
-    v = beta2 * v + (1 - beta2) * arma::square(grad);
-    double etat = eta * std::sqrt(1 - std::pow(beta2, t)) / (1 - std::pow(beta1, t));
-    arma::vec nextw = w - etat * m / (arma::sqrt(v) + epsilon);
-    ++t;
+    G += grad % grad;
+    arma::vec nextw = w - eta / sqrt(G + epsilon) % grad;
+
+    return nextw;
+
+  }
+
+  arma::vec preupdate(const arma::vec& w) {
+    return w - velocity * v;
+  }
+};
+
+
+
+//===========//
+// Adadelta //
+//=========//
+class Adadelta : public Optimizer {
+public:
+  const arma::uword tn; // #transcripts
+
+  arma::vec eg2;
+  arma::vec edx2;
+
+  const double gamma; // para1 for Adadelta
+  const double epsilon; // small value, not change
+
+  Adadelta(const arma::uword tn,
+           const double gamma,
+           const double epsilon)
+    : tn(tn), gamma(gamma), epsilon(epsilon) {
+
+    eg2 = arma::vec(tn, arma::fill::zeros);
+    edx2 = arma::vec(tn, arma::fill::zeros);
+
+  }
+
+  arma::vec update(const arma::vec& w,
+                   const arma::vec& grad,
+                   const double eta) {
+
+    eg2 = gamma * eg2 + (1 - gamma) * grad % grad;
+    arma::vec dx = -arma::sqrt(edx2 + epsilon) / arma::sqrt(eg2 + epsilon) % grad;
+    edx2 = gamma * edx2 + (1 - gamma) * dx % dx;
+    arma::vec nextw = w + dx;
+
+    return nextw;
+
+  }
+
+  arma::vec preupdate(const arma::vec& w) {
+    return w;
+  }
+};
+
+
+//=========//
+// RMSProp //
+//=========//
+class RMSProp : public Optimizer {
+public:
+  const arma::uword tn; // #transcripts
+
+  arma::vec eg2;
+  arma::vec v;
+
+  const double gamma; // para1 for RMSProp
+  const double epsilon; // small value, not change
+
+  RMSProp(const arma::uword tn,
+          const double gamma,
+          const double epsilon)
+    : tn(tn), gamma(gamma), epsilon(epsilon) {
+
+    eg2 = arma::vec(tn, arma::fill::zeros);
+    v = arma::vec(tn, arma::fill::zeros);
+
+  }
+
+  arma::vec update(const arma::vec& w,
+                   const arma::vec& grad,
+                   const double eta) {
+
+    eg2 = gamma * eg2 + (1 - gamma) * grad % grad;
+    arma::vec nextw = w - eta / sqrt(eg2 + epsilon) % grad;
 
     return nextw;
 
@@ -222,26 +299,30 @@ public:
 };
 
 
-//===========//
-// Adadelta //
-//=========//
-class Adadelta : public Optimizer {
+//======//
+// Adam //
+//======//
+class Adam : public Optimizer {
 public:
   const arma::uword tn; // #transcripts
 
-  arma::vec eg2;
-  arma::vec edx2;
+  arma::vec m;
+  arma::vec v;
+  arma::uword t;
 
-  const double gamma; // para1 for Adadelta
+  const double beta1; // para1 for Adam
+  const double beta2; // para2 for Adam
   const double epsilon; // small value, not change
 
-  Adadelta(const arma::uword tn,
-           const double gamma,
-           const double epsilon)
-    : tn(tn), gamma(gamma), epsilon(epsilon) {
+  Adam(const arma::uword tn,
+       const double beta1,
+       const double beta2,
+       const double epsilon)
+    : tn(tn), beta1(beta1), beta2(beta2), epsilon(epsilon) {
 
-    eg2 = arma::vec(tn, arma::fill::zeros);
-    edx2 = arma::vec(tn, arma::fill::zeros);
+    m = arma::vec(tn, arma::fill::zeros);
+    v = arma::vec(tn, arma::fill::zeros);
+    t = 1;
 
   }
 
@@ -249,10 +330,11 @@ public:
                    const arma::vec& grad,
                    const double eta) {
 
-    eg2 = gamma * eg2 + (1 - gamma) * grad % grad;
-    arma::vec dx = -arma::sqrt(edx2 + epsilon) / arma::sqrt(eg2 + epsilon) % grad;
-    edx2 = gamma * edx2 + (1 - gamma) * dx % dx;
-    arma::vec nextw = w + dx;
+    m = beta1 * m + (1 - beta1) * grad;
+    v = beta2 * v + (1 - beta2) * arma::square(grad);
+    double etat = eta * std::sqrt(1 - std::pow(beta2, t)) / (1 - std::pow(beta1, t));
+    arma::vec nextw = w - etat * m / (arma::sqrt(v) + epsilon);
+    ++t;
 
     return nextw;
 
@@ -263,6 +345,12 @@ public:
   }
 };
 
+
+
 #endif
+
+
+
+
 
 

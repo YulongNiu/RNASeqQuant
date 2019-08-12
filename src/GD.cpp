@@ -571,7 +571,7 @@ Rcpp::List NAdagrad(const arma::vec& efflenraw,
       resll(iter) = LL(af->AFCounts(w) * cn, efflen, ec, count);
     } else {}
 
-    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(af->AFCounts(w), efflen, ec, count) << "|" << t << std::endl;
+    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(af->AFCounts(w) * cn, efflen, ec, count) << "|" << std::endl;
     idx = shuffle(idx);
     uword biter = 0;
     double etai = eta / (1 + decay * iter);
@@ -603,7 +603,6 @@ Rcpp::List NAdagrad(const arma::vec& efflenraw,
 
   Rcout << "The log likelihood is " << std::setprecision (20) << LL(est, efflen, ec, count) <<
     "." << std::endl;
-
 
   return res;
 }

@@ -64,7 +64,7 @@ Rcpp::List GD(const arma::vec& efflenraw,
   uword iter;
   for (iter = 0; iter < epochs; ++iter) {
 
-    Rcout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(af->AFCounts(w) * cn, efflen, ec, count) << std::endl;
+    // Rcout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(af->AFCounts(w) * cn, efflen, ec, count) << std::endl;
 
     if (details) {
       resll(iter) = LL(af->AFCounts(w) * cn, efflen, ec, count);

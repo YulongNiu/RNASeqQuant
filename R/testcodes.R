@@ -79,17 +79,23 @@ emest <- EM(plist$efflen, plist$ec, plist$count, 41392, detail = TRUE)
 ## nice test
 gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), 600, 1024, list(af = 'Softmax', opt = 'AdaMax'), list(eta = 0.1, decay = 0)) %>% .$counts
 gdest <- AdaMax(plist$efflen, plist$ec, plist$count, length(plist$efflen), 500, 1024, 0.1, list(af = 'Softmax'), list())
+
+
 gdest <- AdamW(plist$efflen, plist$ec, plist$count, 1/w, length(plist$efflen), 500, 1024, 0.01, list(af = 'Softmax'), list())
-gdest <- AMSGrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 500, 1024, 0.1, list(af = 'Softmax'), list())
+
+gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), 600, 1024, list(af = 'Softmax', opt = 'AMSGrad'), list(eta = 0.07, decay = 0.003)) %>% .$counts
+
 gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), 600, 1024, list(af = 'Softmax', opt = 'Adam'), list(eta = 0.1, decay = 0.03)) %>% .$counts
-gdest <- NAdam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 600, 1024, 0.25, list(af = 'Softmax'), list())
-gdest <- NAdagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 500, 1024, 0.1, list(af = 'Softmax'), list())
+
+gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), 600, 1024, list(af = 'Softmax', opt = 'NAdam'), list(eta = 0.1, decay = 0.03)) %>% .$counts
+
+gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), 600, 1024, list(af = 'Softmax', opt = 'NAdagrad'), list(eta = 0.1, decay = 0.00001)) %>% .$counts
 
 ## NRMSProp full batch
 emest <- EM(plist$efflen, plist$ec, plist$count, length(plist$efflen), detail = TRUE)
 gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), 600, 36580, list(af = 'Softmax', opt = 'NRMSProp'), list(eta = 0.005, decay = 0.003)) %>% .$counts
 gdest <- NRMSPropW(plist$efflen, plist$ec, plist$count, 1/w, length(plist$efflen), 600, 36580, 0.005, list(af = 'Softmax'), list())
-gdest <- NAdagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 1067, 36580, 0.7, FALSE, list(af = 'Softmax'), list())
+gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), 600, 36580, list(af = 'Softmax', opt = 'NAdagrad'), list(eta = 0.7, decay = 0.00001)) %>% .$counts
 
 ## plot
 tibble(iter = c(1 : length(emest$ll), 1 : length(gdest$ll)),

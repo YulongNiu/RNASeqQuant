@@ -163,7 +163,8 @@ public:
                    const double eta) {
 
     G += grad % grad;
-    arma::vec nextw = w - eta / arma::sqrt(G + epsilon) % grad;
+    v = velocity * v + eta / arma::sqrt(G + epsilon) % grad;
+    arma::vec nextw = w - v;
 
     return nextw;
 

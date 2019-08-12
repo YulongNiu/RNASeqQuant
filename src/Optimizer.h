@@ -57,9 +57,9 @@ public:
 };
 
 
-//==========//
-// Momentum //
-//==========//
+//======//
+// NAG //
+//=====//
 class NAG : public Optimizer {
 public:
   const arma::uword tn; // #transcripts
@@ -93,6 +93,42 @@ public:
 
   arma::vec preupdate(const arma::vec& w) {
     return w - velocity * v;
+  }
+};
+
+
+//=========//
+// Adagrad //
+//=========//
+class Adagrad : public Optimizer {
+public:
+  const arma::uword tn; // #transcripts
+
+  arma::vec G;
+
+  const double epsilon; // small value, not change
+
+  Adagrad(const arma::uword tn,
+          const double epsilon)
+    : tn(tn), epsilon(epsilon) {
+
+    G = arma::vec(tn, arma::fill::zeros);
+
+  }
+
+  arma::vec update(const arma::vec& w,
+                   const arma::vec& grad,
+                   const double eta) {
+
+    G += grad % grad;
+    arma::vec nextw = w - eta / sqrt(G + epsilon) % grad;
+
+    return nextw;
+
+  }
+
+  arma::vec preupdate(const arma::vec& w) {
+    return w;
   }
 };
 

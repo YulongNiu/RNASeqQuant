@@ -21,6 +21,8 @@ GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softma
 
 GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'NAG'), list(eta = 0.5, decay = 0.03)) %>% .$counts
 
+GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'Adagrad'), list(eta = 0.5, decay = 0.03)) %>% .$counts
+
 GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'Adam'), list(eta = 0.1, decay = 0.03)) %>% .$counts
 
 GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'Adadelta'), list(eta = 0.1, decay = 0.03)) %>% .$counts

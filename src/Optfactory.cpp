@@ -17,11 +17,16 @@ std::shared_ptr<Optimizer> Optfactory::createOpt(arma::uword tn,
     optobj = std::make_shared<Momentum>(tn, gamma, epsilon);
 
   }
-  if (isEqualStr(optName, "NAG")) {
+  else if (isEqualStr(optName, "NAG")) {
 
     double gamma = arguments.containsElementNamed("gamma") ? arguments["beta1"] : 0.9;
     double velocity = arguments.containsElementNamed("velocity") ? arguments["beta1"] : 0.9;
     optobj = std::make_shared<NAG>(tn, gamma, velocity, epsilon);
+
+  }
+  else if (isEqualStr(optName, "Adagrad")) {
+
+    optobj = std::make_shared<Adagrad>(tn, epsilon);
 
   }
   else if (isEqualStr(optName, "Adam")) {

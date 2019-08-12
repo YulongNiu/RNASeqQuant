@@ -64,13 +64,12 @@ arma::vec Momentum(const arma::vec& efflenraw,
   uvec idx = linspace<uvec>(0, ecn - 1, ecn);
 
   // active function
-  std::shared_ptr<AFmeasure> afgrad = AFfactory().createAFGradient(attrs, arguments);
-  std::shared_ptr<AFmeasure> afc = AFfactory().createAFCounts(attrs, arguments);
+  std::shared_ptr<AFmeasure> af = AFfactory().createAF(attrs, arguments);
 
   uword iter;
   for (iter = 0; iter < epochs; ++iter) {
 
-    // Rcout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w), efflen, ec, count) << std::endl;
+    // Rcout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(af->AFCounts(w), efflen, ec, count) << std::endl;
 
     idx = shuffle(idx);
     uword biter = 0;
@@ -82,7 +81,7 @@ arma::vec Momentum(const arma::vec& efflenraw,
       uvec eachidx = idx.subvec(biter, endi);
 
       // adam for each batch
-      grad = afgrad->AFGradient(w, efflen, ec, count, eachidx);
+      grad = af->AFGradient(w, efflen, ec, count, eachidx);
       v = gamma * v + eta * grad;
       w -= v;
 
@@ -91,7 +90,7 @@ arma::vec Momentum(const arma::vec& efflenraw,
   }
 
   // reset small est
-  vec est = afc->AFCounts(w) * cn;
+  vec est = af->AFCounts(w) * cn;
   Rcout << "The log likelihood is " << std::setprecision (20) << LL(est, efflen, ec, count) <<
     "." << std::endl;
 
@@ -145,12 +144,11 @@ arma::vec NAG(const arma::vec& efflenraw,
   uvec idx = linspace<uvec>(0, ecn - 1, ecn);
 
   // active function
-  std::shared_ptr<AFmeasure> afgrad = AFfactory().createAFGradient(attrs, arguments);
-  std::shared_ptr<AFmeasure> afc = AFfactory().createAFCounts(attrs, arguments);
+  std::shared_ptr<AFmeasure> af = AFfactory().createAF(attrs, arguments);
 
   for (uword iter = 0; iter < epochs; ++iter) {
 
-    // Rcout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w), efflen, ec, count) << std::endl;
+    // Rcout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(af->AFCounts(w), efflen, ec, count) << std::endl;
 
     idx = shuffle(idx);
     uword biter = 0;
@@ -162,7 +160,7 @@ arma::vec NAG(const arma::vec& efflenraw,
       uvec eachidx = idx.subvec(biter, endi);
 
       // adam for each batch
-      grad = afgrad->AFGradient(w - gamma * v, efflen, ec, count, eachidx);
+      grad = af->AFGradient(w - gamma * v, efflen, ec, count, eachidx);
       v = gamma * v + eta * grad;
       w -= v;
 
@@ -171,7 +169,7 @@ arma::vec NAG(const arma::vec& efflenraw,
   }
 
   // reset small est
-  vec est = afc->AFCounts(w) * cn;
+  vec est = af->AFCounts(w) * cn;
   Rcout << "The log likelihood is " << std::setprecision (20) << LL(est, efflen, ec, count) <<
     "." << std::endl;
 
@@ -227,12 +225,11 @@ arma::vec Adam(const arma::vec& efflenraw,
   uvec idx = linspace<uvec>(0, ecn - 1, ecn);
 
   // active function
-  std::shared_ptr<AFmeasure> afgrad = AFfactory().createAFGradient(attrs, arguments);
-  std::shared_ptr<AFmeasure> afc = AFfactory().createAFCounts(attrs, arguments);
+  std::shared_ptr<AFmeasure> af = AFfactory().createAF(attrs, arguments);
 
   for (uword iter = 0; iter < epochs; ++iter) {
 
-    // Rcout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w), efflen, ec, count) << std::endl;
+    // Rcout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(af->AFCounts(w), efflen, ec, count) << std::endl;
 
     idx = shuffle(idx);
     uword biter = 0;
@@ -246,7 +243,7 @@ arma::vec Adam(const arma::vec& efflenraw,
       uvec eachidx = idx.subvec(biter, endi);
 
       // adam for each batch
-      grad = afgrad->AFGradient(w, efflen, ec, count, eachidx);
+      grad = af->AFGradient(w, efflen, ec, count, eachidx);
       m = beta1 * m + (1 - beta1) * grad;
       v = beta2 * v + (1 - beta2) * square(grad);
       double etat = etai * sqrt(1 - pow(beta2, t)) / (1 - pow(beta1, t));
@@ -257,7 +254,7 @@ arma::vec Adam(const arma::vec& efflenraw,
   }
 
   // step3: reset small est
-  vec est = afc->AFCounts(w) * cn;
+  vec est = af->AFCounts(w) * cn;
   Rcout << "The log likelihood is " << std::setprecision (20) << LL(est, efflen, ec, count) <<
     "." << std::endl;
 
@@ -313,12 +310,11 @@ arma::vec NAdam(const arma::vec& efflenraw,
   uvec idx = linspace<uvec>(0, ecn - 1, ecn);
 
   // active function
-  std::shared_ptr<AFmeasure> afgrad = AFfactory().createAFGradient(attrs, arguments);
-  std::shared_ptr<AFmeasure> afc = AFfactory().createAFCounts(attrs, arguments);
+  std::shared_ptr<AFmeasure> af = AFfactory().createAF(attrs, arguments);
 
-  for (uword iter = 0; iter < epochs; ++iter) {
+   for (uword iter = 0; iter < epochs; ++iter) {
 
-    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w), efflen, ec, count) << "|" << t << std::endl;
+    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(af->AFCounts(w), efflen, ec, count) << "|" << t << std::endl;
     idx = shuffle(idx);
     uword biter = 0;
     double etai = eta / (1 + decay * iter);
@@ -331,7 +327,7 @@ arma::vec NAdam(const arma::vec& efflenraw,
       uvec eachidx = idx.subvec(biter, endi);
 
       // adam for each batch
-      grad = afgrad->AFGradient(w, efflen, ec, count, eachidx);
+      grad = af->AFGradient(w, efflen, ec, count, eachidx);
       m = beta1 * m + (1 - beta1) * grad;
       v = beta2 * v + (1 - beta2) * square(grad);
       vec etat = beta1 * m + (1 - beta1) * grad / (1 - pow(beta1, t));
@@ -342,7 +338,7 @@ arma::vec NAdam(const arma::vec& efflenraw,
   }
 
   // step3: reset small est
-  vec est = afc->AFCounts(w) * cn;
+  vec est = af->AFCounts(w) * cn;
   Rcout << "The log likelihood is " << std::setprecision (20) << LL(est, efflen, ec, count) <<
     "." << std::endl;
 
@@ -398,12 +394,11 @@ arma::vec AdaMax(const arma::vec& efflenraw,
   uvec idx = linspace<uvec>(0, ecn - 1, ecn);
 
   // active function
-  std::shared_ptr<AFmeasure> afgrad = AFfactory().createAFGradient(attrs, arguments);
-  std::shared_ptr<AFmeasure> afc = AFfactory().createAFCounts(attrs, arguments);
+  std::shared_ptr<AFmeasure> af = AFfactory().createAF(attrs, arguments);
 
   for (uword iter = 0; iter < epochs; ++iter) {
 
-    // Rcout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w), efflen, ec, count) << std::endl;
+    // Rcout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(af->AFCounts(w), efflen, ec, count) << std::endl;
 
     idx = shuffle(idx);
     uword biter = 0;
@@ -416,7 +411,7 @@ arma::vec AdaMax(const arma::vec& efflenraw,
       uvec eachidx = idx.subvec(biter, endi);
 
       // adam for each batch
-      grad = afgrad->AFGradient(w, efflen, ec, count, eachidx);
+      grad = af->AFGradient(w, efflen, ec, count, eachidx);
       m = beta1 * m + (1 - beta1) * grad;
       u = Max(beta2 * u, abs(grad));
       w -= eta * m / u;
@@ -426,7 +421,7 @@ arma::vec AdaMax(const arma::vec& efflenraw,
   }
 
   // step3: reset small est
-  vec est = afc->AFCounts(w) * cn;
+  vec est = af->AFCounts(w) * cn;
   Rcout << "The log likelihood is " << std::setprecision (20) << LL(est, efflen, ec, count) <<
     "." << std::endl;
 
@@ -480,12 +475,11 @@ arma::vec Adagrad(const arma::vec& efflenraw,
   uvec idx = linspace<uvec>(0, ecn - 1, ecn);
 
   // active function
-  std::shared_ptr<AFmeasure> afgrad = AFfactory().createAFGradient(attrs, arguments);
-  std::shared_ptr<AFmeasure> afc = AFfactory().createAFCounts(attrs, arguments);
+  std::shared_ptr<AFmeasure> af = AFfactory().createAF(attrs, arguments);
 
   for (uword iter = 0; iter < epochs; ++iter) {
 
-    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w), efflen, ec, count) << "|" << t << std::endl;
+    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(af->AFCounts(w), efflen, ec, count) << "|" << t << std::endl;
     idx = shuffle(idx);
     uword biter = 0;
 
@@ -496,7 +490,7 @@ arma::vec Adagrad(const arma::vec& efflenraw,
       uvec eachidx = idx.subvec(biter, endi);
 
       // adam for each batch
-      grad = afgrad->AFGradient(w, efflen, ec, count, eachidx);
+      grad = af->AFGradient(w, efflen, ec, count, eachidx);
       G += grad % grad;
       w -= eta / sqrt(G + epsilon) % grad;
 
@@ -505,8 +499,8 @@ arma::vec Adagrad(const arma::vec& efflenraw,
   }
 
   // reset small est
-  vec est = afc->AFCounts(w) * cn;
-  Rcout << "The log likelihood is " << std::setprecision (20) << LL(afc->AFCounts(w), efflen, ec, count) <<
+  vec est = af->AFCounts(w) * cn;
+  Rcout << "The log likelihood is " << std::setprecision (20) << LL(af->AFCounts(w), efflen, ec, count) <<
     "." << std::endl;
 
   est.elem(find(est < countLimit)).zeros();
@@ -567,17 +561,16 @@ Rcpp::List NAdagrad(const arma::vec& efflenraw,
   uvec idx = linspace<uvec>(0, ecn - 1, ecn);
 
   // active function
-  std::shared_ptr<AFmeasure> afgrad = AFfactory().createAFGradient(attrs, arguments);
-  std::shared_ptr<AFmeasure> afc = AFfactory().createAFCounts(attrs, arguments);
+  std::shared_ptr<AFmeasure> af = AFfactory().createAF(attrs, arguments);
 
   uword iter;
   for (iter = 0; iter < epochs; ++iter) {
 
     if (details) {
-      resll(iter) = LL(afc->AFCounts(w) * cn, efflen, ec, count);
+      resll(iter) = LL(af->AFCounts(w) * cn, efflen, ec, count);
     } else {}
 
-    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w), efflen, ec, count) << "|" << t << std::endl;
+    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(af->AFCounts(w), efflen, ec, count) << "|" << t << std::endl;
     idx = shuffle(idx);
     uword biter = 0;
     double etai = eta / (1 + decay * iter);
@@ -589,7 +582,7 @@ Rcpp::List NAdagrad(const arma::vec& efflenraw,
       uvec eachidx = idx.subvec(biter, endi);
 
       // NAG
-      grad = afgrad->AFGradient(w - velocity * V, efflen, ec, count, eachidx);
+      grad = af->AFGradient(w - velocity * V, efflen, ec, count, eachidx);
       G += grad % grad;
 
       // update V
@@ -601,7 +594,7 @@ Rcpp::List NAdagrad(const arma::vec& efflenraw,
   }
 
   // reset small est
-  vec est = afc->AFCounts(w) * cn;
+  vec est = af->AFCounts(w) * cn;
   est.elem(find(est < countLimit)).zeros();
 
   List res = List::create(_["counts"] = est,
@@ -662,12 +655,11 @@ arma::vec Adadelta(const arma::vec& efflenraw,
   uvec idx = linspace<uvec>(0, ecn - 1, ecn);
 
   // active function
-  std::shared_ptr<AFmeasure> afgrad = AFfactory().createAFGradient(attrs, arguments);
-  std::shared_ptr<AFmeasure> afc = AFfactory().createAFCounts(attrs, arguments);
+  std::shared_ptr<AFmeasure> af = AFfactory().createAF(attrs, arguments);
 
   for (uword iter = 0; iter < epochs; ++iter) {
 
-    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w), efflen, ec, count) << "|" << t << std::endl;
+    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(af->AFCounts(w), efflen, ec, count) << "|" << t << std::endl;
     idx = shuffle(idx);
     uword biter = 0;
 
@@ -678,7 +670,7 @@ arma::vec Adadelta(const arma::vec& efflenraw,
       uvec eachidx = idx.subvec(biter, endi);
 
       // adam for each batch
-      grad = afgrad->AFGradient(w, efflen, ec, count, eachidx);
+      grad = af->AFGradient(w, efflen, ec, count, eachidx);
       eg2 = gamma * eg2 + (1 - gamma) * grad % grad;
       vec dx = -sqrt(edx2 + epsilon) / sqrt(eg2 + epsilon) % grad;
       edx2 = gamma * edx2 + (1 - gamma) * dx % dx;
@@ -689,7 +681,7 @@ arma::vec Adadelta(const arma::vec& efflenraw,
   }
 
   // reset small est
-  vec est = afc->AFCounts(w) * cn;
+  vec est = af->AFCounts(w) * cn;
   Rcout << "The log likelihood is " << std::setprecision (20) << LL(est, efflen, ec, count) <<
     "." << std::endl;
 
@@ -745,12 +737,11 @@ arma::vec RMSProp(const arma::vec& efflenraw,
   uvec idx = linspace<uvec>(0, ecn - 1, ecn);
 
   // active function
-  std::shared_ptr<AFmeasure> afgrad = AFfactory().createAFGradient(attrs, arguments);
-  std::shared_ptr<AFmeasure> afc = AFfactory().createAFCounts(attrs, arguments);
+  std::shared_ptr<AFmeasure> af = AFfactory().createAF(attrs, arguments);
 
   for (uword iter = 0; iter < epochs; ++iter) {
 
-    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w), efflen, ec, count) << "|" << t << std::endl;
+    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(af->AFCounts(w), efflen, ec, count) << "|" << t << std::endl;
     idx = shuffle(idx);
     uword biter = 0;
 
@@ -761,7 +752,7 @@ arma::vec RMSProp(const arma::vec& efflenraw,
       uvec eachidx = idx.subvec(biter, endi);
 
       // adam for each batch
-      grad = afgrad->AFGradient(w, efflen, ec, count, eachidx);
+      grad = af->AFGradient(w, efflen, ec, count, eachidx);
       eg2 = gamma * eg2 + (1 - gamma) * grad % grad;
       w -= eta / sqrt(eg2 + epsilon) % grad;
 
@@ -770,7 +761,7 @@ arma::vec RMSProp(const arma::vec& efflenraw,
   }
 
   // reset small est
-  vec est = afc->AFCounts(w) * cn;
+  vec est = af->AFCounts(w) * cn;
   Rcout << "The log likelihood is " << std::setprecision (20) << LL(est, efflen, ec, count) <<
     "." << std::endl;
 
@@ -834,17 +825,16 @@ Rcpp::List NRMSProp(const arma::vec& efflenraw,
   uvec idx = linspace<uvec>(0, ecn - 1, ecn);
 
   // active function
-  std::shared_ptr<AFmeasure> afgrad = AFfactory().createAFGradient(attrs, arguments);
-  std::shared_ptr<AFmeasure> afc = AFfactory().createAFCounts(attrs, arguments);
+  std::shared_ptr<AFmeasure> af = AFfactory().createAF(attrs, arguments);
 
   uword iter;
   for (iter = 0; iter < epochs; ++iter) {
 
     if (details) {
-      resll(iter) = LL(afc->AFCounts(w) * cn, efflen, ec, count);
+      resll(iter) = LL(af->AFCounts(w) * cn, efflen, ec, count);
     } else {}
 
-    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w) * cn, efflen, ec, count) << std::endl;
+    // std::cout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(af->AFCounts(w) * cn, efflen, ec, count) << std::endl;
     idx = shuffle(idx);
     uword biter = 0;
     double etai = eta / (1 + decay * iter);
@@ -857,7 +847,7 @@ Rcpp::List NRMSProp(const arma::vec& efflenraw,
 
       // NAG
       // w -= velocity * V;
-      grad = afgrad->AFGradient(w - velocity * V, efflen, ec, count, eachidx);
+      grad = af->AFGradient(w - velocity * V, efflen, ec, count, eachidx);
       eg2 = gamma * eg2 + (1 - gamma) * grad % grad;
 
       // update V
@@ -869,7 +859,7 @@ Rcpp::List NRMSProp(const arma::vec& efflenraw,
   }
 
   // small est & no ec transcripts --> zero
-  vec est = afc->AFCounts(w) * cn;
+  vec est = af->AFCounts(w) * cn;
   est.elem(find(est < countLimit)).zeros();
 
   List res = List::create(_["counts"] = est,
@@ -926,12 +916,11 @@ arma::vec AMSGrad(const arma::vec& efflenraw,
   uvec idx = linspace<uvec>(0, ecn - 1, ecn);
 
   // active function
-  std::shared_ptr<AFmeasure> afgrad = AFfactory().createAFGradient(attrs, arguments);
-  std::shared_ptr<AFmeasure> afc = AFfactory().createAFCounts(attrs, arguments);
+  std::shared_ptr<AFmeasure> af = AFfactory().createAF(attrs, arguments);
 
   for (uword iter = 0; iter < epochs; ++iter) {
 
-    // Rcout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(afc->AFCounts(w), efflen, ec, count) << std::endl;
+    // Rcout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(af->AFCounts(w), efflen, ec, count) << std::endl;
 
     idx = shuffle(idx);
     uword biter = 0;
@@ -944,7 +933,7 @@ arma::vec AMSGrad(const arma::vec& efflenraw,
       uvec eachidx = idx.subvec(biter, endi);
 
       // adam for each batch
-      grad = afgrad->AFGradient(w, efflen, ec, count, eachidx);
+      grad = af->AFGradient(w, efflen, ec, count, eachidx);
       m = beta1 * m + (1 - beta1) * grad;
       v = Max(v, beta2 * v + (1 - beta2) * square(grad));
       double etat = eta * sqrt(1 - pow(beta2, t)) / (1 - pow(beta1, t));
@@ -955,7 +944,7 @@ arma::vec AMSGrad(const arma::vec& efflenraw,
   }
 
   // step3: reset small est
-  vec est = afc->AFCounts(w) * cn;
+  vec est = af->AFCounts(w) * cn;
   Rcout << "The log likelihood is " << std::setprecision (20) << LL(est, efflen, ec, count) <<
     "." << std::endl;
 

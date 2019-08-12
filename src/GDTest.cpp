@@ -13,35 +13,6 @@ using namespace arma;
 using namespace std;
 
 // [[Rcpp::export]]
-void Test() {
-
-  Optimizer *testadam  = new NRMSProp(10, 0.9, 0.9, 1e-8);
-
-  vec g = vec(10); g.fill(0.1);
-  vec w = vec(10); w.fill(20);
-
-  Rcout << testadam -> update(w, g, 0.1) << endl;
-  Rcout << testadam -> preupdate(w) << endl;
-
-}
-
-
-// TestObj(10, list(opt = 'Adam'), list())
-// [[Rcpp::export]]
-void TestObj(arma::uword tn,
-             const Rcpp::List attrs,
-             const Rcpp::List arguments) {
-
-  std::shared_ptr<Optimizer> optobj = Optfactory().createOpt(tn, attrs, arguments);
-
-  vec g = vec(10); g.fill(0.1);
-  vec w = vec(10); w.fill(20);
-
-  Rcout << optobj -> update(w, g, 0.1) << endl;
-}
-
-
-// [[Rcpp::export]]
 Rcpp::List GD(const arma::vec& efflenraw,
               const Rcpp::CharacterVector& ecraw,
               const arma::uvec& countraw,

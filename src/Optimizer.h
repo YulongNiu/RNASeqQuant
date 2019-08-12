@@ -1,8 +1,8 @@
 #ifndef OPTIMIZER_H_
 #define OPTIMIZER_H_
 
-#include <RcppArmadillo.h>
 #include <cmath>
+#include <RcppArmadillo.h>
 
 class Optimizer {
 public:

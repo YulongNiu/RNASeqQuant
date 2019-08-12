@@ -8,8 +8,8 @@ class Optfactory {
 public:
 
   std::shared_ptr<Optimizer> createOpt(arma::uword tn,
-                                      const Rcpp::List& attrs,
-                                      const Rcpp::List& arguments);
+                                       const Rcpp::List& attrs,
+                                       const Rcpp::List& arguments);
 
   std::shared_ptr<Optimizer> createUpdate(const Rcpp::List& attrs,
                                           const Rcpp::List& arguments);

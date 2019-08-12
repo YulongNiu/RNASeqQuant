@@ -115,32 +115,32 @@ public:
 };
 
 
-// //===================================
-// // Custom gradient of active function
-// //===================================
-// class AFCustom : public AFmeasure {
-// private:
-//   funcGradientPtr fungrad;
-//   funcCountsPtr func;
-// public:
-//   explicit AFCustom(funcGradientPtr fungrad,
-//                     funcCountsPtr func) {
-//     this->fungrad = fungrad;
-//     this->func = func;
-//   }
-//   ~AFCustom() {}
+//===================================//
+// Custom gradient of active function//
+//===================================//
+class AFCustom : public AFmeasure {
+private:
+  funcGradientPtr funcGrad;
+  funcCountsPtr funcC;
+public:
+  explicit AFCustom(funcGradientPtr funcGrad,
+                    funcCountsPtr funcC) {
+    this->funcGrad = funcGrad;
+    this->funcC = funcC;
+  }
+  ~AFCustom() {}
 
-//   arma::vec AFGradient(const arma::vec& w,
-//                        const std::vector<arma::vec>& efflen,
-//                        const std::vector<arma::uvec>& ec,
-//                        const arma::uvec& count,
-//                        const arma::uvec& idx) {
-//     return fungrad(w, efflen, ec, count, idx);
-//   }
+  arma::vec AFGradient(const arma::vec& w,
+                       const std::vector<arma::vec>& efflen,
+                       const std::vector<arma::uvec>& ec,
+                       const arma::uvec& count,
+                       const arma::uvec& idx) {
+    return funcGrad(w, efflen, ec, count, idx);
+  }
 
-//   arma::vec AFCounts(const arma::vec& w) {
-//     return func(w);
-//   }
-// };
+  arma::vec AFCounts(const arma::vec& w) {
+    return funcC(w);
+  }
+};
 
 #endif

@@ -18,11 +18,13 @@ std::shared_ptr<AFmeasure> AFfactory::createAFGradient(const Rcpp::List &attrs,
     double alpha = arguments.containsElementNamed("alpha") ? arguments["alpha"] : 0.01;
     afgrad = std::make_shared<AFISRU>(alpha);
   }
-  // else if (isEqualStr(afName, "custom")) {
-  //   SEXP func_=arguments["gradientAF"];
-  //   funcGradientPtr func = *Rcpp::XPtr<funcGradientPtr>(func_);
-  //   afgrad = std::make_shared<AFCustom>(func);
-  // }
+  else if (isEqualStr(afName, "custom")) {
+    SEXP funcGrad_=arguments["gradientAF"];
+    SEXP funcC_=arguments["countsAF"];
+    funcGradientPtr funcGrad = *Rcpp::XPtr<funcGradientPtr>(funcGrad_);
+    funcCountsPtr funcC = *Rcpp::XPtr<funcCountsPtr>(funcC_);
+    afgrad = std::make_shared<AFCustom>(funcGrad, funcC);
+  }
   else {}
 
   return afgrad;

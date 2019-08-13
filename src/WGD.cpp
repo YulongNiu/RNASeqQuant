@@ -116,8 +116,7 @@ arma::vec AdamW(const arma::vec& efflenraw,
   uvec idx = linspace<uvec>(0, ecn - 1, ecn);
 
   // active function
-  std::shared_ptr<AFmeasure> afgrad = AFfactory().createAFGradient(attrs, arguments);
-  std::shared_ptr<AFmeasure> afc = AFfactory().createAFCounts(attrs, arguments);
+  std::shared_ptr<AFmeasure> af = AFfactory().createAF(attrs, arguments);
 
   for (uword iter = 0; iter < epochs; ++iter) {
 
@@ -134,7 +133,7 @@ arma::vec AdamW(const arma::vec& efflenraw,
       uvec eachidx = idx.subvec(biter, endi);
 
       // adam for each batch
-      grad = afgrad->AFGradient(w, efflen, ec, count, eachidx);
+      grad = af->AFGradient(w, efflen, ec, count, eachidx);
       m = beta1 * m + (1 - beta1) * grad;
       v = beta2 * v + (1 - beta2) * square(grad);
       double etat = eta * sqrt(1 - pow(beta2, t)) / (1 - pow(beta1, t));
@@ -145,7 +144,7 @@ arma::vec AdamW(const arma::vec& efflenraw,
   }
 
   // step3: reset small est
-  vec est = afc->AFCounts(w) * cn;
+  vec est = af->AFCounts(w) * cn;
   Rcout << "The log likelihood is " << std::setprecision (20) << LL(est, efflen, ec, count) <<
     "." << std::endl;
 
@@ -211,8 +210,7 @@ arma::vec NRMSPropW(const arma::vec& efflenraw,
   uvec idx = linspace<uvec>(0, ecn - 1, ecn);
 
   // active function
-  std::shared_ptr<AFmeasure> afgrad = AFfactory().createAFGradient(attrs, arguments);
-  std::shared_ptr<AFmeasure> afc = AFfactory().createAFCounts(attrs, arguments);
+  std::shared_ptr<AFmeasure> af = AFfactory().createAF(attrs, arguments);
 
   for (uword iter = 0; iter < epochs; ++iter) {
 
@@ -229,7 +227,7 @@ arma::vec NRMSPropW(const arma::vec& efflenraw,
       uvec eachidx = idx.subvec(biter, endi);
 
       // NAG
-      grad = afgrad->AFGradient(w - velocity * V, efflen, ec, count, eachidx);
+      grad = af->AFGradient(w - velocity * V, efflen, ec, count, eachidx);
       eg2 = gamma * eg2 + (1 - gamma) * grad % grad;
 
       // update V
@@ -241,7 +239,7 @@ arma::vec NRMSPropW(const arma::vec& efflenraw,
   }
 
   // reset small est
-  vec est = afc->AFCounts(w) * cn;
+  vec est = af->AFCounts(w) * cn;
   Rcout << "The log likelihood is " << std::setprecision (20) << LL(est, efflen, ec, count) <<
     "." << std::endl;
 

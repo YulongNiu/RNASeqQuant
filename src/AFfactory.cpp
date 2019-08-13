@@ -10,7 +10,7 @@ std::shared_ptr<AFmeasure> AFfactory::createAF(const Rcpp::List &attrs,
   if (isEqualStr(afName, "Softmax")) {
     af = std::make_shared<AFSM>();
   }
-  else if (isEqualStr(afName, "Softplus")) {
+  else if (isEqualStr(afName, "SoftPlus")) {
     af = std::make_shared<AFSP>();
   }
   else if (isEqualStr(afName, "ISRU")) {

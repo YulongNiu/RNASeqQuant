@@ -13,12 +13,68 @@ using namespace arma;
 using namespace std;
 
 
-
+//' Gradient decent (GD) model for RNA-seq quantification.
+//'
+//' GD model for RNA-seq quantification. The equivalence class (ec) with 0 counts are removed, because these counts have no contributes to the final results.
+//'
+//' @title GD model
+//' @param epochs Iteration number.
+//' @param batchsize Mini-batch size, it should be smaller or equal to \code{epochs}.
+//' @param attrs Set active functions and optimization algorithms.
+//' \itemize{
+//'   \item \code{af}: "Softmax", "SoftPlus", "ISRU".
+//'   \item \code{gd}: "Adagrad", "NAdagrad", "Adadelta", "RMSProp", "NRMSProp", "Adam", "NAdam", and "AMSGrad".
+//' }
+//' @param arguments Set advance parameters for \code{attrs}.
+//' \itemize{
+//'   \item \code{alpha}: used in "ISRU", default 0.01.
+//'   \item \code{eta} and \code{decay}: Learning rate and decay rate, default 0.1 and 0.03, respectively. Used in "Adagrad", "NAdagrad", "RMSProp", "NRMSProp", "Adam", "NAdam", and "AMSGrad".
+//'   \item \code{gamma}: used in "Adadelta", "RMSProp", and "NRMSProp", default 0.9.
+//'   \item \code{velocity}: used in "NAdagrad" and "NRMSProp", default 0.9.
+//'   \item \code{beta1} and \code{beta2}: used in "Adam" , "NAdam", "AdaMax", and "AMSGrad", default 0.9 and 0.999, respectively.
+//'   \item \code{epsilon}: used in all optimization algorithms, default 1e-08.
+//' }
+//' @inheritParams EM
+//' @return A \code{List} indicates estimated counts of transcripts.
+//' @examples
+//' ## Single species
+//' ##    f1 f2 f3
+//' ## ec1 1 1 1
+//' ## ec2 0 1 1
+//' ## ec3 1 0 1
+//' ## ec4 1 0 0
+//' ## ec5 1 1 0
+//' plist <- list(ec = c('0,1,2', '1,2', '0,2', '0', '0,1'), count = rep(1, 5), efflen = rep(1, 3))
+//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'Adagrad'), list(eta = 0.5, decay = 0.03))
+//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'NAdagrad'), list(eta = 0.5, decay = 0.03))
+//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'Adadelta'), list(gamma = 0.8))
+//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'RMSProp'), list(eta = 0.1, decay = 0.03))
+//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03))
+//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'Adam'), list(eta = 0.1, decay = 0.03))
+//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'NAdam'), list(eta = 0.1, decay = 0.03))
+//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'AdaMax'), list(eta = 0.1, decay = 0.03))
+//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'AMSGrad'), list(eta = 0.1, decay = 0.03))
+//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'SoftPlus', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03))
+//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'ISRU', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03))
+//'
+//' ## Two species
+//' ##    f1 f2 f3 f1' f2'
+//' ## ec1 1  1  0  0  1
+//' ## ec2 1  0  1  1  0
+//' ## ec3 0  1  1  0  0
+//' ## ec4 0  0  0  1  1
+//' ## ec5 1  0  1  0  1
+//' ## ec6 1  1  0  0  0
+//' plist <- list(ec = c('0,1,4', '0,2,3', '1,2', '3,4', '0,2,4', '0,1'),
+//'               count = rep(1, 6), efflen = rep(1, 5))
+//' GD(plist$efflen, plist$ec, plist$count, spenum = c(3, 2), 100, 1024, list(af = 'Softmax', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03))
+//' @author Yulong Niu \email{yulong.niu@@hotmail.com}
+//' @export
 // [[Rcpp::export]]
 Rcpp::List GD(const arma::vec& efflenraw,
               const Rcpp::CharacterVector& ecraw,
               const arma::uvec& countraw,
-              const arma::uvec& spenumraw,
+              const arma::uvec& spenum,
               const arma::uword epochs,
               const arma::uword batchsize,
               const Rcpp::List attrs,
@@ -43,10 +99,10 @@ Rcpp::List GD(const arma::vec& efflenraw,
   vector<vec> efflen = MatchEfflen(ec, efflenraw);
 
   // step2: initialization
-  uword tn = sum(spenumraw);
+  uword tn = sum(spenum);
   uword cn = sum(count);
   uword ecn = ec.size();
-  uvec ftidx = FalseTIdx(ec, spenumraw);
+  uvec ftidx = FalseTIdx(ec, spenum);
   vec resll(epochs, fill::zeros);
 
   // Glorot normal initializer/Xavier normal initializer

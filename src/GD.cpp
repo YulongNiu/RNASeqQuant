@@ -33,6 +33,7 @@ using namespace std;
 //'   \item \code{velocity}: used in "NAdagrad" and "NRMSProp", default 0.9.
 //'   \item \code{beta1} and \code{beta2}: used in "Adam" , "NAdam", "AdaMax", and "AMSGrad", default 0.9 and 0.999, respectively.
 //'   \item \code{epsilon}: used in all optimization algorithms, default 1e-08.
+//'   \item \code{assign0}: used in "AdaMax" indicating whether assign 0 to transcripts that having no mapped reads. \code{FALSE} is recommended for "AdaMax".
 //' }
 //' @inheritParams EM
 //' @return A \code{List} indicates estimated counts of transcripts.
@@ -52,7 +53,7 @@ using namespace std;
 //' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03))
 //' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'Adam'), list(eta = 0.1, decay = 0.03))
 //' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'NAdam'), list(eta = 0.1, decay = 0.03))
-//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'AdaMax'), list(eta = 0.1, decay = 0.03))
+//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'AdaMax'), list(eta = 0.1, decay = 0.03, assign0 = FALSE))
 //' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'AMSGrad'), list(eta = 0.1, decay = 0.03))
 //' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'SoftPlus', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03))
 //' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'ISRU', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03))
@@ -108,7 +109,10 @@ Rcpp::List GD(const arma::vec& efflenraw,
   // Glorot normal initializer/Xavier normal initializer
   vec w = randn<vec>(tn) / sqrt(tn);
   // vec w(tn); w.fill(0.01);
-  w.elem(ftidx).fill(-1e8);
+  if (!arguments.containsElementNamed("assign0") || arguments["assign0"]) {
+    w.elem(ftidx).fill(-1e8);
+  } else {}
+
   vec grad = vec(tn);
   uvec idx = linspace<uvec>(0, ecn - 1, ecn);
 

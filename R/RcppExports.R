@@ -49,50 +49,6 @@ EMSpe <- function(efflenraw, ecraw, countraw, spenum, spefixcounts, maxiter = 10
     .Call(`_RNASeqQuant_EMSpe`, efflenraw, ecraw, countraw, spenum, spefixcounts, maxiter, miniter, details)
 }
 
-Momentum <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, details, attrs, arguments) {
-    .Call(`_RNASeqQuant_Momentum`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, details, attrs, arguments)
-}
-
-NAG <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments) {
-    .Call(`_RNASeqQuant_NAG`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments)
-}
-
-Adam <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments) {
-    .Call(`_RNASeqQuant_Adam`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments)
-}
-
-NAdam <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments) {
-    .Call(`_RNASeqQuant_NAdam`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments)
-}
-
-AdaMax <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments) {
-    .Call(`_RNASeqQuant_AdaMax`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments)
-}
-
-Adagrad <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments) {
-    .Call(`_RNASeqQuant_Adagrad`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments)
-}
-
-NAdagrad <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, details, attrs, arguments) {
-    .Call(`_RNASeqQuant_NAdagrad`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, details, attrs, arguments)
-}
-
-Adadelta <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments) {
-    .Call(`_RNASeqQuant_Adadelta`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments)
-}
-
-RMSProp <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments) {
-    .Call(`_RNASeqQuant_RMSProp`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments)
-}
-
-NRMSProp <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, details, attrs, arguments) {
-    .Call(`_RNASeqQuant_NRMSProp`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, details, attrs, arguments)
-}
-
-AMSGrad <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments) {
-    .Call(`_RNASeqQuant_AMSGrad`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments)
-}
-
 GD <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, attrs, arguments, details = FALSE) {
     .Call(`_RNASeqQuant_GD`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, attrs, arguments, details)
 }

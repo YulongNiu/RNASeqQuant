@@ -12,6 +12,8 @@ using namespace Rcpp;
 using namespace arma;
 using namespace std;
 
+
+
 // [[Rcpp::export]]
 Rcpp::List GD(const arma::vec& efflenraw,
               const Rcpp::CharacterVector& ecraw,

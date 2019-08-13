@@ -11,11 +11,6 @@ public:
                                        const Rcpp::List& attrs,
                                        const Rcpp::List& arguments);
 
-  std::shared_ptr<Optimizer> createUpdate(const Rcpp::List& attrs,
-                                          const Rcpp::List& arguments);
-
-  std::shared_ptr<Optimizer> createPreupdate(const Rcpp::List& attrs,
-                                             const Rcpp::List& arguments);
 };
 
 #endif

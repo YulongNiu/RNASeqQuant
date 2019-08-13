@@ -76,10 +76,9 @@ emest <- EM(plist$efflen, plist$ec, plist$count, c(10000, 10000, 21392), detail 
 emest <- EM(plist$efflen, plist$ec, plist$count, 41392, detail = TRUE)
 
 ## RNASeqQuant GD
-## nice test
-gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), 600, 1024, list(af = 'Softmax', opt = 'AdaMax'), list(eta = 0.1, decay = 0)) %>% .$counts
-gdest <- AdaMax(plist$efflen, plist$ec, plist$count, length(plist$efflen), 500, 1024, 0.1, list(af = 'Softmax'), list())
 
+## nice test
+gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), 600, 1024, list(af = 'Softmax', opt = 'AdaMax'), list(eta = 0.1, decay = 0.001)) %>% .$counts
 
 gdest <- AdamW(plist$efflen, plist$ec, plist$count, 1/w, length(plist$efflen), 500, 1024, 0.01, list(af = 'Softmax'), list())
 

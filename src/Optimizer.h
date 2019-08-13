@@ -405,6 +405,7 @@ public:
 
   arma::vec m;
   arma::vec u;
+  arma::uword t;
 
   const double beta1; // para1 for AdaMax
   const double beta2; // para2 for AdaMax
@@ -418,6 +419,7 @@ public:
 
     m = arma::vec(tn, arma::fill::zeros);
     u = arma::vec(tn, arma::fill::zeros);
+    t = 1;
 
   }
 
@@ -427,7 +429,8 @@ public:
 
     m = beta1 * m + (1 - beta1) * grad;
     u = Max(beta2 * u, arma::abs(grad));
-    arma::vec nextw = w - eta * m / u;
+    arma::vec nextw = w - eta * m / ((1 - std::pow(beta1, t)) * u);
+    ++t;
 
     return nextw;
 

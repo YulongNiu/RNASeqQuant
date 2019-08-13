@@ -181,3 +181,47 @@ bool isEqualStr(std::string& str1,
                 std::string str2) {
   return str1.compare(str2) == 0;
 }
+
+
+
+//' Pairwise maximum elements of two vectors
+//'
+//' @title Extract maximum elements
+//' @return A \code{arma::vec} vector indicating maximum element by pair-wise comparison.
+//' @param vec1 vec2 \code{arma::vec} vectors.
+//' @author Yulong Niu \email{yulong.niu@@hotmail.com}
+//' @keywords internal
+// [[Rcpp::export]]
+arma::vec Max(const arma::vec& vec1,
+              const arma::vec& vec2) {
+
+  mat m = join_rows(vec1, vec2);
+  return max(m, 1);
+
+}
+
+
+// [[Rcpp::export]]
+arma::uvec TrueTIdx(const std::vector<arma::uvec>& ec) {
+
+  // collapse ec
+  uvec coles;
+  for (auto i : ec) {
+    coles = join_cols(coles, i);
+  }
+
+  return unique(coles);
+}
+
+
+// [[Rcpp::export]]
+arma::uvec FalseTIdx(const std::vector<arma::uvec>& ec,
+                     const arma::uvec& spenum) {
+
+  uword tn = sum(spenum);
+  uvec ftIdx = zeros<uvec>(tn);
+
+  ftIdx.elem(TrueTIdx(ec)).ones();
+
+  return find(ftIdx == 0);
+}

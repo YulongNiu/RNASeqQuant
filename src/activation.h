@@ -6,10 +6,6 @@
 #include "softplus.h"
 #include "isru.h"
 
-using namespace Rcpp;
-using namespace arma;
-using namespace std;
-
 // [[Rcpp::depends(RcppArmadillo)]]
 
 //' Gradient.
@@ -38,13 +34,13 @@ public:
                        const std::vector<arma::uvec>& ec,
                        const arma::uvec& count,
                        const arma::uvec& idx) {
-    vec grad(w.n_elem, fill::zeros);
+    arma::vec grad(w.n_elem, fill::zeros);
 
     for (auto i : idx) {
       grad.elem(ec[i]) += count(i) * Softmax(w.elem(ec[i]), 1/efflen[i]);
     }
 
-    return sum(count.elem(idx)) * Softmax1(w) - grad;
+    return arma::sum(count.elem(idx)) * Softmax1(w) - grad;
   }
 
   arma::vec AFCounts(const arma::vec& w) {
@@ -65,13 +61,13 @@ public:
                        const std::vector<arma::uvec>& ec,
                        const arma::uvec& count,
                        const arma::uvec& idx) {
-    vec grad(w.n_elem, fill::zeros);
+    arma::vec grad(w.n_elem, fill::zeros);
 
     for (auto i : idx) {
       grad.elem(ec[i]) += count(i) * SoftplusGrad(w.elem(ec[i]), 1/efflen[i]);
     }
 
-    return sum(count.elem(idx)) * SoftplusGrad1(w) - grad;
+    return arma::sum(count.elem(idx)) * SoftplusGrad1(w) - grad;
   }
 
   arma::vec AFCounts(const arma::vec& w) {
@@ -100,13 +96,13 @@ public:
                        const std::vector<arma::uvec>& ec,
                        const arma::uvec& count,
                        const arma::uvec& idx) {
-    vec grad(w.n_elem, fill::zeros);
+    arma::vec grad(w.n_elem, fill::zeros);
 
     for (auto i : idx) {
       grad.elem(ec[i]) += count(i) * ISRUGrad(w.elem(ec[i]), InvSqrtRoot(w.elem(ec[i]), alpha), 1/efflen[i], alpha);
     }
 
-    return sum(count.elem(idx)) * ISRUGrad1(w, InvSqrtRoot(w, alpha), alpha) - grad;
+    return arma::sum(count.elem(idx)) * ISRUGrad1(w, InvSqrtRoot(w, alpha), alpha) - grad;
   }
 
   arma::vec AFCounts(const arma::vec& w) {
@@ -115,32 +111,32 @@ public:
 };
 
 
-// //===================================
-// // Custom gradient of active function
-// //===================================
-// class AFCustom : public AFmeasure {
-// private:
-//   funcGradientPtr fungrad;
-//   funcCountsPtr func;
-// public:
-//   explicit AFCustom(funcGradientPtr fungrad,
-//                     funcCountsPtr func) {
-//     this->fungrad = fungrad;
-//     this->func = func;
-//   }
-//   ~AFCustom() {}
+//===================================//
+// Custom gradient of active function//
+//===================================//
+class AFCustom : public AFmeasure {
+private:
+  funcGradientPtr funcGrad;
+  funcCountsPtr funcC;
+public:
+  explicit AFCustom(funcGradientPtr funcGrad,
+                    funcCountsPtr funcC) {
+    this->funcGrad = funcGrad;
+    this->funcC = funcC;
+  }
+  ~AFCustom() {}
 
-//   arma::vec AFGradient(const arma::vec& w,
-//                        const std::vector<arma::vec>& efflen,
-//                        const std::vector<arma::uvec>& ec,
-//                        const arma::uvec& count,
-//                        const arma::uvec& idx) {
-//     return fungrad(w, efflen, ec, count, idx);
-//   }
+  arma::vec AFGradient(const arma::vec& w,
+                       const std::vector<arma::vec>& efflen,
+                       const std::vector<arma::uvec>& ec,
+                       const arma::uvec& count,
+                       const arma::uvec& idx) {
+    return funcGrad(w, efflen, ec, count, idx);
+  }
 
-//   arma::vec AFCounts(const arma::vec& w) {
-//     return func(w);
-//   }
-// };
+  arma::vec AFCounts(const arma::vec& w) {
+    return funcC(w);
+  }
+};
 
 #endif

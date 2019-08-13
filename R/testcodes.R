@@ -1,12 +1,13 @@
 ## ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~test codes~~~~~~~~~~~~~~~~~~~~~~~
+## library('tibble')
+## library('dplyr')
+## library('ggplot2')
 ## library('Rcpp')
 ## library('magrittr')
-## sourceCpp('../src/utilities.cpp')
-## sourceCpp('../src/softmax.cpp')
-## sourceCpp('../src/softplus.cpp')
-## sourceCpp('../src/isru.cpp')
-## sourceCpp('../src/likelihood.cpp')
+
+## sourceCpp('../src/GDTest.cpp')
 ## sourceCpp('../src/GD.cpp')
+## ## sourceCpp('../src/WGD.cpp')
 ## sourceCpp('../src/EM.cpp')
 ## source('ec.R')
 
@@ -15,21 +16,33 @@
 
 ## EM(plist$efflen, plist$ec, plist$count, spenum = 3) %>% .$counts
 
-## Adam(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(method = 'Softmax'), list())
-## Adam(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(method = 'Softplus'), list())
-## Adam(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(method = 'ISRU'), list(alpha = 0.1))
+## ## test diff GD
+## GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'Momentum'), list(eta = 0.5, decay = 0.03)) %>% .$counts
 
-## Adagrad(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(method = 'Softmax'), list())
-## Adagrad(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(method = 'Softplus'), list())
-## Adagrad(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(method = 'ISRU'), list(alpha = 0.1))
+## GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'NAG'), list(eta = 0.5, decay = 0.03)) %>% .$counts
 
-## RMSProp(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(method = 'Softmax'), list())
-## RMSProp(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(method = 'Softplus'), list())
-## RMSProp(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(method = 'ISRU'), list(alpha = 0.1))
+## GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'Adagrad'), list(eta = 0.5, decay = 0.03)) %>% .$counts
 
-## NRMSProp(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(method = 'Softmax'), list())
-## NRMSProp(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(method = 'Softplus'), list())
-## NRMSProp(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, 0.1, list(method = 'ISRU'), list(alpha = 0.1))
+## GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'NAdagrad'), list(eta = 0.5, decay = 0.03)) %>% .$counts
+
+## GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'Adadelta'), list(gamma = 0.8)) %>% .$counts
+
+## GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'RMSProp'), list(eta = 0.1, decay = 0.03)) %>% .$counts
+
+## GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03)) %>% .$counts
+
+## GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'Adam'), list(eta = 0.1, decay = 0.03)) %>% .$counts
+
+## GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'NAdam'), list(eta = 0.1, decay = 0.03)) %>% .$counts
+
+## GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'AdaMax'), list(eta = 0.1, decay = 0.03)) %>% .$counts
+
+## GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'AMSGrad'), list(eta = 0.1, decay = 0.03)) %>% .$counts
+
+## ## test active functions
+## GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03)) %>% .$counts
+## GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softplus', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03)) %>% .$counts
+## GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'ISRU', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03)) %>% .$counts
 ## ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -40,6 +53,10 @@
 ## countpath <- file.path(testpath, 'testpseudo/pseudoalignments.tsv')
 ## abpath <- file.path(testpath, 'testquant/abundance.tsv')
 ## plist <- read_pseudo(ecpath, countpath, abpath)
+## w <- read.table(ecpath, stringsAsFactors = FALSE) %>%
+##   `[`(, 2) %>%
+##   SplitEC %>%
+##   CountEC
 
 ## ## plist <- list()
 ## ## plist$efflen <- read.table('abundance_ath.tsv', stringsAsFactors = FALSE, header = TRUE)[, 3]
@@ -56,41 +73,40 @@
 ## ## RNASeqQuant EM
 ## emest <- EMSpe(plist$efflen, plist$ec, plist$count, c(10000, 10000, 21392), rep(3731388, 3), detail = TRUE)
 ## emest <- EM(plist$efflen, plist$ec, plist$count, c(10000, 10000, 21392), detail = TRUE)
-## emest <- EM(plist$efflen, plist$ec, plist$count, 41392, detail = FALSE)
+## emest <- EM(plist$efflen, plist$ec, plist$count, 41392, detail = TRUE)
 
 ## ## RNASeqQuant GD
-## gdest <- Adam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(method = 'Softmax'), list())
-## gdest <- Adam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(method = 'Softplus'), list())
-## gdest <- Adam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(method = 'ISRU'), list(alpha = 0.1))
-
-
-## gdest <- Adagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(method = 'Softmax'), list())
-## gdest <- Adagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(method = 'Softplus'), list())
-## gdest <- Adagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(method = 'ISRU'), list(alpha = 0.1))
-
-## gdest <- RMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(method = 'Softmax'), list())
-## gdest <- RMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(method = 'Softplus'), list())
-## gdest <- RMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(method = 'ISRU'), list(alpha = 0.1))
-
-## gdest <- NRMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(method = 'Softmax'), list())
-## gdest <- NRMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(method = 'Softplus'), list())
-## gdest <- NRMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 200, 1024, 0.1, list(method = 'ISRU'), list(alpha = 0.1))
-
 
 ## ## nice test
-## ## Adam mini-batch
-## gdest <- Adam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 1024, 0.1, list(method = 'Softmax'), list())
-## gdest <- NAdam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 1024, 0.1, list(method = 'Softmax'), list())
-## gdest <- NAdagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 1024, 0.1, list(method = 'Softmax'), list())
+## gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), 600, 1024, list(af = 'Softmax', opt = 'AdaMax'), list(eta = 0.1, decay = 0.001)) %>% .$counts
 
+## gdest <- AdamW(plist$efflen, plist$ec, plist$count, 1/w, length(plist$efflen), 500, 1024, 0.01, list(af = 'Softmax'), list())
+
+## gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), 600, 1024, list(af = 'Softmax', opt = 'AMSGrad'), list(eta = 0.07, decay = 0.003)) %>% .$counts
+
+## gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), 600, 1024, list(af = 'Softmax', opt = 'Adam'), list(eta = 0.1, decay = 0.03)) %>% .$counts
+
+## gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), 600, 1024, list(af = 'Softmax', opt = 'NAdam'), list(eta = 0.1, decay = 0.03)) %>% .$counts
+
+## gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), 600, 1024, list(af = 'Softmax', opt = 'NAdagrad'), list(eta = 0.1, decay = 0.00001)) %>% .$counts
 
 ## ## NRMSProp full batch
 ## emest <- EM(plist$efflen, plist$ec, plist$count, length(plist$efflen), detail = TRUE)
-## gdest <- NRMSProp(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 36580, 0.005, list(method = 'Softmax'), list())
-## gdest <- NAdagrad(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 36580, 0.2, list(method = 'Softmax'), list())
+## gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), 600, 36580, list(af = 'Softmax', opt = 'NRMSProp'), list(eta = 0.005, decay = 0.003)) %>% .$counts
+## gdest <- NRMSPropW(plist$efflen, plist$ec, plist$count, 1/w, length(plist$efflen), 600, 36580, 0.005, list(af = 'Softmax'), list())
+## gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), 600, 36580, list(af = 'Softmax', opt = 'NAdagrad'), list(eta = 0.7, decay = 0.00001)) %>% .$counts
+
+## ## plot
+## tibble(iter = c(1 : length(emest$ll), 1 : length(gdest$ll)),
+##        ll = -c(emest$ll, gdest$ll),
+##        method = c(rep('EM', length(emest$ll)), rep('GD', length(gdest$ll)))) %>%
+##   slice(300 : length(emest$ll), (300 + length(emest$ll)) : (length(emest$ll) + length(emest$ll))) %>%
+##   ggplot(aes(x = iter, y = ll, group = method)) +
+##   geom_point(aes(color = method), size = 0.01)
+
 
 ## ## merge res
-## mergeres <- cbind(kallistoest, emest, gdest)
+## mergeres <- cbind(kallistoest, emest$counts, gdest$counts)
 ## colnames(mergeres) <- c('kallistoest', 'emest', 'gdest')
 
 ## ## correlation coefficient
@@ -100,15 +116,6 @@
 ## ## test full batch
 ## set.seed(12345)
 ## w <- rnorm(41392, 0, sqrt(1/41392))
-
-## LL(Softmax1(w), MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count)
-## w <- w - 0.01 * GradientSM(w, MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count, length(plist$efflen), 0:30000)
-
-## LL(Softplus1(w)/sum(Softplus1(w)), MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count)
-## w <- w - 0.01 * GradientSP(w, MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count, 0:30000)
-
-## ## w <- rnorm(41392, 0, sqrt(1/41392))
-## w <- w - 0.01 * GradientSM(w, MatchEfflen(SplitEC(plist$ec), plist$efflen), SplitEC(plist$ec), plist$count, idx)[idx+1]
 ## ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 

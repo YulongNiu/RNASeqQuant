@@ -17,7 +17,7 @@ emest <- EM(plist$efflen, plist$ec, plist$count, length(plist$efflen))
 
 ## adam
 ## softmax
-gdest <- Adam(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 1024, 0.1, list(method = 'Softmax'), list())
+gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 1024, list(af = 'Softmax', opt = 'Adam'), list(eta = 0.1, decay = 0.03)) %>% .$counts
 
 ## test1: count number
 test_that('Total number of reads in EM results', {

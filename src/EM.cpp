@@ -185,9 +185,6 @@ Rcpp::List EM(const arma::vec& efflenraw,
     }
 
     if (nopassn == 0 && iter >= miniter - 1) {
-      Rcout << "The iteration number is " << iter + 1
-            << ". The log likelihood is " << std::setprecision (20) << LL(startest, efflen, ec, count)
-            << "." << std::endl;
       break;
     } else {
       startest = est;
@@ -195,7 +192,7 @@ Rcpp::List EM(const arma::vec& efflenraw,
   }
 
   // check if maxiter
-  if (iter == maxiter) {iter--;} else {}
+  if (iter == maxiter) {--iter;} else {}
 
   // step3: reset small est
   est.elem(find(est < countLimit)).zeros();
@@ -204,6 +201,10 @@ Rcpp::List EM(const arma::vec& efflenraw,
   List res = List::create(_["counts"] = est,
                           _["specounts"] = specounts.rows(0, iter),
                           _["ll"] = resll.subvec(0, iter));
+
+  Rcout << "The iteration number is " << iter + 1
+        << ". The log likelihood is " << std::setprecision (20) << LL(est, efflen, ec, count)
+        << "." << std::endl;
 
   return res;
 }

@@ -25,4 +25,12 @@ arma::vec LambdaSpe(const arma::vec& emlambda,
 bool isEqualStr(std::string& str1,
                 std::string str2);
 
+arma::vec Max(const arma::vec& vec1,
+              const arma::vec& vec2);
+
+arma::uvec TrueTIdx(const std::vector<arma::uvec>& ec);
+
+arma::uvec FalseTIdx(const std::vector<arma::uvec>& ec,
+                     const arma::uvec& spenum);
+
 #endif

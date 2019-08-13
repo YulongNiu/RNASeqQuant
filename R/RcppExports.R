@@ -49,40 +49,24 @@ EMSpe <- function(efflenraw, ecraw, countraw, spenum, spefixcounts, maxiter = 10
     .Call(`_RNASeqQuant_EMSpe`, efflenraw, ecraw, countraw, spenum, spefixcounts, maxiter, miniter, details)
 }
 
-Momentum <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments) {
-    .Call(`_RNASeqQuant_Momentum`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments)
+GD <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, attrs, arguments, details = FALSE) {
+    .Call(`_RNASeqQuant_GD`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, attrs, arguments, details)
 }
 
-NAG <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments) {
-    .Call(`_RNASeqQuant_NAG`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments)
+CountRepeat <- function(x) {
+    .Call(`_RNASeqQuant_CountRepeat`, x)
 }
 
-Adam <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments) {
-    .Call(`_RNASeqQuant_Adam`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments)
+CountEC <- function(ec) {
+    .Call(`_RNASeqQuant_CountEC`, ec)
 }
 
-NAdam <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments) {
-    .Call(`_RNASeqQuant_NAdam`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments)
+AdamW <- function(efflenraw, ecraw, countraw, ecw, spenumraw, epochs, batchsize, eta, attrs, arguments) {
+    .Call(`_RNASeqQuant_AdamW`, efflenraw, ecraw, countraw, ecw, spenumraw, epochs, batchsize, eta, attrs, arguments)
 }
 
-Adagrad <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments) {
-    .Call(`_RNASeqQuant_Adagrad`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments)
-}
-
-NAdagrad <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments) {
-    .Call(`_RNASeqQuant_NAdagrad`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments)
-}
-
-Adadelta <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments) {
-    .Call(`_RNASeqQuant_Adadelta`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments)
-}
-
-RMSProp <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments) {
-    .Call(`_RNASeqQuant_RMSProp`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments)
-}
-
-NRMSProp <- function(efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments) {
-    .Call(`_RNASeqQuant_NRMSProp`, efflenraw, ecraw, countraw, spenumraw, epochs, batchsize, eta, attrs, arguments)
+NRMSPropW <- function(efflenraw, ecraw, countraw, ecw, spenumraw, epochs, batchsize, eta, attrs, arguments) {
+    .Call(`_RNASeqQuant_NRMSPropW`, efflenraw, ecraw, countraw, ecw, spenumraw, epochs, batchsize, eta, attrs, arguments)
 }
 
 #' Gradient.
@@ -366,5 +350,24 @@ LambdaSpe <- function(emlambda, spenum, spefixcounts) {
 #' @keywords internal
 isEqualStr <- function(str1, str2) {
     .Call(`_RNASeqQuant_isEqualStr`, str1, str2)
+}
+
+#' Pairwise maximum elements of two vectors
+#'
+#' @title Extract maximum elements
+#' @return A \code{arma::vec} vector indicating maximum element by pair-wise comparison.
+#' @param vec1 vec2 \code{arma::vec} vectors.
+#' @author Yulong Niu \email{yulong.niu@@hotmail.com}
+#' @keywords internal
+Max <- function(vec1, vec2) {
+    .Call(`_RNASeqQuant_Max`, vec1, vec2)
+}
+
+TrueTIdx <- function(ec) {
+    .Call(`_RNASeqQuant_TrueTIdx`, ec)
+}
+
+FalseTIdx <- function(ec, spenum) {
+    .Call(`_RNASeqQuant_FalseTIdx`, ec, spenum)
 }
 

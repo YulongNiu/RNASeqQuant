@@ -9,11 +9,8 @@
 //==============================
 class AFfactory {
 public:
-  std::shared_ptr<AFmeasure> createAFGradient(const Rcpp::List& attrs,
-                                              const Rcpp::List& arguments);
-
-  std::shared_ptr<AFmeasure> createAFCounts(const Rcpp::List& attrs,
-                                            const Rcpp::List& arguments);
+  std::shared_ptr<AFmeasure> createAF(const Rcpp::List& attrs,
+                                      const Rcpp::List& arguments);
 };
 
 #endif

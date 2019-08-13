@@ -409,5 +409,29 @@ x^{(n+1)} &= x^{(n)} - v^{(n)}
 (\#eq:23)
 \end{equation}
 
+#### Parameters
+
+* $\eta$ and $decay$: learning rate and decay rate of $\eta$, respectively.
+
+* $velocity$: used in NAG.
+
+* $\gamma$: used in exponentially weighted average, default value is $0.9$.
+
+* $\beta_1$ and $\beta_2$: used in Adam based algorithm, default values $\beta_1 = 0.9$, $\beta_2 = 0.999$.
+
+* $\epsilon$: very small value to prevent 0 as a denominator, like $10^{-8}$.
+
+| Name     | Parameters                                        |
+|----------|---------------------------------------------------|
+| Adagrad  | $\eta$, $decay$, $\epsilon$                       |
+| NAdagrad | $\eta$, $decay$, $velocity$, $\epsilon$           |
+| Adadelta | $\gamma$, $\epsilon$                              |
+| RMSProp  | $\eta$, $decay$, $\gamma$, $\epsilon$             |
+| NRMSProp | $\eta$, $decay$, $\gamma$, $velocity$, $\epsilon$ |
+| Adam     | $\eta$, $decay$, $\beta_1$, $\beta_2$, $\epsilon$ |
+| NAdam    | $\eta$, $decay$, $\beta_1$, $\beta_2$, $\epsilon$ |
+| AdaMax   | $\eta$, $decay$, $\beta_1$, $\beta_2$, $\epsilon$ |
+| AMSGrad  | $\eta$, $decay$, $\beta_1$, $\beta_2$, $\epsilon$ |
+
 
 # References

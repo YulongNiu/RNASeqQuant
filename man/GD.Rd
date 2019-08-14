@@ -34,6 +34,8 @@ GD(efflenraw, ecraw, countraw, spenum, epochs, batchsize, attrs, arguments,
   \item \code{velocity}: used in "NAdagrad" and "NRMSProp", default 0.9.
   \item \code{beta1} and \code{beta2}: used in "Adam" , "NAdam", "AdaMax", and "AMSGrad", default 0.9 and 0.999, respectively.
   \item \code{epsilon}: used in all optimization algorithms, default 1e-08.
+  \item \code{assign0}: used in "AdaMax" indicating whether assign 0 to transcripts that having no mapped reads. \code{FALSE} is recommended for "AdaMax".
+  \item \code{gradientAF} and \code{countsAF}: customized active function for gradient and counts.
 }}
 
 \item{details}{A \code{bool} value.  When it is set as \code{true}, logistic likelihood and counts for each species in every iteration will be returned, otherwise \code{false}.}
@@ -63,7 +65,7 @@ GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softma
 GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03))
 GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'Adam'), list(eta = 0.1, decay = 0.03))
 GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'NAdam'), list(eta = 0.1, decay = 0.03))
-GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'AdaMax'), list(eta = 0.1, decay = 0.03))
+GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'AdaMax'), list(eta = 0.1, decay = 0.03, assign0 = FALSE))
 GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'AMSGrad'), list(eta = 0.1, decay = 0.03))
 GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'SoftPlus', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03))
 GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'ISRU', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03))

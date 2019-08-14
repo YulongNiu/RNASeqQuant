@@ -14,16 +14,16 @@ header-includes:
   - \newcommand{\tildel}[1]{\widetilde{l_{#1}}}
   - \newcommand*{\diff}{\mathop{}\!\mathrm{d}}
 output:
-  BiocStyle::html_document:
-    toc: true
-    toc_float: true
-    includes:
-      before_body: header.html
   BiocStyle::pdf_document:
     toc: true
     latex_engine: pdflatex
     includes:
       in_header: header.tex
+  BiocStyle::html_document:
+    toc: true
+    toc_float: true
+    includes:
+      before_body: header.html
 vignette: >
   %\usepackage[utf8]{inputenc}
   %\VignetteIndexEntry{RNASeqQuant: an R package for RNA-Seq quantification}
@@ -343,10 +343,10 @@ x^{(n+1)} &= x^{(n)} - \frac{\eta}{\sqrt{G^{(n)}+ \epsilon}} g(x)^{(n)}
 
 \begin{equation}
 \begin{split}
-E[g^2]^{(n)} &= \lambda E[g^2]^{(n-1)} + (1-\lambda)g^2(x)^{(n)} \\
+E[g^2]^{(n)} &= \gamma E[g^2]^{(n-1)} + (1-\gamma)g^2(x)^{(n)} \\
 \Delta x^{(n)} &= - \frac{\sqrt{E[\Delta x^2]^{(n-1)}+\epsilon}}{\sqrt{E[g^2]^{(n)}+\epsilon}} g^{(n)} \\
 x^{(n+1)} &= x^{(n)} + \Delta x^{(n)} \\
-E[\Delta x^2]^{(n+1)} &= \lambda E[\Delta x^2]^{(n)} + (1-\lambda) \Delta x^{2(n)} \\
+E[\Delta x^2]^{(n+1)} &= \gamma E[\Delta x^2]^{(n)} + (1-\gamma) \Delta x^{2(n)} \\
 \end{split}
 (\#eq:20)
 \end{equation}
@@ -355,7 +355,7 @@ E[\Delta x^2]^{(n+1)} &= \lambda E[\Delta x^2]^{(n)} + (1-\lambda) \Delta x^{2(n
 
 \begin{equation}
 \begin{split}
-E[g^2]^{(n)} &= \lambda E[g^2]^{(n-1)} + (1-\lambda)g^2(x)^{(n)} \\
+E[g^2]^{(n)} &= \gamma E[g^2]^{(n-1)} + (1-\gamma)g^2(x)^{(n)} \\
 x^{(n+1)} &= x^{(n)} - \frac{\eta}{\sqrt{E[g^2]^{(n)}+\epsilon}} g(x)^{(n)}
 \end{split}
 (\#eq:21)

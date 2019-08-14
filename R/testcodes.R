@@ -90,18 +90,18 @@ gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), 600, 1024
 
 ## NRMSProp full batch
 emest <- EM(plist$efflen, plist$ec, plist$count, length(plist$efflen), detail = TRUE)
-gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), 600, 36580, list(af = 'Softmax', opt = 'NRMSProp'), list(eta = 0.005, decay = 0.003)) %>% .$counts
+gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), 1067, 36580, list(af = 'Softmax', opt = 'NRMSProp'), list(eta = 0.005, decay = 0.003, velocity = 0.98), TRUE)
 gdest <- NRMSPropW(plist$efflen, plist$ec, plist$count, 1/w, length(plist$efflen), 600, 36580, 0.005, list(af = 'Softmax'), list())
-gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), 600, 36580, list(af = 'Softmax', opt = 'NAdagrad'), list(eta = 0.7, decay = 0.00001)) %>% .$counts
+gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), 1067, 36580, list(af = 'Softmax', opt = 'NAdagrad'), list(eta = 0.7, decay = 0.0001))
 
 ## plot
-tibble(iter = c(1 : length(emest$ll), 1 : length(gdest$ll)),
-       ll = -c(emest$ll, gdest$ll),
-       method = c(rep('EM', length(emest$ll)), rep('GD', length(gdest$ll)))) %>%
-  slice(300 : length(emest$ll), (300 + length(emest$ll)) : (length(emest$ll) + length(emest$ll))) %>%
-  ggplot(aes(x = iter, y = ll, group = method)) +
-  geom_point(aes(color = method), size = 0.01)
-
+tibble(Iter = c(1 : length(emest$ll), 1 : length(gdest$ll)),
+       NLL = -c(emest$ll, gdest$ll),
+       method = c(rep('EM', length(emest$ll)), rep('Softmax', length(gdest$ll)))) %>%
+  filter(Iter >= 300) %>%
+  ggplot(aes(x = Iter, y = NLL, group = method)) +
+  geom_point(aes(color = method), size = 0.01) +
+  geom_hline(yintercept = -(emest$ll %>% .[length(.)]), linetype = 'dashed', color = 'gray')
 
 ## merge res
 mergeres <- cbind(kallistoest, emest$counts, gdest$counts)

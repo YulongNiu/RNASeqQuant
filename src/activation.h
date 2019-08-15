@@ -79,9 +79,9 @@ public:
 //' @inheritParams InvSqrtRoot
 //' @rdname gradient
 //' @keywords internal
-//=========//
-// ISRU    //
-//=========//
+//======//
+// ISRU //
+//======//
 class AFISRU : public AFmeasure {
 private:
   double alpha;

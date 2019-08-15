@@ -42,8 +42,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // GD
-Rcpp::List GD(const arma::vec& efflenraw, const Rcpp::CharacterVector& ecraw, const arma::uvec& countraw, const arma::uvec& spenum, const arma::uword epochs, const arma::uword batchsize, const Rcpp::List attrs, const Rcpp::List arguments, const bool details);
-RcppExport SEXP _RNASeqQuant_GD(SEXP efflenrawSEXP, SEXP ecrawSEXP, SEXP countrawSEXP, SEXP spenumSEXP, SEXP epochsSEXP, SEXP batchsizeSEXP, SEXP attrsSEXP, SEXP argumentsSEXP, SEXP detailsSEXP) {
+Rcpp::List GD(const arma::vec& efflenraw, const Rcpp::CharacterVector& ecraw, const arma::uvec& countraw, const arma::uvec& spenum, const Rcpp::List attrs, const Rcpp::List arguments, const arma::uword maxiter, const arma::uword miniter, const arma::uword batchsize, const bool details);
+RcppExport SEXP _RNASeqQuant_GD(SEXP efflenrawSEXP, SEXP ecrawSEXP, SEXP countrawSEXP, SEXP spenumSEXP, SEXP attrsSEXP, SEXP argumentsSEXP, SEXP maxiterSEXP, SEXP miniterSEXP, SEXP batchsizeSEXP, SEXP detailsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -51,12 +51,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const Rcpp::CharacterVector& >::type ecraw(ecrawSEXP);
     Rcpp::traits::input_parameter< const arma::uvec& >::type countraw(countrawSEXP);
     Rcpp::traits::input_parameter< const arma::uvec& >::type spenum(spenumSEXP);
-    Rcpp::traits::input_parameter< const arma::uword >::type epochs(epochsSEXP);
-    Rcpp::traits::input_parameter< const arma::uword >::type batchsize(batchsizeSEXP);
     Rcpp::traits::input_parameter< const Rcpp::List >::type attrs(attrsSEXP);
     Rcpp::traits::input_parameter< const Rcpp::List >::type arguments(argumentsSEXP);
+    Rcpp::traits::input_parameter< const arma::uword >::type maxiter(maxiterSEXP);
+    Rcpp::traits::input_parameter< const arma::uword >::type miniter(miniterSEXP);
+    Rcpp::traits::input_parameter< const arma::uword >::type batchsize(batchsizeSEXP);
     Rcpp::traits::input_parameter< const bool >::type details(detailsSEXP);
-    rcpp_result_gen = Rcpp::wrap(GD(efflenraw, ecraw, countraw, spenum, epochs, batchsize, attrs, arguments, details));
+    rcpp_result_gen = Rcpp::wrap(GD(efflenraw, ecraw, countraw, spenum, attrs, arguments, maxiter, miniter, batchsize, details));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -449,7 +450,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_RNASeqQuant_EM", (DL_FUNC) &_RNASeqQuant_EM, 7},
     {"_RNASeqQuant_EMSpe", (DL_FUNC) &_RNASeqQuant_EMSpe, 8},
-    {"_RNASeqQuant_GD", (DL_FUNC) &_RNASeqQuant_GD, 9},
+    {"_RNASeqQuant_GD", (DL_FUNC) &_RNASeqQuant_GD, 10},
     {"_RNASeqQuant_CountRepeat", (DL_FUNC) &_RNASeqQuant_CountRepeat, 1},
     {"_RNASeqQuant_CountEC", (DL_FUNC) &_RNASeqQuant_CountEC, 1},
     {"_RNASeqQuant_AdamW", (DL_FUNC) &_RNASeqQuant_AdamW, 10},

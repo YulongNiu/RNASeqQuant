@@ -177,12 +177,10 @@ Rcpp::List EM(const arma::vec& efflenraw,
     est = EMSingle(startest, efflen, ec, count);
 
     // stop iteration condition
-    uword nopassn = 0;
-    for (uword t = 0; t < tn; ++t) {
-      if (est(t) > countChangeLimit && (fabs(est(t) - startest(t))/est(t)) > countChange) {
-        ++nopassn;
-      } else {}
-    }
+    uword nopassn = sum((est > countChangeLimit) %
+                        ((abs(est - startest) / est) > countChange));
+
+    // Rcout << nopassn << "|" << iter << endl;
 
     if (nopassn == 0 && iter >= miniter - 1) {
       break;
@@ -261,12 +259,8 @@ Rcpp::List EMSpe(const arma::vec& efflenraw,
     est = LambdaSpe(eachlambda, spenum, spefixcounts);
 
     // stop iteration condition
-    uword nopassn = 0;
-    for (uword t = 0; t < tn; ++t) {
-      if (est(t) > countChangeLimit && (fabs(est(t) - startest(t))/est(t)) > countChange) {
-        ++nopassn;
-      } else {}
-    }
+    uword nopassn = sum((est > countChangeLimit) %
+                        ((abs(est - startest) / est) > countChange));
 
     if (nopassn == 0 && iter >= miniter - 1) {
       Rcout << "The iteration number is " << iter + 1

@@ -18,7 +18,6 @@ using namespace std;
 //' GD model for RNA-seq quantification. The equivalence class (ec) with 0 counts are removed, because these counts have no contributes to the final results.
 //'
 //' @title GD model
-//' @param epochs Iteration number.
 //' @param batchsize Mini-batch size, it should be smaller or equal to \code{epochs}.
 //' @param attrs Set active functions and optimization algorithms.
 //' \itemize{
@@ -47,27 +46,27 @@ using namespace std;
 //' ## ec4 1 0 0
 //' ## ec5 1 1 0
 //' plist <- list(ec = c('0,1,2', '1,2', '0,2', '0', '0,1'), count = rep(1, 5), efflen = rep(1, 3))
-//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
-//'   list(af = 'Softmax', opt = 'Adagrad'), list(eta = 0.5, decay = 0.03))
-//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+//' GD(plist$efflen, plist$ec, plist$count, spenum = 3,
+//'    list(af = 'Softmax', opt = 'Adagrad'), list(eta = 0.5, decay = 0.03))
+//' GD(plist$efflen, plist$ec, plist$count, spenum = 3,
 //'    list(af = 'Softmax', opt = 'NAdagrad'), list(eta = 0.5, decay = 0.03))
-//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+//' GD(plist$efflen, plist$ec, plist$count, spenum = 3,
 //'    list(af = 'Softmax', opt = 'Adadelta'), list(gamma = 0.8))
-//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+//' GD(plist$efflen, plist$ec, plist$count, spenum = 3,
 //'    list(af = 'Softmax', opt = 'RMSProp'), list(eta = 0.1, decay = 0.03))
-//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+//' GD(plist$efflen, plist$ec, plist$count, spenum = 3,
 //'    list(af = 'Softmax', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03))
-//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+//' GD(plist$efflen, plist$ec, plist$count, spenum = 3,
 //'    list(af = 'Softmax', opt = 'Adam'), list(eta = 0.1, decay = 0.03))
-//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+//' GD(plist$efflen, plist$ec, plist$count, spenum = 3,
 //'    list(af = 'Softmax', opt = 'NAdam'), list(eta = 0.1, decay = 0.03))
-//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+//' GD(plist$efflen, plist$ec, plist$count, spenum = 3,
 //'    list(af = 'Softmax', opt = 'AdaMax'), list(eta = 0.1, decay = 0.03, assign0 = FALSE))
-//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+//' GD(plist$efflen, plist$ec, plist$count, spenum = 3,
 //'    list(af = 'Softmax', opt = 'AMSGrad'), list(eta = 0.1, decay = 0.03))
-//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+//' GD(plist$efflen, plist$ec, plist$count, spenum = 3,
 //'    list(af = 'SoftPlus', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03))
-//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+//' GD(plist$efflen, plist$ec, plist$count, spenum = 3,
 //'    list(af = 'ISRU', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03))
 //'
 //' ## Two species
@@ -80,8 +79,8 @@ using namespace std;
 //' ## ec6 1  1  0  0  0
 //' plist <- list(ec = c('0,1,4', '0,2,3', '1,2', '3,4', '0,2,4', '0,1'),
 //'               count = rep(1, 6), efflen = rep(1, 5))
-//' GD(plist$efflen, plist$ec, plist$count, spenum = c(3, 2), 100, 1024,
-//'    list(af = 'Softmax', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03))
+//' GD(plist$efflen, plist$ec, plist$count, spenum = c(3, 2),
+//'    list(af = 'Softmax', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03), batchsize = 1024)
 //' @author Yulong Niu \email{yulong.niu@@hotmail.com}
 //' @export
 // [[Rcpp::export]]
@@ -89,15 +88,16 @@ Rcpp::List GD(const arma::vec& efflenraw,
               const Rcpp::CharacterVector& ecraw,
               const arma::uvec& countraw,
               const arma::uvec& spenum,
-              const arma::uword epochs,
-              const arma::uword batchsize,
               const Rcpp::List attrs,
               const Rcpp::List arguments,
+              const arma::uword maxiter = 10000,
+              const arma::uword miniter = 50,
+              const arma::uword batchsize = 1024,
               const bool details = false) {
 
   // stop iteration settings from kallisto
-  // double countChangeLimit = 1e-2
-  // double countChange = 1e-2
+  double countChangeLimit = 1e-2;
+  double countChange = 1e-2;
   double countLimit = 1e-8;
 
   // step1: pseudo information remove zero counts
@@ -113,14 +113,16 @@ Rcpp::List GD(const arma::vec& efflenraw,
   uword cn = sum(count);
   uword ecn = ec.size();
   uvec ftidx = FalseTIdx(ec, spenum);
-  vec resll(epochs, fill::zeros);
+  vec resll(maxiter, fill::zeros);
   // Glorot normal initializer/Xavier normal initializer
-  vec w = randn<vec>(tn) / sqrt(tn);
   // vec w(tn); w.fill(0.01);
+  vec est(tn, fill::zeros);
+  vec startw = randn<vec>(tn) / sqrt(tn);
+  vec w = startw;
 
   // gd settings
   if (!arguments.containsElementNamed("assign0") || arguments["assign0"]) {
-    w.elem(ftidx).fill(-1e8);
+    startw.elem(ftidx).fill(-1e8);
   } else {}
   double eta = arguments.containsElementNamed("eta") ? arguments["eta"] : 0.1;
   double decay = arguments.containsElementNamed("decay") ? arguments["decay"] : 0.03;
@@ -134,12 +136,15 @@ Rcpp::List GD(const arma::vec& efflenraw,
   vec grad = vec(tn);
   uvec idx = linspace<uvec>(0, ecn - 1, ecn);
   uword iter;
-  for (iter = 0; iter < epochs; ++iter) {
+  for (iter = 0; iter < maxiter; ++iter) {
 
     // Rcout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(af->AFCounts(w) * cn, efflen, ec, count) << std::endl;
 
+    est = af->AFCounts(w) * cn;
+
+    // record running details
     if (details) {
-      resll(iter) = LL(af->AFCounts(w) * cn, efflen, ec, count);
+      resll(iter) = LL(est, efflen, ec, count);
     } else {}
 
     idx = shuffle(idx);
@@ -158,16 +163,27 @@ Rcpp::List GD(const arma::vec& efflenraw,
 
       biter += batchsize;
     }
+
+    uword nopassn = sum((est > countChangeLimit) %
+                        (abs(1 - exp(w - startw)) > countChange));
+
+    if (nopassn == 0 && iter >= miniter - 1) {
+      break;
+    } else {
+      startw = w;
+    }
   }
 
+  // check if maxiter
+  if (iter == maxiter) {--iter;} else {}
+
   // step4: small est & no ec transcripts --> zero
-  vec est = af->AFCounts(w) * cn;
   est.elem(find(est < countLimit)).zeros();
 
   List res = List::create(_["counts"] = est,
-                          _["ll"] = resll.subvec(0, iter - 1));
+                          _["ll"] = resll.subvec(0, iter));
 
-  Rcout << "The iteration number is " << epochs
+  Rcout << "The iteration number is " << iter + 1
         << ". The log likelihood is " << std::setprecision (20) << LL(est, efflen, ec, count)
         << "." << std::endl;
 

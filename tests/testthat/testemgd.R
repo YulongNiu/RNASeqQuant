@@ -17,7 +17,7 @@ emest <- EM(plist$efflen, plist$ec, plist$count, length(plist$efflen))
 
 ## adam
 ## softmax
-gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), 300, 1024, list(af = 'Softmax', opt = 'Adam'), list(eta = 0.1, decay = 0.03)) %>% .$counts
+gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), list(af = 'Softmax', opt = 'NRMSProp'), list(eta = 0.005, decay = 0.003, velocity = 0.95, gamma = 0.8), batchsize = 36580)
 
 ## test1: count number
 test_that('Total number of reads in EM results', {
@@ -25,6 +25,6 @@ test_that('Total number of reads in EM results', {
 })
 
 test_that('Total number of reads in GD results', {
-  expect_equal(sum(plist$count), sum(gdest))
+  expect_equal(sum(plist$count), sum(gdest$counts))
 })
 ######################################################################

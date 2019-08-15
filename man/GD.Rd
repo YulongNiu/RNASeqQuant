@@ -4,7 +4,8 @@
 \alias{GD}
 \title{GD model}
 \usage{
-GD(efflenraw, ecraw, countraw, spenum, epochs, batchsize, attrs, arguments,
+GD(efflenraw, ecraw, countraw, spenum, attrs, arguments,
+  maxiter = 10000L, miniter = 50L, batchsize = 1024L,
   details = FALSE)
 }
 \arguments{
@@ -15,10 +16,6 @@ GD(efflenraw, ecraw, countraw, spenum, epochs, batchsize, attrs, arguments,
 \item{countraw}{A \code{arma::uvec} indicates the counts of ec.}
 
 \item{spenum}{A \code{arma::uvec} indicated the transcript number in each species.}
-
-\item{epochs}{Iteration number.}
-
-\item{batchsize}{Mini-batch size, it should be smaller or equal to \code{epochs}.}
 
 \item{attrs}{Set active functions and optimization algorithms.
 \itemize{
@@ -37,6 +34,12 @@ GD(efflenraw, ecraw, countraw, spenum, epochs, batchsize, attrs, arguments,
   \item \code{assign0}: used in "AdaMax" indicating whether assign 0 to transcripts that having no mapped reads. \code{FALSE} is recommended for "AdaMax".
   \item \code{gradientAF} and \code{countsAF}: customized active function for gradient and counts.
 }}
+
+\item{maxiter}{The maximum iteration number with the default value of 10000.}
+
+\item{miniter}{The minimum iteration number with the default value of 50.}
+
+\item{batchsize}{Mini-batch size, it should be smaller or equal to \code{epochs}.}
 
 \item{details}{A \code{bool} value.  When it is set as \code{true}, logistic likelihood and counts for each species in every iteration will be returned, otherwise \code{false}.}
 }
@@ -58,27 +61,27 @@ GD model for RNA-seq quantification. The equivalence class (ec) with 0 counts ar
 ## ec4 1 0 0
 ## ec5 1 1 0
 plist <- list(ec = c('0,1,2', '1,2', '0,2', '0', '0,1'), count = rep(1, 5), efflen = rep(1, 3))
-GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
-  list(af = 'Softmax', opt = 'Adagrad'), list(eta = 0.5, decay = 0.03))
-GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+GD(plist$efflen, plist$ec, plist$count, spenum = 3,
+   list(af = 'Softmax', opt = 'Adagrad'), list(eta = 0.5, decay = 0.03))
+GD(plist$efflen, plist$ec, plist$count, spenum = 3,
    list(af = 'Softmax', opt = 'NAdagrad'), list(eta = 0.5, decay = 0.03))
-GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+GD(plist$efflen, plist$ec, plist$count, spenum = 3,
    list(af = 'Softmax', opt = 'Adadelta'), list(gamma = 0.8))
-GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+GD(plist$efflen, plist$ec, plist$count, spenum = 3,
    list(af = 'Softmax', opt = 'RMSProp'), list(eta = 0.1, decay = 0.03))
-GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+GD(plist$efflen, plist$ec, plist$count, spenum = 3,
    list(af = 'Softmax', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03))
-GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+GD(plist$efflen, plist$ec, plist$count, spenum = 3,
    list(af = 'Softmax', opt = 'Adam'), list(eta = 0.1, decay = 0.03))
-GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+GD(plist$efflen, plist$ec, plist$count, spenum = 3,
    list(af = 'Softmax', opt = 'NAdam'), list(eta = 0.1, decay = 0.03))
-GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+GD(plist$efflen, plist$ec, plist$count, spenum = 3,
    list(af = 'Softmax', opt = 'AdaMax'), list(eta = 0.1, decay = 0.03, assign0 = FALSE))
-GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+GD(plist$efflen, plist$ec, plist$count, spenum = 3,
    list(af = 'Softmax', opt = 'AMSGrad'), list(eta = 0.1, decay = 0.03))
-GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+GD(plist$efflen, plist$ec, plist$count, spenum = 3,
    list(af = 'SoftPlus', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03))
-GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+GD(plist$efflen, plist$ec, plist$count, spenum = 3,
    list(af = 'ISRU', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03))
 
 ## Two species
@@ -91,8 +94,8 @@ GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
 ## ec6 1  1  0  0  0
 plist <- list(ec = c('0,1,4', '0,2,3', '1,2', '3,4', '0,2,4', '0,1'),
               count = rep(1, 6), efflen = rep(1, 5))
-GD(plist$efflen, plist$ec, plist$count, spenum = c(3, 2), 100, 1024,
-   list(af = 'Softmax', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03))
+GD(plist$efflen, plist$ec, plist$count, spenum = c(3, 2),
+   list(af = 'Softmax', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03), batchsize = 1024)
 }
 \author{
 Yulong Niu \email{yulong.niu@hotmail.com}

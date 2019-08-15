@@ -16,7 +16,6 @@ typedef arma::vec (*funcCountsPtr)(const arma::vec& w);
 
 class AFmeasure {
 public:
-  virtual ~AFmeasure() {};
 
   virtual arma::vec AFGradient(const arma::vec& w,
                                const std::vector<arma::vec>& efflen,
@@ -25,6 +24,9 @@ public:
                                const arma::uvec& idx) = 0;
 
   virtual arma::vec AFCounts(const arma::vec& w) = 0;
+
+  virtual ~AFmeasure() {};
+
 };
 
 #endif

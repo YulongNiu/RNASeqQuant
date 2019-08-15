@@ -77,7 +77,7 @@
 
 ## ## RNASeqQuant GD
 ## ## nice test
-## gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), 600, 1024, list(af = 'Softmax', opt = 'AdaMax'), list(eta = 0.1, decay = 0.001, assign0 = FALSE)) %>% .$counts
+## gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), list(af = 'Softmax', opt = 'AdaMax'), list(eta = 0.1, decay = 0.001, assign0 = FALSE), batchsize = 1024) %>% .$counts
 
 ## gdest <- AdamW(plist$efflen, plist$ec, plist$count, 1/w, length(plist$efflen), 500, 1024, 0.01, list(af = 'Softmax'), list())
 
@@ -91,9 +91,9 @@
 
 ## ## NRMSProp full batch
 ## emest <- EM(plist$efflen, plist$ec, plist$count, length(plist$efflen), detail = TRUE)
-## gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), 1067, 36580, list(af = 'Softmax', opt = 'NRMSProp'), list(eta = 0.005, decay = 0.003, velocity = 0.95, gamma = 0.8), TRUE)
+## gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), list(af = 'Softmax', opt = 'NRMSProp'), list(eta = 0.005, decay = 0.003, velocity = 0.95, gamma = 0.8), batchsize = 36580, details = TRUE)
 ## gdest <- NRMSPropW(plist$efflen, plist$ec, plist$count, 1/w, length(plist$efflen), 600, 36580, 0.005, list(af = 'Softmax'), list())
-## gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), 1067, 36580, list(af = 'Softmax', opt = 'NAdagrad'), list(eta = 0.7, decay = 0.0001))
+## gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), list(af = 'Softmax', opt = 'NAdagrad'), list(eta = 0.7, decay = 0.0001), batchsize = 36580, details = TRUE)
 
 ## ## plot
 ## tibble(Iter = c(1 : length(emest$ll), 1 : length(gdest$ll)),

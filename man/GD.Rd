@@ -58,17 +58,28 @@ GD model for RNA-seq quantification. The equivalence class (ec) with 0 counts ar
 ## ec4 1 0 0
 ## ec5 1 1 0
 plist <- list(ec = c('0,1,2', '1,2', '0,2', '0', '0,1'), count = rep(1, 5), efflen = rep(1, 3))
-GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'Adagrad'), list(eta = 0.5, decay = 0.03))
-GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'NAdagrad'), list(eta = 0.5, decay = 0.03))
-GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'Adadelta'), list(gamma = 0.8))
-GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'RMSProp'), list(eta = 0.1, decay = 0.03))
-GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03))
-GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'Adam'), list(eta = 0.1, decay = 0.03))
-GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'NAdam'), list(eta = 0.1, decay = 0.03))
-GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'AdaMax'), list(eta = 0.1, decay = 0.03, assign0 = FALSE))
-GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'AMSGrad'), list(eta = 0.1, decay = 0.03))
-GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'SoftPlus', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03))
-GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'ISRU', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03))
+GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+  list(af = 'Softmax', opt = 'Adagrad'), list(eta = 0.5, decay = 0.03))
+GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+   list(af = 'Softmax', opt = 'NAdagrad'), list(eta = 0.5, decay = 0.03))
+GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+   list(af = 'Softmax', opt = 'Adadelta'), list(gamma = 0.8))
+GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+   list(af = 'Softmax', opt = 'RMSProp'), list(eta = 0.1, decay = 0.03))
+GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+   list(af = 'Softmax', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03))
+GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+   list(af = 'Softmax', opt = 'Adam'), list(eta = 0.1, decay = 0.03))
+GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+   list(af = 'Softmax', opt = 'NAdam'), list(eta = 0.1, decay = 0.03))
+GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+   list(af = 'Softmax', opt = 'AdaMax'), list(eta = 0.1, decay = 0.03, assign0 = FALSE))
+GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+   list(af = 'Softmax', opt = 'AMSGrad'), list(eta = 0.1, decay = 0.03))
+GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+   list(af = 'SoftPlus', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03))
+GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+   list(af = 'ISRU', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03))
 
 ## Two species
 ##    f1 f2 f3 f1' f2'
@@ -80,7 +91,8 @@ GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'ISRU',
 ## ec6 1  1  0  0  0
 plist <- list(ec = c('0,1,4', '0,2,3', '1,2', '3,4', '0,2,4', '0,1'),
               count = rep(1, 6), efflen = rep(1, 5))
-GD(plist$efflen, plist$ec, plist$count, spenum = c(3, 2), 100, 1024, list(af = 'Softmax', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03))
+GD(plist$efflen, plist$ec, plist$count, spenum = c(3, 2), 100, 1024,
+   list(af = 'Softmax', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03))
 }
 \author{
 Yulong Niu \email{yulong.niu@hotmail.com}

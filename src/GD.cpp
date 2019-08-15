@@ -47,17 +47,28 @@ using namespace std;
 //' ## ec4 1 0 0
 //' ## ec5 1 1 0
 //' plist <- list(ec = c('0,1,2', '1,2', '0,2', '0', '0,1'), count = rep(1, 5), efflen = rep(1, 3))
-//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'Adagrad'), list(eta = 0.5, decay = 0.03))
-//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'NAdagrad'), list(eta = 0.5, decay = 0.03))
-//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'Adadelta'), list(gamma = 0.8))
-//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'RMSProp'), list(eta = 0.1, decay = 0.03))
-//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03))
-//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'Adam'), list(eta = 0.1, decay = 0.03))
-//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'NAdam'), list(eta = 0.1, decay = 0.03))
-//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'AdaMax'), list(eta = 0.1, decay = 0.03, assign0 = FALSE))
-//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'Softmax', opt = 'AMSGrad'), list(eta = 0.1, decay = 0.03))
-//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'SoftPlus', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03))
-//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024, list(af = 'ISRU', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03))
+//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+//'   list(af = 'Softmax', opt = 'Adagrad'), list(eta = 0.5, decay = 0.03))
+//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+//'    list(af = 'Softmax', opt = 'NAdagrad'), list(eta = 0.5, decay = 0.03))
+//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+//'    list(af = 'Softmax', opt = 'Adadelta'), list(gamma = 0.8))
+//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+//'    list(af = 'Softmax', opt = 'RMSProp'), list(eta = 0.1, decay = 0.03))
+//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+//'    list(af = 'Softmax', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03))
+//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+//'    list(af = 'Softmax', opt = 'Adam'), list(eta = 0.1, decay = 0.03))
+//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+//'    list(af = 'Softmax', opt = 'NAdam'), list(eta = 0.1, decay = 0.03))
+//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+//'    list(af = 'Softmax', opt = 'AdaMax'), list(eta = 0.1, decay = 0.03, assign0 = FALSE))
+//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+//'    list(af = 'Softmax', opt = 'AMSGrad'), list(eta = 0.1, decay = 0.03))
+//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+//'    list(af = 'SoftPlus', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03))
+//' GD(plist$efflen, plist$ec, plist$count, spenum = 3, 100, 1024,
+//'    list(af = 'ISRU', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03))
 //'
 //' ## Two species
 //' ##    f1 f2 f3 f1' f2'
@@ -69,7 +80,8 @@ using namespace std;
 //' ## ec6 1  1  0  0  0
 //' plist <- list(ec = c('0,1,4', '0,2,3', '1,2', '3,4', '0,2,4', '0,1'),
 //'               count = rep(1, 6), efflen = rep(1, 5))
-//' GD(plist$efflen, plist$ec, plist$count, spenum = c(3, 2), 100, 1024, list(af = 'Softmax', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03))
+//' GD(plist$efflen, plist$ec, plist$count, spenum = c(3, 2), 100, 1024,
+//'    list(af = 'Softmax', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03))
 //' @author Yulong Niu \email{yulong.niu@@hotmail.com}
 //' @export
 // [[Rcpp::export]]
@@ -88,10 +100,6 @@ Rcpp::List GD(const arma::vec& efflenraw,
   // double countChange = 1e-2
   double countLimit = 1e-8;
 
-  // gd settings
-  double eta = arguments.containsElementNamed("eta") ? arguments["eta"] : 0.1;
-  double decay = arguments.containsElementNamed("decay") ? arguments["decay"] : 0.03;
-
   // step1: pseudo information remove zero counts
   uvec zeros = find(countraw > 0);
   IntegerVector zerosidx(zeros.begin(), zeros.end());
@@ -106,24 +114,25 @@ Rcpp::List GD(const arma::vec& efflenraw,
   uword ecn = ec.size();
   uvec ftidx = FalseTIdx(ec, spenum);
   vec resll(epochs, fill::zeros);
-
   // Glorot normal initializer/Xavier normal initializer
   vec w = randn<vec>(tn) / sqrt(tn);
   // vec w(tn); w.fill(0.01);
+
+  // gd settings
   if (!arguments.containsElementNamed("assign0") || arguments["assign0"]) {
     w.elem(ftidx).fill(-1e8);
   } else {}
-
-  vec grad = vec(tn);
-  uvec idx = linspace<uvec>(0, ecn - 1, ecn);
+  double eta = arguments.containsElementNamed("eta") ? arguments["eta"] : 0.1;
+  double decay = arguments.containsElementNamed("decay") ? arguments["decay"] : 0.03;
 
   // active function
   std::shared_ptr<AFmeasure> af = AFfactory().createAF(attrs, arguments);
-
   // GD method
   std::shared_ptr<Optimizer> gd = Optfactory().createOpt(tn, attrs, arguments);
 
   // step3: gradient decent
+  vec grad = vec(tn);
+  uvec idx = linspace<uvec>(0, ecn - 1, ecn);
   uword iter;
   for (iter = 0; iter < epochs; ++iter) {
 

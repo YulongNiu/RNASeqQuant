@@ -81,9 +81,9 @@ gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), list(af =
 
 gdest <- AdamW(plist$efflen, plist$ec, plist$count, 1/w, length(plist$efflen), 500, 1024, 0.01, list(af = 'Softmax'), list())
 
-gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), 600, 1024, list(af = 'Softmax', opt = 'AMSGrad'), list(eta = 0.07, decay = 0.003)) %>% .$counts
+gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), list(af = 'Softmax', opt = 'AMSGrad'), list(eta = 0.07, decay = 0.003), maxiter = 500)
 
-gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), 600, 1024, list(af = 'Softmax', opt = 'Adam'), list(eta = 0.1, decay = 0.03)) %>% .$counts
+gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), list(af = 'Softmax', opt = 'Adam'), list(eta = 0.1, decay = 0.03), maxiter = 500)
 
 gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), 600, 1024, list(af = 'Softmax', opt = 'NAdam'), list(eta = 0.1, decay = 0.03)) %>% .$counts
 
@@ -92,6 +92,7 @@ gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), 600, 1024
 ## NRMSProp full batch
 emest <- EM(plist$efflen, plist$ec, plist$count, length(plist$efflen), detail = TRUE)
 gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), list(af = 'Softmax', opt = 'NRMSProp'), list(eta = 0.005, decay = 0.003, velocity = 0.95, gamma = 0.8), batchsize = 36580, details = TRUE)
+gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), list(af = 'Softmax', opt = 'AMSGrad'), list(eta = 0.005, decay = 0.003, velocity = 0.95, gamma = 0.8), batchsize = 36580, miniter = 1000, details = TRUE)
 gdest <- NRMSPropW(plist$efflen, plist$ec, plist$count, 1/w, length(plist$efflen), 600, 36580, 0.005, list(af = 'Softmax'), list())
 gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), list(af = 'Softmax', opt = 'NAdagrad'), list(eta = 0.7, decay = 0.0001), batchsize = 36580, details = TRUE)
 

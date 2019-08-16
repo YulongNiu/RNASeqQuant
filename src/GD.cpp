@@ -116,13 +116,11 @@ Rcpp::List GD(const arma::vec& efflenraw,
   vec resll(maxiter, fill::zeros);
   // Glorot normal initializer/Xavier normal initializer
   // vec w(tn); w.fill(0.01);
-  vec est(tn, fill::zeros);
-  vec startw = randn<vec>(tn) / sqrt(tn);
-  vec w = startw;
+  vec w = randn<vec>(tn) / sqrt(tn);
 
   // gd settings
   if (!arguments.containsElementNamed("assign0") || arguments["assign0"]) {
-    startw.elem(ftidx).fill(-1e8);
+    w.elem(ftidx).fill(-1e8);
   } else {}
   double eta = arguments.containsElementNamed("eta") ? arguments["eta"] : 0.1;
   double decay = arguments.containsElementNamed("decay") ? arguments["decay"] : 0.03;
@@ -132,19 +130,19 @@ Rcpp::List GD(const arma::vec& efflenraw,
   // GD method
   std::shared_ptr<Optimizer> gd = Optfactory().createOpt(tn, attrs, arguments);
 
+  vec startest = af->AFCounts(w) * cn;
+  vec est(tn, fill::zeros);
+
   // step3: gradient decent
   vec grad = vec(tn);
   uvec idx = linspace<uvec>(0, ecn - 1, ecn);
   uword iter;
   for (iter = 0; iter < maxiter; ++iter) {
-
     // Rcout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(af->AFCounts(w) * cn, efflen, ec, count) << std::endl;
-
-    est = af->AFCounts(w) * cn;
 
     // record running details
     if (details) {
-      resll(iter) = LL(est, efflen, ec, count);
+      resll(iter) = LL(startest, efflen, ec, count);
     } else {}
 
     idx = shuffle(idx);
@@ -164,13 +162,17 @@ Rcpp::List GD(const arma::vec& efflenraw,
       biter += batchsize;
     }
 
+    est = af->AFCounts(w) * cn;
+
     uword nopassn = sum((est > countChangeLimit) %
-                        (abs(1 - exp(w - startw)) > countChange));
+                        (abs(est - startest) > countChange));
+
+    // Rcout << nopassn << endl;
 
     if (nopassn == 0 && iter >= miniter - 1) {
       break;
     } else {
-      startw = w;
+      startest = est;
     }
   }
 

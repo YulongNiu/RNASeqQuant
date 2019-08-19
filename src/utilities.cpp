@@ -225,3 +225,23 @@ arma::uvec FalseTIdx(const std::vector<arma::uvec>& ec,
 
   return find(ftIdx == 0);
 }
+
+// [[Rcpp::export]]
+arma::vec PreInit(const std::vector<arma::vec>& efflen,
+                  const std::vector<arma::uvec>& ec,
+                  const arma::uvec& count,
+                  const arma::uvec& spenum) {
+  vec init(sum(spenum), fill::zeros);
+
+  for (uword i = 0; i < ec.size(); ++i) {
+    vec eachcp = 1 / efflen[i];
+    init.elem(ec[i]) += eachcp * count(i) / sum(eachcp);
+  }
+
+  vec initnorm = init / sum(init);
+  for (uword i = 0; i < initnorm.n_elem; ++i) {
+    initnorm[i] = (initnorm[i] == 0) ? -1e8 : log(initnorm[i]);
+  }
+
+  return initnorm;
+}

@@ -74,7 +74,7 @@ arma::vec EMSingle(const arma::vec& startest,
 
   for (uword i = 0; i < ec.size(); ++i) {
     vec eachcp = startest.elem(ec[i]) / efflen[i];
-    estcount.elem(ec[i]) += eachcp * count(i)/ sum(eachcp);
+    estcount.elem(ec[i]) += eachcp * count(i) / sum(eachcp);
   }
 
   return estcount;

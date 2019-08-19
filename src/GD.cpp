@@ -112,15 +112,21 @@ Rcpp::List GD(const arma::vec& efflenraw,
   uword tn = sum(spenum);
   uword cn = sum(count);
   uword ecn = ec.size();
-  uvec ftidx = FalseTIdx(ec, spenum);
   vec resll(maxiter, fill::zeros);
+
+  //~~~~~~~~~~~~~~~~~old init~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Glorot normal initializer/Xavier normal initializer
   // vec w(tn); w.fill(0.01);
   vec w = randn<vec>(tn) / sqrt(tn);
+  uvec ftidx = FalseTIdx(ec, spenum);
+  w.elem(ftidx).fill(-1e8);
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  // vec w = PreInit(efflen, ec, count, spenum);
 
   // gd settings
-  if (!arguments.containsElementNamed("assign0") || arguments["assign0"]) {
-    w.elem(ftidx).fill(-1e8);
+  if (arguments.containsElementNamed("assign0") && !arguments["assign0"]) {
+    w.elem(find(w < -1e7)).fill(0.01);
   } else {}
   double eta = arguments.containsElementNamed("eta") ? arguments["eta"] : 0.1;
   double decay = arguments.containsElementNamed("decay") ? arguments["decay"] : 0.03;

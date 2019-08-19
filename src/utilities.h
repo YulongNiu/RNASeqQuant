@@ -33,4 +33,9 @@ arma::uvec TrueTIdx(const std::vector<arma::uvec>& ec);
 arma::uvec FalseTIdx(const std::vector<arma::uvec>& ec,
                      const arma::uvec& spenum);
 
+arma::vec PreInit(const std::vector<arma::vec>& efflen,
+                  const std::vector<arma::uvec>& ec,
+                  const arma::uvec& count,
+                  const arma::uvec& spenum);
+
 #endif

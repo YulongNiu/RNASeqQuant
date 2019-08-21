@@ -144,7 +144,7 @@ Rcpp::List GD(const arma::vec& efflenraw,
   uvec idx = linspace<uvec>(0, ecn - 1, ecn);
   uword iter;
   for (iter = 0; iter < maxiter; ++iter) {
-    Rcout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LogSumExp1(w) << "|" << LL(af->AFCounts(w) * cn, efflen, ec, count) << std::endl;
+    Rcout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(af->AFCounts(w) * cn, efflen, ec, count) << std::endl;
 
     // record running details
     if (details) {

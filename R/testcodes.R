@@ -7,6 +7,7 @@ library('magrittr')
 library('readr')
 
 sourceCpp('../src/GD.cpp')
+sourceCpp('../src/ODE.cpp')
 ## sourceCpp('../src/WGD.cpp')
 sourceCpp('../src/EM.cpp')
 source('ec.R')
@@ -43,6 +44,8 @@ GD(plist$efflen, plist$ec, plist$count, spenum = 3, list(af = 'Softmax', opt = '
 GD(plist$efflen, plist$ec, plist$count, spenum = 3, list(af = 'Softmax', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03)) %>% .$counts
 GD(plist$efflen, plist$ec, plist$count, spenum = 3, list(af = 'SoftPlus', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03)) %>% .$counts
 GD(plist$efflen, plist$ec, plist$count, spenum = 3, list(af = 'ISRU', opt = 'NRMSProp'), list(eta = 0.1, decay = 0.03)) %>% .$counts
+
+RK45(plist$efflen, plist$ec, plist$count, length(plist$efflen), list(af = 'Softmax'), list(eta = 0.1, decay = 0), maxiter = 50) %>% .$counts
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -105,9 +108,9 @@ gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), list(af =
 gdest <- NRMSPropW(plist$efflen, plist$ec, plist$count, 1/w, length(plist$efflen), 600, 36580, 0.005, list(af = 'Softmax'), list())
 gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), list(af = 'Softmax', opt = 'NAdagrad'), list(eta = 0.7, decay = 0.0001), batchsize = 36580, details = TRUE)
 
-gdestx <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), list(af = 'Softmax', opt = 'NRMSProp'), list(eta = 0.005, decay = 0.003, velocity = 0.95, gamma = 0.8), maxiter = 600, batchsize = 36580, details = TRUE)
+## ODE
+odeest <- RK4(plist$efflen, plist$ec, plist$count, length(plist$efflen), list(af = 'Softmax'), list(eta = 0.00001, decay = 0), maxiter = 600, batchsize = 36580, details = TRUE)
 
-## plot
 tibble(Iter = c(1 : length(emest$ll), 1 : length(gdest$ll), 1 : length(gdestx$ll)),
        NLL = -c(emest$ll, gdest$ll, gdestx$ll),
        method = c(rep('EM', length(emest$ll)), rep('Softmax', length(gdest$ll)), rep('Xavier', length(gdestx$ll)))) %>%

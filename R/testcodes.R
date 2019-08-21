@@ -76,7 +76,16 @@ emest <- EM(plist$efflen, plist$ec, plist$count, c(10000, 10000, 21392), detail 
 emest <- EM(plist$efflen, plist$ec, plist$count, 41392, detail = TRUE)
 
 ## RNASeqQuant GD
-## nice test
+## test vanilla
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), list(af = 'Softmax', opt = 'Momentum'), list(eta = 0.00001, decay = 0), maxiter = 600, batchsize = 36580)
+
+gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), list(af = 'Softmax', opt = 'NAG'), list(eta = 0.000001, decay = 0), maxiter = 600, batchsize = 36580)
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), list(af = 'Softmax', opt = 'NRMSProp'), list(eta = 0.005, decay = 0.003, velocity = 0.95, gamma = 0.8), maxiter = 600, batchsize = 36580)
+
+
 gdest <- GD(plist$efflen, plist$ec, plist$count, length(plist$efflen), list(af = 'Softmax', opt = 'AdaMax'), list(eta = 0.1, decay = 0.001), maxiter = 600, batchsize = 1024)
 
 gdest <- AdamW(plist$efflen, plist$ec, plist$count, 1/w, length(plist$efflen), 500, 1024, 0.01, list(af = 'Softmax'), list())
@@ -120,6 +129,49 @@ set.seed(12345)
 w <- rnorm(41392, 0, sqrt(1/41392))
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+##~~~~~~~~~~~~~~~~~~~~~~~~test ODE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+library('deSolve')
+
+LogSumExp1 <- function(x) {
+  maxx <- max(x)
+
+  return(maxx + log(sum(exp(x - maxx))))
+}
+
+Softmax1 <- function(x, y) {
+  return(exp(x - LogSumExp1(y)))
+}
+
+testGD <- function(t, state, ...) {
+
+  with(as.list(c(state)), {
+    dx1 <- -5 * Softmax1(x1, c(x1, x2, x3)) + Softmax1(x1, c(x1, x2, x3)) + Softmax1(x1, c(x1, x3)) + 1 + Softmax1(x1, c(x1, x2))
+    dx2 <- -5 * Softmax1(x2, c(x1, x2, x3)) + Softmax1(x2, c(x1, x2, x3)) + Softmax1(x2, c(x2, x3)) + Softmax1(x2, c(x1, x2))
+    dx3 <- -5 * Softmax1(x3, c(x1, x2, x3)) + Softmax1(x3, c(x1, x2, x3)) + Softmax1(x3, c(x2, x3)) + Softmax1(x3, c(x1, x3))
+    list(c(dx1, dx2, dx3))
+  })
+
+}
+
+state <- c(x1 = 0.01, x2 = 0.01, x3 = 0.01)
+times <- seq(0, 100, by = 0.01)
+out <- ode(y = state, times = times, func = testGD, parms = NULL, method = 'ode45')
+
+
+state <- c(x1 = 0.01, x2 = 0.01, x3 = 0.01)
+state <- c(X = 1, Y = 1, Z = 1)
+Lorenz <- function(t, state, parameters) {
+  with(as.list(c(state, parameters)), {
+    dX <- a*X + Y*Z
+    dY <- b * (Y-Z)
+    dZ <- -X*Y + c*Y - Z
+    list(c(dX, dY, dZ))
+  })
+}
+times <- seq(0, 100, by = 0.01)
+out <- ode(y = state, times = times, func = Lorenz, parms = parameters)
+
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## RNASeqEM:::start_profiler("profile.out")
 ## tmp1 <- RNASeqEM:::LogSumExpRatio1(rnorm(1:10000))

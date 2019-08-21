@@ -117,12 +117,12 @@ Rcpp::List GD(const arma::vec& efflenraw,
   //~~~~~~~~~~~~~~~~~old init~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Glorot normal initializer/Xavier normal initializer
   // vec w(tn); w.fill(0.01);
-  vec w = randn<vec>(tn) / sqrt(tn);
-  uvec ftidx = FalseTIdx(ec, spenum);
-  w.elem(ftidx).fill(-1e8);
+  // vec w = randn<vec>(tn) / sqrt(tn);
+  // uvec ftidx = FalseTIdx(ec, spenum);
+  // w.elem(ftidx).fill(-1e8);
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  // vec w = PreInit(efflen, ec, count, spenum);
+  vec w = PreInit(efflen, ec, count, spenum);
 
   // gd settings
   if (arguments.containsElementNamed("assign0") && !arguments["assign0"]) {
@@ -144,7 +144,7 @@ Rcpp::List GD(const arma::vec& efflenraw,
   uvec idx = linspace<uvec>(0, ecn - 1, ecn);
   uword iter;
   for (iter = 0; iter < maxiter; ++iter) {
-    // Rcout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LL(af->AFCounts(w) * cn, efflen, ec, count) << std::endl;
+    Rcout << std::setprecision (10) << min(w) << "|" << max(w) << "|" << LogSumExp1(w) << "|" << LL(af->AFCounts(w) * cn, efflen, ec, count) << std::endl;
 
     // record running details
     if (details) {
